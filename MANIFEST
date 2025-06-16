@@ -5,6 +5,8 @@ prepare.sql
 create.sql
 insert.sql
 
+README.md
+
 st.sh
 
 # CLI API
@@ -20,8 +22,9 @@ st.sh
 #   -d|--diff|diff <gid1> <filename> [gid2]
 #	# diff the given gid1 of filename against one in current dir or
 #	# against gid2 one if given
-#   -e|--extract|extract <gid> <filename>
-#	# extract path/file.ext as path/file#gid.ext
+#   -e|--extract|extract <all [gid]|<gid> <filename>>
+#	# extract all files at latest or given gid into the current dir
+#	# if it is empty; or extract path/file.ext as path/file#gid.ext
 #   -p|--print|print <gid> <filename>
 #	# print the given generation's file to stdout
 #   -l|--list|list [gid] # list gid x created x tag -or- all files for gid

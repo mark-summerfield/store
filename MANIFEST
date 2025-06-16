@@ -1,3 +1,5 @@
+# TODO try out Tcllib rcs to create and apply patches
+
 store
 app-1.tm
 
@@ -8,6 +10,11 @@ insert.sql
 README.md
 
 st.sh
+
+# When adding a file to a new generation run 2 additional threads:
+#   - gzip the file
+#   - diff the file to the previous (if there was one)
+# then use smallest of raw, gzipped, diff and set kind accordingly
 
 # CLI API
 #   # default action is store with no message (creating dirname.str if

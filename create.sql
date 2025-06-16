@@ -11,7 +11,6 @@ CREATE TABLE Generations (
 CREATE VIEW ViewGenerations AS
     SELECT gid, DATETIME(created) AS created, message FROM Generations;
 
-
 -- kind
 --  R raw bytes (the actual file)
 --  Z gzip compressed raw bytes (the actual file)

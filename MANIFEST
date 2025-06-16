@@ -1,6 +1,39 @@
 store.tcl
 app-1.tm
 
+prepare.sql
+create.sql
+insert.sql
+
 st.sh
+
+# CLI API
+#   # default action is store with no message (creating dirname.str if
+#	it doesn't exist)
+#   -m|--message|message <any text> # store with this message
+#
+#   -h|--help|help # usage
+#   --version|version
+# 
+#   -v|--verbose|verbose # give more info on action
+#
+#   -d|--diff|diff <gid1> <filename> [gid2]
+#	# diff the given gid1 of filename against one in current dir or
+#	# against gid2 one if given
+#   -e|--extract|extract <gid> <filename>
+#	# extract path/file.ext as path/file#gid.ext
+#   -p|--print|print <gid> <filename>
+#	# print the given generation's file to stdout
+#   -l|--list|list [gid] # list gid x created x tag -or- all files for gid
+#   -g|--globs|globs # list includes & excludes
+#   -i|--include|include <dirname> <glob|filename>
+#	# include on subsequent stores
+#   -E|--exclude|exclude <dirname> <glob|filename>
+#	# don't include on subsequent stores
+#   --drop|drop <dirname> <glob|filename> # ignore on subsequent stores
+#   -P|--purge|purge <filename>
+#	# delete the given filename in every generation and add the
+#	# filename to the excludes (use this for unintentionally stored
+#	# files)
 
 # vim: syn=yaml

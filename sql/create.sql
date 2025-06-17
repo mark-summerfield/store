@@ -9,7 +9,10 @@ CREATE TABLE Generations (
 );
 
 CREATE VIEW ViewGenerations AS
-    SELECT gid, DATETIME(created) AS created, message FROM Generations;
+    SELECT gid, DATETIME(created) AS created, message FROM Generations
+    ORDER BY gid DESC;
+
+CREATE VIEW LastGeneration AS SELECT MAX(gid) FROM Generations;
 
 -- kind
 --  R raw bytes (the actual file); usize set; zsize NULL

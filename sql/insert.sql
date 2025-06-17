@@ -1,0 +1,31 @@
+-- Copyright © 2025 Mark Summerfield. All Rights Reserved.
+
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.bak');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.class');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.dll');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.exe');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.jar');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.jpeg');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.jpg');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.ld');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.ldx');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.li');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.lix');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.o');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.obj');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.png');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.rs.bk');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.so*');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.sw[nop]');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.syso');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*.tmp');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '*~');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', '__pycache__');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'build');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'dist');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'moc_*.cpp');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'qrc_*.cpp');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'tags');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'target');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'test.*');
+INSERT INTO Excludes (folder, pattern) VALUES ('.', 'zOld');

@@ -1,24 +1,41 @@
-# TODO try out Tcllib rcs to create and apply patches
-
 store
 app-1.tm
 
-prepare.sql
-create.sql
-insert.sql
+test_diff.tcl # TODO try RCS; try struct::list LCS
+
+sql/prepare.sql
+sql/create.sql
+sql/insert.sql
 
 README.md
 
 st.sh
 
-# When adding a file to a new generation run 2 additional threads:
-#   - gzip the file
-#   - diff the file to the previous (if there was one)
-# then use smallest of raw, gzipped, diff and set kind accordingly
+# Algorithm for storing a file in a new generation
+#
+#   if the file is new
+#	read file
+#	gzip file
+#	store R or r into data whichever is smaller
+#	set usize and if r set zsize
+#   else if the file is in a previous generation
+#	read prev R or r version (skipping back if = or D or d)
+#	    and prev usize and prev zsize
+#	read file
+#	if usize == prev usize and data == prev data
+#	    set = and set pgid
+#	else
+#	    parallel: gzip x diff vs prev x diff vs prev gzip
+#	    store R or r or D or d into data whichever is smaller
+#	    set usize and if r or d set zsize
+#	    if D or d set pgid
 
 # CLI API
-#   # default action is store with no message (creating dirname.str if
-#	it doesn't exist)
+#   default action is store with no message
+#	creates dirname.str if it doesn't exist
+#	hidden files are ignored by default
+#	excluded files are ignored
+#	subdirs are included by default
 #   -m|--message|message <any text> # store with this message
 #
 #   -h|--help|help # usage
@@ -26,23 +43,31 @@ st.sh
 # 
 #   -v|--verbose|verbose # give more info on action
 #
-#   -d|--diff|diff <gid1> <filename> [gid2]
-#	# diff the given gid1 of filename against one in current dir or
-#	# against gid2 one if given
-#   -e|--extract|extract <all [gid]|<gid> <filename>>
-#	# extract all files at latest or given gid into the current dir
-#	# if it is empty; or extract path/file.ext as path/file#gid.ext
-#   -p|--print|print <gid> <filename>
-#	# print the given generation's file to stdout
-#   -l|--list|list [gid] # list gid x created x tag -or- all files for gid
-#   -g|--globs|globs # list includes & excludes
-#   -i|--include|include <dirname> <glob|filename>
-#	# include on subsequent stores
-#   -E|--exclude|exclude <dirname> <glob|filename>
-#	# don't include on subsequent stores
-#   --drop|drop <dirname> <glob|filename> # ignore on subsequent stores
+#   -g|--gui|gui # launch GUI
+#   -d|--diff|diff <last|gid1> [last|gid2] <filename> 
+#	# diff the last or given gid1 of filename against one in current
+#	# dir or against last or gid2 if given
+#   -e|--extract|extract <last|gid> [filename1 [filename2 [... filenameN]]]>
+#	# extract all files at last or given gid into the current dir or
+#	# the specified files using naming
+#	# path/filename1.ext → path/filename1#gid.ext etc
+#   -r|--restore|restore <last|gid> [filename1 [filename2 [... filenameN]]]>
+#	# restore all files at last or given gid into the current dir or
+#	# the specified files using their original names _overwriting_ the
+#	# current versions; if _any_ of the files to be overwritten has
+#	# unstored changes, does _nothing_ and reports the problem
+#   -p|--print|print <last|gid> <filename1>
+#	# print the latest or given generation's filenames to stdout
+#   -l|--list|list [last|gid]
+#	# lists all generations (gid x created x tag)
+#	# or lists last or given gid's filenames
+#   -E|--exclude|exclude [<dirname> <glob|filename>]
+#	# if given no args, lists all current excludes dirname x pattern;
+#	# otherwise adds given dirname x pattern to excludes
+#   --drop|drop <dirname> <glob|filename>
+#	# drops given dirname x pattern from excludes
 #   -P|--purge|purge <filename>
-#	# delete the given filename in every generation and add the
+#	# delete the given filename in every generation and adds the
 #	# filename to the excludes (use this for unintentionally stored
 #	# files)
 

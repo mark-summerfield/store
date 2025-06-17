@@ -5,4 +5,3 @@ namespace eval app {}
 proc app::main {} {
     puts store
 }
-

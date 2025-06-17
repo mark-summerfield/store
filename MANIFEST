@@ -1,5 +1,6 @@
 store
 app-1.tm
+globals-1.tm
 
 sql/prepare.sql
 sql/create.sql

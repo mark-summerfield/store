@@ -1,8 +1,6 @@
 store
 app-1.tm
 
-test_diff.tcl # TODO try RCS; try struct::list LCS
-
 sql/prepare.sql
 sql/create.sql
 sql/insert.sql

@@ -1,0 +1,11 @@
+filestore.go
+
+filestore_test.go
+
+README.md
+
+go.mod
+
+st.sh
+
+# vim: syn=yaml

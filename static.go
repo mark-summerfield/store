@@ -19,4 +19,13 @@ var SQL_INSERT string
 
 const (
 	DRIVER = "sqlite"
+
+	SQL_EXCLUDES = `SELECT folder, pattern FROM Excludes
+					ORDER BY folder, pattern;`
+	SQL_GID_FOR_FILENAME = `SELECT gid FROM Files WHERE filename = ?
+							LIMIT 1;`
+	SQL_GET_FILE = `SELECT gid, kind, usize, zsize, data FROM Files
+					WHERE kind IN ('R', 'r') AND filename = ?
+					ORDER BY gid DESC LIMIT 1;`
+	SQL_NEW_GEN = "INSERT INTO Generations (message) VALUES (?);"
 )

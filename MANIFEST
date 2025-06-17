@@ -1,6 +1,10 @@
 filestore.go
-static.go
+files.go # TODO Add(filename ...string)
+generations.go
+excludes.go
+kind.go
 db.go
+static.go
 
 filestore_test.go
 

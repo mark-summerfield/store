@@ -34,7 +34,8 @@ CREATE TABLE Files (
     PRIMARY KEY(gid, filename)
 );
 
--- hidden files are excluded by default; subdirs are included by default
+-- the application is assumed to exclude hidden files by default and to
+-- include subdirs by default
 CREATE TABLE Excludes (
     folder TEXT NOT NULL, -- the (relative) folder to apply the glob to
     pattern TEXT KEY NOT NULL, -- glob or filename to exclude

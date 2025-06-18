@@ -17,8 +17,6 @@ CREATE VIEW LastGeneration AS SELECT MAX(gid) FROM Generations;
 -- kind
 --  R raw bytes (the actual file); usize set; zsize NULL
 --  r gzip compressed raw bytes (the actual file); usize & zsize set
---  D diff from record whose gid is pgid; usize set; zsize NULL
---  d diff gzip compressed from record whose gid is pgid; usize & zsize set
 --  = unchanged from record whose gid is pgid; usize & zsize & data NULL
 CREATE TABLE Files (
     gid INTEGER NOT NULL, -- generation ID
@@ -29,7 +27,7 @@ CREATE TABLE Files (
     pgid INTEGER,
     data BLOB,
 
-    CHECK(kind IN ('R', 'r', 'D', 'd', '=')),
+    CHECK(kind IN ('R', 'r', '=')),
     CHECK(usize IS NULL OR usize > 0),
     CHECK(zsize IS NULL OR zsize > 0),
     FOREIGN KEY(pgid) REFERENCES Generations(gid),

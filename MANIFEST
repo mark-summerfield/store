@@ -18,16 +18,16 @@ st.sh
 #	store R or r into data whichever is smaller
 #	set usize and if r set zsize
 #   else if the file is in a previous generation
-#	read prev R or r version (skipping back if = or D or d)
-#	    and prev usize and prev zsize
 #	read file
-#	if usize == prev usize and data == prev data
+#	if prev is R and usize == prev usize and data == prev data
 #	    set = and set pgid
 #	else
-#	    parallel: gzip x diff vs prev x diff vs prev gzip
-#	    store R or r or D or d into data whichever is smaller
-#	    set usize and if r or d set zsize
-#	    if D or d set pgid
+#	    gzip file
+#	    if prev is r and zsize == prev zsize and data == prev data
+#	        set = and set pgid
+#	    else
+#	    	store R or r into data whichever is smaller
+#	    	set usize and if r set zsize
 
 # CLI API
 #   default action is store with no message

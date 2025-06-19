@@ -4,6 +4,8 @@ package require misc
 package require sqlite3 3
 
 oo::class create Store {
+    variable filename
+    variable db
 
     constructor filename_ {
         variable filename

@@ -12,15 +12,12 @@ oo::class create Store {
         set filename $filename_
         set exists [file isfile $filename]
         variable db
-        set db ::STORE#[clock micro]
+        set db ::STORE#[clock clicks]
         sqlite3 $db $filename
-        set sql [misc::read_file $::APPPATH/sql/prepare.sql]
-        $db eval $sql
+        $db eval [misc::read_file $::APPPATH/sql/prepare.sql] 
         if {!$exists} {
-            set sql [misc::read_file $::APPPATH/sql/create.sql]
-            $db eval $sql
-            set sql [misc::read_file $::APPPATH/sql/insert.sql]
-            $db eval $sql
+            $db eval [misc::read_file $::APPPATH/sql/create.sql] 
+            $db eval [misc::read_file $::APPPATH/sql/insert.sql] 
         }
     }
 

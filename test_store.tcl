@@ -8,8 +8,10 @@ package require misc
 package require store
 
 proc test1 {} {
+    set filename /tmp/test1.db
+    file delete $filename
     puts [misc::sqlite_version]
-    set st [Store new /tmp/test1.db]
+    set st [Store new $filename]
     puts "store=$st is_closed=[$st is_closed]"
     $st destroy 
 }

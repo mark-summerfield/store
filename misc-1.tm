@@ -2,11 +2,12 @@
 
 namespace eval misc {}
 
-proc misc::read_file filename {
+proc misc::read_utf8 filename {
     set fh [open $filename]
-    set data [read $fh]
+    chan configure $fh -encoding utf-8
+    set text [read $fh]
     close $fh
-    return $data
+    return $text
 }
 
 proc misc::sqlite_version {} {

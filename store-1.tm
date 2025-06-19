@@ -14,10 +14,10 @@ oo::class create Store {
         variable db
         set db ::STORE#[clock clicks]
         sqlite3 $db $filename
-        $db eval [misc::read_file $::APPPATH/sql/prepare.sql] 
+        $db eval [misc::read_utf8 $::APPPATH/sql/prepare.sql] 
         if {!$exists} {
-            $db eval [misc::read_file $::APPPATH/sql/create.sql] 
-            $db eval [misc::read_file $::APPPATH/sql/insert.sql] 
+            $db eval [misc::read_utf8 $::APPPATH/sql/create.sql] 
+            $db eval [misc::read_utf8 $::APPPATH/sql/insert.sql] 
         }
     }
 

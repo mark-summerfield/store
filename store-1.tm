@@ -35,6 +35,12 @@ oo::class create Store {
         variable db
         catch {$db version}
     }
+
+    method last_generation {} {
+        variable db
+        set gid [$db eval {SELECT * FROM LastGeneration}]
+        expr {$gid == "{}" ? 0 : int($gid)}
+    }
 }
 
 # Algorithm for storing a file in a new generation

@@ -13,6 +13,7 @@ proc test1 {} {
     puts [misc::sqlite_version]
     set st [Store new $filename]
     puts "store=$st is_closed=[$st is_closed]"
+    puts "last_generation=[$st last_generation]"
     $st destroy 
 }
 

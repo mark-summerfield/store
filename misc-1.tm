@@ -14,6 +14,5 @@ proc misc::sqlite_version {} {
     sqlite3 $db :memory:
     set version "SQLite [$db version]"
     $db close
-    set db {}
     return $version
 }

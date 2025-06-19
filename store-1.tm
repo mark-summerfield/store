@@ -6,41 +6,41 @@ package require sqlite3 3
 oo::class create Store {
     variable filename
     variable db
+}
 
-    constructor filename_ {
-        variable filename
-        set filename $filename_
-        set exists [file isfile $filename]
+oo::define Store constructor filename_ {
+    variable filename
+    set filename $filename_
+    set exists [file isfile $filename]
+    variable db
+    set db ::STORE#[clock clicks]
+    sqlite3 $db $filename
+    $db eval [misc::read_utf8 $::APPPATH/sql/prepare.sql] 
+    if {!$exists} {
+        $db eval [misc::read_utf8 $::APPPATH/sql/create.sql] 
+        $db eval [misc::read_utf8 $::APPPATH/sql/insert.sql] 
+    }
+}
+
+oo::define Store destructor { my close }
+
+oo::define Store method close {} {
+    if {![my is_closed]} {
         variable db
-        set db ::STORE#[clock clicks]
-        sqlite3 $db $filename
-        $db eval [misc::read_utf8 $::APPPATH/sql/prepare.sql] 
-        if {!$exists} {
-            $db eval [misc::read_utf8 $::APPPATH/sql/create.sql] 
-            $db eval [misc::read_utf8 $::APPPATH/sql/insert.sql] 
-        }
+        $db close
+        set db {}
     }
+}
 
-    destructor { my close }
+oo::define Store method is_closed {} {
+    variable db
+    catch {$db version}
+}
 
-    method close {} {
-        if {![my is_closed]} {
-            variable db
-            $db close
-            set db {}
-        }
-    }
-
-    method is_closed {} {
-        variable db
-        catch {$db version}
-    }
-
-    method last_generation {} {
-        variable db
-        set gid [$db eval {SELECT * FROM LastGeneration}]
-        expr {$gid == "{}" ? 0 : int($gid)}
-    }
+oo::define Store method last_generation {} {
+    variable db
+    set gid [$db eval {SELECT * FROM LastGeneration}]
+    expr {$gid == "{}" ? 0 : int($gid)}
 }
 
 # Algorithm for storing a file in a new generation

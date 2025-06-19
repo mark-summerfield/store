@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require globals
+package require store
 
 namespace eval app {}
 

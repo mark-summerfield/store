@@ -1,6 +1,10 @@
 store
 app-1.tm
+store-1.tm
+misc-1.tm
 globals-1.tm
+
+test_store.tcl
 
 sql/prepare.sql
 sql/create.sql
@@ -10,32 +14,13 @@ README.md
 
 st.sh
 
-# Algorithm for storing a file in a new generation
-#
-#   if the file is new
-#	read file
-#	gzip file
-#	store R or r into data whichever is smaller
-#	set usize and if r set zsize
-#   else if the file is in a previous generation
-#	read file
-#	if prev is R and usize == prev usize and data == prev data
-#	    set = and set pgid
-#	else
-#	    gzip file
-#	    if prev is r and zsize == prev zsize and data == prev data
-#	        set = and set pgid
-#	    else
-#	    	store R or r into data whichever is smaller
-#	    	set usize and if r set zsize
-
 # CLI API
-#   default action is store with no message
-#	creates dirname.str if it doesn't exist
-#	hidden files are ignored by default
-#	excluded files are ignored
-#	subdirs are included by default
-#   -m|--message|message <any text> # store with this message
+#   default action is update (i.e., create new generation) with no message
+#	creates new generation with 'R' or 'r' or '=' for every file
+#	present in the _last_ generation that hasn't been deleted _and_
+#	which is not _explicitly_ excluded (i.e., by exact name, not by
+#	glob)
+#   -m|--message|message <any text> # update with message
 #
 #   -h|--help|help # usage
 #   --version|version
@@ -43,6 +28,13 @@ st.sh
 #   -v|--verbose|verbose # give more info on action
 #
 #   -g|--gui|gui # launch GUI
+#   -a|--add|add [filename1|dirname1 [... filename|dirnameN]]
+#	creates dirname.str if it doesn't exist
+#	creates a new generation adding all files in the current dir and
+#	all given filenames and all files in the given dirs (if any
+#	given), but excluding hidden files and excluding excluded files;
+#	if a given filename is excluded by glob it is included; if
+#	excluded by exact name it is excluded and a warning output
 #   -d|--diff|diff <last|gid1> [last|gid2] <filename> 
 #	# diff the last or given gid1 of filename against one in current
 #	# dir or against last or gid2 if given

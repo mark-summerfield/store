@@ -1,5 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require filerecord
 package require globals
 package require misc
 package require sqlite3 3
@@ -91,18 +92,32 @@ oo::define Store method Update {message args} {
         puts "created new generation gid=$gid"
     }
     set n 0
-    foreach filename $filenames {
-        incr n [my UpdateOne $gid $filename]
-    }
-    return 
+    foreach filename $filenames { incr n [my UpdateOne $gid $filename] }
+    return $n
 }
 
 # adds the given file as 'R' or 'r' or '='; returns 1 for 'R' or 'r' or
 # 0 for '='
 oo::define Store method UpdateOne {gid filename} {
     puts "TODO Update"
-    # TODO report action according to Feedback
+    set fileRecord [my GetMostRecent $filename]
+    if {$fileRecord eq {}} {
+        # no prev rec; new file
+    } else {
+        # we have prev
+    }
+    # TODO report action according to Feedback i.e., 'R' or 'r' or '='
     return 0
+}
+
+oo::define Store method GetMostRecent {filename} {
+    set gid [$Db eval {SELECT gid FROM Files WHERE filename = :filename \
+                       AND kind != '='}]
+    set fileRecord {}
+    if {$gid != "{}"} {
+        set fileRecord [FileRecord $db $gid $filename]
+    }
+    return $fileRecord
 }
 
 # Algorithm for storing a file in a new generation
@@ -142,12 +157,8 @@ oo::define Store method restore {{gid end} args} {
 # returns a list of the last or given gid's filenames
 oo::define Store method filenames {{gid end}} {
     if {$gid eq end} { set gid [my last_generation] }
-    set filenames [list]
-    $Db eval {SELECT filename FROM Files WHERE gid = $gid \
-              ORDER BY LOWER(filename)} {
-        lappend filenames $filename
-    }
-    return $filenames
+    return [$Db eval {SELECT filename FROM Files WHERE gid = $gid \
+            ORDER BY LOWER(filename)}]
 }
 
 # lists all generations (gid x created x tag)

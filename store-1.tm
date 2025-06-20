@@ -71,7 +71,7 @@ oo::define Store method add {args} {
 # exact name, not by glob) and returns true; otherwise does nothing and
 # returns false
 oo::define Store method update {message} {
-    if {[my last_generation] == 0} return false
+    if {[my last_generation] == 0} { return false }
     if {[my feedback] eq $::FEEDBACK_FULL} {
         puts "updated: $message"
     }

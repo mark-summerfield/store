@@ -54,40 +54,75 @@ oo::define Store method last_generation {} {
 }
 
 # creates new generation with 'R' or 'r' or '=' for every given file
+# returns the number of files added
 oo::define Store method add {args} {
     set size [llength $args]
     set n [expr {$size == 1 ? one : $size}]
     set s [expr {$size == 1 ? "" : s}]
-    set message "added $n new file$s"
     if {[my feedback] eq $::FEEDBACK_FULL} {
-        puts $message
+        puts "adding $n new file$s"
     }
-    my Update $message {*}args
+    return [my Update "added $n new file$s" {*}args]
 }
 
 # if at least one prev generation exists, creates new generation with
 # 'R' or 'r' or '=' for every file present in the _last_ generation that
-# hasn't been deleted _and_ which is not _explicitly_ excluded (i.e., by
-# exact name, not by glob) and returns true; otherwise does nothing and
-# returns false
+# hasn't been deleted and returns the number updated; otherwise does
+# nothing and returns 0
 oo::define Store method update {message} {
-    if {[my last_generation] == 0} { return false }
+    set gid [my last_generation]
+    if {$gid == 0} { return 0 }
     if {[my feedback] eq $::FEEDBACK_FULL} {
-        puts "updated: $message"
+        puts "updating: $message"
     }
-    puts "TODO update"
-    # gather list of files i.e., every one present in the last
-    # generation that hasn't been deleted _and_ which is not
-    # _explicitly_ excluded (i.e., by exact name, not by glob)
-    # then call: my Update $message {*}args
-    return true
+    return [my Update $message {*}[my filenames $gid]]
 }
 
-# creates new generation with 'R' or 'r' or '=' for every given file
+# creates new generation with 'R' or 'r' or '=' for every given file —
+# providing it still exists
 oo::define Store method Update {message args} {
+    set filenames [lmap filename $args {
+        expr {[file isfile $filename] ? $filename : [continue]}
+    }]
+    if {[llength $filenames] == 0} { return 0 }
+    $Db eval {INSERT INTO Generations (message) VALUES ($message)}
+    set gid [$Db eval {LAST_INSERT_ROWID}]
+    if {[my feedback] eq $::FEEDBACK_FULL} {
+        puts "created new generation gid=$gid"
+    }
+    set n 0
+    foreach filename $filenames {
+        incr n [my UpdateOne $gid $filename]
+    }
+    return 
+}
+
+# adds the given file as 'R' or 'r' or '='; returns 1 for 'R' or 'r' or
+# 0 for '='
+oo::define Store method UpdateOne {gid filename} {
     puts "TODO Update"
     # TODO report action according to Feedback
+    return 0
 }
+
+# Algorithm for storing a file in a new generation
+#
+#   if the file is new
+#	read file
+#	gzip file
+#	store R or r into data whichever is smaller
+#	set usize and if r set zsize
+#   else if the file is in a previous generation
+#	read file
+#	if prev is R and usize == prev usize and data == prev data
+#	    set = and set pgid
+#	else
+#	    gzip file
+#	    if prev is r and zsize == prev zsize and data == prev data
+#	        set = and set pgid
+#	    else
+#	    	store R or r into data whichever is smaller
+#	    	set usize and if r set zsize
 
 # extracts all files at last or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
@@ -106,7 +141,13 @@ oo::define Store method restore {{gid end} args} {
 
 # returns a list of the last or given gid's filenames
 oo::define Store method filenames {{gid end}} {
-    puts "TODO filenames"
+    if {$gid eq end} { set gid [my last_generation] }
+    set filenames [list]
+    $Db eval {SELECT filename FROM Files WHERE gid = $gid \
+              ORDER BY LOWER(filename)} {
+        lappend filenames $filename
+    }
+    return $filenames
 }
 
 # lists all generations (gid x created x tag)
@@ -134,22 +175,3 @@ oo::define Store method unexclude {dirname pattern} {
 oo::define Store method purge {filename} {
     puts "TODO purge"
 }
-
-# Algorithm for storing a file in a new generation
-#
-#   if the file is new
-#	read file
-#	gzip file
-#	store R or r into data whichever is smaller
-#	set usize and if r set zsize
-#   else if the file is in a previous generation
-#	read file
-#	if prev is R and usize == prev usize and data == prev data
-#	    set = and set pgid
-#	else
-#	    gzip file
-#	    if prev is r and zsize == prev zsize and data == prev data
-#	        set = and set pgid
-#	    else
-#	    	store R or r into data whichever is smaller
-#	    	set usize and if r set zsize

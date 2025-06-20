@@ -16,10 +16,11 @@ st.sh
 
 # CLI API
 #   default action is update (i.e., create new generation) with no message
-#	creates new generation with 'R' or 'r' or '=' for every file
-#	present in the _last_ generation that hasn't been deleted _and_
-#	which is not _explicitly_ excluded (i.e., by exact name, not by
-#	glob)
+#	if no existing dirname1.str givens an error message saying to
+#	use add; otherwise creates new generation with 'R' or 'r' or '='
+#	for every file present in the _last_ generation that hasn't been
+#	deleted _and_ which is not _explicitly_ excluded (i.e., by exact
+#	name, not by glob)
 #   -m|--message|message <any text> # update with message
 #
 #   -h|--help|help # usage
@@ -47,16 +48,15 @@ st.sh
 #	# the specified files using their original names _overwriting_ the
 #	# current versions; if _any_ of the files to be overwritten has
 #	# unstored changes, does _nothing_ and reports the problem
-#   -p|--print|print <last|gid> <filename1>
+#   -f|--filenames|filenames <last|gid>
 #	# print the latest or given generation's filenames to stdout
 #   -l|--list|list [last|gid]
 #	# lists all generations (gid x created x tag)
-#	# or lists last or given gid's filenames
 #   -E|--exclude|exclude [<dirname> <glob|filename>]
 #	# if given no args, lists all current excludes dirname x pattern;
 #	# otherwise adds given dirname x pattern to excludes
-#   --drop|drop <dirname> <glob|filename>
-#	# drops given dirname x pattern from excludes
+#   -u|--unexclude|unexclude <dirname> <glob|filename>
+#	# unexcludes the given dirname x pattern from excludes
 #   -P|--purge|purge <filename>
 #	# delete the given filename in every generation and adds the
 #	# filename to the excludes (use this for unintentionally stored

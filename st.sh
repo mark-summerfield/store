@@ -1,5 +1,5 @@
 #!/bin/bash
-clc -s -l tcl
 nagelfar.sh \
     | grep -v Unknown.command..app::main
+clc -s -l tcl
 git st

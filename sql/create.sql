@@ -36,11 +36,3 @@ CREATE TABLE Files (
     FOREIGN KEY(gid) REFERENCES Generations(gid),
     PRIMARY KEY(gid, filename)
 );
-
--- hidden files are excluded by default; subdirs are included by default
-CREATE TABLE Excludes (
-    folder TEXT NOT NULL, -- the (relative) folder to apply the glob to
-    pattern TEXT KEY NOT NULL, -- glob or filename to exclude
-
-    PRIMARY KEY(folder, pattern)
-);

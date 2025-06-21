@@ -7,7 +7,7 @@ package require sqlite3 3
 
 oo::class create Store {
     initialize {
-        variable Feedback $::FEEDBACK_NONE
+        variable Feedback $::FEEDBACK_ERRORS
     }
     variable Filename
     variable Db
@@ -32,7 +32,6 @@ oo::define Store constructor filename {
     $Db eval [readFile $::APPPATH/sql/prepare.sql] 
     if {!$exists} {
         $Db eval [readFile $::APPPATH/sql/create.sql] 
-        $Db eval [readFile $::APPPATH/sql/insert.sql] 
     }
 }
 
@@ -54,8 +53,9 @@ oo::define Store method last_generation {} {
     expr {$gid == "{}" ? 0 : int($gid)}
 }
 
-# creates new generation with 'R' or 'r' or '=' for every given file
-# returns the number of files added
+# Creates new generation with 'R' or 'r' or '=' for every given file
+# returns the number of files added. (Excludes should be handled by the
+# application itself.)
 oo::define Store method add {args} {
     set size [llength $args]
     set n [expr {$size == 1 ? one : $size}]
@@ -166,23 +166,7 @@ oo::define Store method list {} {
     puts "TODO list"
 }
 
-# returns all excludes (dirname x pattern)
-oo::define Store method excludes {} {
-    puts "TODO exclude"
-}
-
-# adds the given (dirname x pattern) to the excludes
-oo::define Store method exclude {dirname pattern} {
-    puts "TODO exclude"
-}
-
-# removes the given (dirname x pattern) to the excludes
-oo::define Store method unexclude {dirname pattern} {
-    puts "TODO drop"
-}
-
-# deletes the given filename in every generation and adds the filename
-# to the excludes (use this for unintentionally stored files)
+# deletes the given filename in every generation
 oo::define Store method purge {filename} {
     puts "TODO purge"
 }

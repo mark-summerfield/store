@@ -9,19 +9,18 @@ test_store.tcl
 
 sql/prepare.sql
 sql/create.sql
-sql/insert.sql
 
 README.md
 
 st.sh
 
+#
 # CLI API
 #   default action is update (i.e., create new generation) with no message
 #	if no existing dirname1.str givens an error message saying to
 #	use add; otherwise creates new generation with 'R' or 'r' or '='
 #	for every file present in the _last_ generation that hasn't been
-#	deleted _and_ which is not _explicitly_ excluded (i.e., by exact
-#	name, not by glob)
+#	deleted
 #   -m|--message|message <any text> # update with message
 #
 #   -h|--help|help # usage
@@ -34,9 +33,11 @@ st.sh
 #	creates dirname.str if it doesn't exist
 #	creates a new generation adding all files in the current dir and
 #	all given filenames and all files in the given dirs (if any
-#	given), but excluding hidden files and excluding excluded files;
-#	if a given filename is excluded by glob it is included; if
-#	excluded by exact name it is excluded and a warning output
+#	given), but excluding hidden files and excluded files:
+#	Excludes are managed by the application itself not by the Store
+#	database. When adding new files the application must exclude any
+#	files/globs listed in .gitignore or .hginore files as well as
+#	hidden files and sensible default ignores.
 #   -d|--diff|diff <last|gid1> [last|gid2] <filename> 
 #	# diff the last or given gid1 of filename against one in current
 #	# dir or against last or gid2 if given
@@ -53,14 +54,7 @@ st.sh
 #	# print the latest or given generation's filenames to stdout
 #   -l|--list|list [last|gid]
 #	# lists all generations (gid x created x tag)
-#   -E|--exclude|exclude [<dirname> <glob|filename>]
-#	# if given no args, lists all current excludes dirname x pattern;
-#	# otherwise adds given dirname x pattern to excludes
-#   -u|--unexclude|unexclude <dirname> <glob|filename>
-#	# unexcludes the given dirname x pattern from excludes
 #   -P|--purge|purge <filename>
-#	# delete the given filename in every generation and adds the
-#	# filename to the excludes (use this for unintentionally stored
-#	# files)
+#	# delete the given filename in every generation
 
 # vim: syn=yaml

@@ -29,10 +29,10 @@ oo::define Store constructor filename {
     set exists [file isfile $Filename]
     set Db ::STR#[string range [clock clicks] end-8 end]
     sqlite3 $Db $Filename
-    $Db eval [misc::read_utf8 $::APPPATH/sql/prepare.sql] 
+    $Db eval [readFile $::APPPATH/sql/prepare.sql] 
     if {!$exists} {
-        $Db eval [misc::read_utf8 $::APPPATH/sql/create.sql] 
-        $Db eval [misc::read_utf8 $::APPPATH/sql/insert.sql] 
+        $Db eval [readFile $::APPPATH/sql/create.sql] 
+        $Db eval [readFile $::APPPATH/sql/insert.sql] 
     }
 }
 

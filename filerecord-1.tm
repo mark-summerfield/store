@@ -34,7 +34,7 @@ oo::define FileRecord method load {filename} {
     set Usize [string length $udata]
     set zdata [zlib compress $Data 9]
     set Zsize [string length $zdata]
-    if {$Usize < $Zsize} {
+    if {$Usize <= $Zsize} {
         set Data $udata
         set Zsize 0
         set Kind $::KIND_UNCOMPRESSED
@@ -61,6 +61,9 @@ oo::define FileRecord method filename {{filename ""}} {
 oo::define FileRecord method kind {{kind ""}} {
     if {$kind ne ""} {
         set Kind $kind
+        if {$Kind eq $::KIND_SAME_AS_PREV} {
+            set Data ""
+        }
     }
     return $Kind
 }

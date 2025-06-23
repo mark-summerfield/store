@@ -103,9 +103,12 @@ oo::define Store method UpdateOne {gid filename} {
     set oldFileRecord [my GetMostRecent $filename]
     set fileRecord load $filename
     if {[$oldFileRecord is_valid]} {
-        # TODO compare fileRecord with oldFileRecord and
-        # if oldFileRecord's data is the same then for fileRecord
-        #   set kind =|data ""|added 0;
+        if {[$oldFileRecord kind] eq [$fileRecord kind] &&
+                [$oldFileRecord data] eq [$fileRecord data]} {
+            $fileRecord kind $::KIND_SAME_AS_PREV
+            $fileRecord gid [$oldFileRecord gid]
+            set added 0
+        }
     }
     $fileRecord gid $gid
     # TODO insert fileRecord into Files

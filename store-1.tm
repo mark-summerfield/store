@@ -101,18 +101,16 @@ oo::define Store method Update {message args} {
 oo::define Store method UpdateOne {gid filename} {
     set added 1
     set oldFileRecord [my GetMostRecent $filename]
-    set fileRecord load $filename
-    if {[$oldFileRecord is_valid]} {
-        if {[$oldFileRecord kind] eq [$fileRecord kind] &&
-                [$oldFileRecord data] eq [$fileRecord data]} {
-            $fileRecord gid $gid
-            $fileRecord kind $::KIND_SAME_AS_PREV
-            $fileRecord pgid [$oldFileRecord gid]
-            $fileRecord clear_data
-            set added 0
-        }
-    }
+    set fileRecord [FileRecord load $filename]
     $fileRecord gid $gid
+    if {[$oldFileRecord is_valid] && \
+            [$oldFileRecord kind] eq [$fileRecord kind] && \
+            [$oldFileRecord data] eq [$fileRecord data]} {
+        $fileRecord kind $::KIND_SAME_AS_PREV
+        $fileRecord pgid [$oldFileRecord gid]
+        $fileRecord clear_data
+        set added 0
+    }
     # TODO insert fileRecord into Files
     # TODO report action according to Feedback i.e., 'U' or 'Z' or '='
     return $added
@@ -120,7 +118,7 @@ oo::define Store method UpdateOne {gid filename} {
 
 oo::define Store method GetMostRecent {filename} {
     set gid [$Db eval {SELECT gid FROM Files WHERE filename = :filename \
-                       AND kind != '='}]
+                       AND kind != $::KIND_SAME_AS_PREV}]
     if {$gid ne $::NULL} {
         $db eval {SELECT gid, filename, kind, usize, zsize, pgid, data \
                   FROM Files WHERE gid = :gid AND filename = :filename} {

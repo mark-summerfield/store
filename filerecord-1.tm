@@ -24,24 +24,24 @@ oo::define FileRecord constructor {{gid 0} {filename ""} {kind ""} \
     set Data $data 
 }
 
-oo::define FileRecord method is_valid {} {
-    return [string match [UZ=] $Kind]
+oo::define FileRecord classmethod load {filename} {
+    set udata [readFile $filename binary]
+    set usize [string length $udata]
+    set zdata [zlib compress $data 9]
+    set zsize [string length $zdata]
+    if {$usize <= $zsize} {
+        set data $udata
+        set zsize 0
+        set kind $::KIND_UNCOMPRESSED
+    } else {
+        set data $zdata
+        set kind $::KIND_ZLIB_COMPRESSED
+    }
+    return [FileRecord new 0 $filename $kind $usize $zsize 0 $data]
 }
 
-oo::define FileRecord method load {filename} {
-    set Filename $filename
-    set udata [readFile $Filename binary]
-    set Usize [string length $udata]
-    set zdata [zlib compress $Data 9]
-    set Zsize [string length $zdata]
-    if {$Usize <= $Zsize} {
-        set Data $udata
-        set Zsize 0
-        set Kind $::KIND_UNCOMPRESSED
-    } else {
-        set Data $zdata
-        set Kind $::KIND_ZLIB_COMPRESSED
-    }
+oo::define FileRecord method is_valid {} {
+    return [string match [UZ=] $Kind]
 }
 
 oo::define FileRecord method gid {{gid 0}} {
@@ -93,6 +93,4 @@ oo::define FileRecord method data {{data ""}} {
     return $Data
 }
 
-oo::define FileRecord method clear_data {} {
-    set Data ""
-}
+oo::define FileRecord method clear_data {} { set Data "" }

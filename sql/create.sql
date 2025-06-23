@@ -17,19 +17,19 @@ CREATE VIEW ViewGenerations AS
 CREATE VIEW LastGeneration AS SELECT MAX(gid) FROM Generations;
 
 -- kind
---  R raw bytes (the actual file); usize set; zsize NULL
---  r gzip compressed raw bytes (the actual file); usize & zsize set
+--  U uncompressed raw bytes (the actual file); usize set; zsize NULL
+--  Z zlib compressed raw bytes (the actual file); usize & zsize set
 --  = unchanged from record whose gid is pgid; usize & zsize & data NULL
 CREATE TABLE Files (
     gid INTEGER NOT NULL, -- generation ID
     filename TEXT NOT NULL, -- contains full (relative) path
     kind TEXT NOT NULL,
     usize INTEGER NOT NULL, -- uncompressed size
-    zsize INTEGER, -- gzip-compressed size
+    zsize INTEGER, -- zlib-compressed size
     pgid INTEGER,
     data BLOB,
 
-    CHECK(kind IN ('R', 'r', '=')),
+    CHECK(kind IN ('U', 'Z', '=')),
     CHECK(usize > 0),
     CHECK(zsize IS NULL OR zsize > 0),
     FOREIGN KEY(pgid) REFERENCES Generations(gid),

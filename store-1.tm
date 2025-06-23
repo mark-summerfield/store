@@ -53,7 +53,7 @@ oo::define Store method last_generation {} {
     expr {$gid == "{}" ? 0 : int($gid)}
 }
 
-# Creates new generation with 'R' or 'r' or '=' for every given file
+# Creates new generation with 'U' or 'Z' or '=' for every given file
 # returns the number of files added. (Excludes should be handled by the
 # application itself.)
 oo::define Store method add {args} {
@@ -67,7 +67,7 @@ oo::define Store method add {args} {
 }
 
 # if at least one prev generation exists, creates new generation with
-# 'R' or 'r' or '=' for every file present in the _last_ generation that
+# 'U' or 'Z' or '=' for every file present in the _last_ generation that
 # hasn't been deleted and returns the number updated; otherwise does
 # nothing and returns 0
 oo::define Store method update {message} {
@@ -79,7 +79,7 @@ oo::define Store method update {message} {
     return [my Update $message {*}[my filenames $gid]]
 }
 
-# creates new generation with 'R' or 'r' or '=' for every given file —
+# creates new generation with 'U' or 'Z' or '=' for every given file —
 # providing it still exists
 oo::define Store method Update {message args} {
     set filenames [lmap filename $args {
@@ -96,26 +96,36 @@ oo::define Store method Update {message args} {
     return $n
 }
 
-# adds the given file as 'R' or 'r' or '='; returns 1 for 'R' or 'r' or
-# 0 for '='
+# adds the given file as 'U' or 'Z' or '='; returns 1 for 'U' or 'Z' or
+# 1 for '='
 oo::define Store method UpdateOne {gid filename} {
+    # TODO
     puts "TODO Update"
+    set added 1
     set fileRecord [my GetMostRecent $filename]
-    if {$fileRecord eq {}} {
-        # no prev rec; new file
+    if {![$fileRecord is_valid]} {
+        $fileRecord load $filename
     } else {
-        # we have prev
+        # we have prev set kind = and added 0; else read data ;
+        # in either case create new fileRecord
     }
-    # TODO report action according to Feedback i.e., 'R' or 'r' or '='
-    return 0
+    $fileRecord gid $gid
+    # TODO insert fileRecord into Files
+    # TODO report action according to Feedback i.e., 'U' or 'Z' or '='
+    return $added
 }
 
 oo::define Store method GetMostRecent {filename} {
     set gid [$Db eval {SELECT gid FROM Files WHERE filename = :filename \
                        AND kind != '='}]
-    set fileRecord {}
-    if {$gid != "{}"} {
-        set fileRecord [FileRecord $db $gid $filename]
+    if {$gid ne $::NULL} {
+        $db eval {SELECT gid, filename, kind, usize, zsize, pgid, data \
+                  FROM Files WHERE gid = :gid AND filename = :filename} {
+            set fileRecord [FileRecord new $gid $filename $kind $usize \
+                            $zsize $pgid $data]
+        }
+    } else {
+        set fileRecord [FileRecord new]
     }
     return $fileRecord
 }
@@ -142,7 +152,8 @@ oo::define Store method GetMostRecent {filename} {
 # extracts all files at last or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
 # path/filename1.ext → path/filename1#gid.ext etc
-oo::define Store method extract {{gid end} args} {
+oo::define Store method extract {{gid 0} args} {
+    # TODO
     puts "TODO extract"
 }
 
@@ -150,23 +161,26 @@ oo::define Store method extract {{gid end} args} {
 # the specified files using their original names _overwriting_ the
 # current versions; if _any_ of the files to be overwritten has
 # unstored changes, does _nothing_ and reports the problem
-oo::define Store method restore {{gid end} args} {
+oo::define Store method restore {{gid 0} args} {
+    # TODO
     puts "TODO restore"
 }
 
 # returns a list of the last or given gid's filenames
-oo::define Store method filenames {{gid end}} {
-    if {$gid eq end} { set gid [my last_generation] }
+oo::define Store method filenames {{gid 0}} {
+    if {$gid == 0} { set gid [my last_generation] }
     return [$Db eval {SELECT filename FROM Files WHERE gid = $gid \
             ORDER BY LOWER(filename)}]
 }
 
 # lists all generations (gid x created x tag)
 oo::define Store method list {} {
+    # TODO
     puts "TODO list"
 }
 
 # deletes the given filename in every generation
 oo::define Store method purge {filename} {
+    # TODO
     puts "TODO purge"
 }

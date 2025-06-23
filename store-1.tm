@@ -105,8 +105,10 @@ oo::define Store method UpdateOne {gid filename} {
     if {[$oldFileRecord is_valid]} {
         if {[$oldFileRecord kind] eq [$fileRecord kind] &&
                 [$oldFileRecord data] eq [$fileRecord data]} {
+            $fileRecord gid $gid
             $fileRecord kind $::KIND_SAME_AS_PREV
-            $fileRecord gid [$oldFileRecord gid]
+            $fileRecord pgid [$oldFileRecord gid]
+            $fileRecord clear_data
             set added 0
         }
     }

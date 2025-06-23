@@ -61,9 +61,6 @@ oo::define FileRecord method filename {{filename ""}} {
 oo::define FileRecord method kind {{kind ""}} {
     if {$kind ne ""} {
         set Kind $kind
-        if {$Kind eq $::KIND_SAME_AS_PREV} {
-            set Data ""
-        }
     }
     return $Kind
 }
@@ -94,4 +91,8 @@ oo::define FileRecord method data {{data ""}} {
         set Data $data
     }
     return $Data
+}
+
+oo::define FileRecord method clear_data {} {
+    set Data ""
 }

@@ -99,15 +99,13 @@ oo::define Store method Update {message args} {
 # adds the given file as 'U' or 'Z' or '='; returns 1 for 'U' or 'Z' or
 # 1 for '='
 oo::define Store method UpdateOne {gid filename} {
-    # TODO
-    puts "TODO Update"
     set added 1
-    set fileRecord [my GetMostRecent $filename]
-    if {![$fileRecord is_valid]} {
-        $fileRecord load $filename
-    } else {
-        # we have prev set kind = and added 0; else read data ;
-        # in either case create new fileRecord
+    set oldFileRecord [my GetMostRecent $filename]
+    set fileRecord load $filename
+    if {[$oldFileRecord is_valid]} {
+        # TODO compare fileRecord with oldFileRecord and
+        # if oldFileRecord's data is the same then for fileRecord
+        #   set kind =|data ""|added 0;
     }
     $fileRecord gid $gid
     # TODO insert fileRecord into Files

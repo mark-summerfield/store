@@ -38,7 +38,8 @@ proc test2 {} {
     set str [Store new $filename]
     $str add sql/prepare.sql sql/create.sql app-1.tm store-1.tm
     $str add README.md
-    $str update "should change nothing"
+    $str update "should change nothing #1"
+    $str update "should change nothing #2"
     # TODO add another generation but this means changing a file!
     $str destroy 
 }

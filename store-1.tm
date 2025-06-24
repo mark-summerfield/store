@@ -53,19 +53,30 @@ oo::define Store method last_generation {} {
     expr {$gid == "{}" ? 0 : int($gid)}
 }
 
-# Creates new generation with 'U' or 'Z' or '=' for every given file
+# Creates new generation with 'U' or 'Z' or 'S' for every given file
 # returns the number of files added. (Excludes should be handled by the
 # application itself.)
 oo::define Store method add {args} {
     set size [llength $args]
     set n [expr {$size == 1 ? "one" : $size}]
     set s [expr {$size == 1 ? "" : "s"}]
-    if {[my verbose]} { puts "adding $n new file$s" }
-    return [my Update "added $n new file$s" true {*}$args]
+    set filenames [my filenames]
+    if {[my verbose]} {
+        puts -nonewline "adding $n new file$s"
+        set size2 [llength $filenames]
+        if {$size2 > 0 } {
+            set n2 [expr {$size2 == 1 ? "one" : $size2}]
+            set s2 [expr {$size2 == 1 ? "" : "s"}]
+            puts -nonewline "; updating $n2 file$s2"
+        }
+        puts ""
+    }
+    set filenames [lsort -nocase [list {*}$filenames {*}$args]]
+    return [my Update "added $n new file$s" true {*}$filenames]
 }
 
 # if at least one prev generation exists, creates new generation with
-# 'U' or 'Z' or '=' for every file present in the _last_ generation that
+# 'U' or 'Z' or 'S' for every file present in the _last_ generation that
 # hasn't been deleted and returns the number updated; otherwise does
 # nothing and returns 0
 oo::define Store method update {message} {
@@ -75,7 +86,7 @@ oo::define Store method update {message} {
     return [my Update $message false {*}[my filenames $gid]]
 }
 
-# creates new generation with 'U' or 'Z' or '=' for every given file —
+# creates new generation with 'U' or 'Z' or 'S' for every given file —
 # providing it still exists
 oo::define Store method Update {message adding args} {
     set filenames [list]
@@ -94,14 +105,14 @@ oo::define Store method Update {message adding args} {
     set gid [$Db last_insert_rowid]
     if {[my verbose]} { puts "created generation #$gid" }
     set n 0
-    foreach filename $filenames {
+    foreach filename [lsort -nocase $filenames] {
         incr n [my UpdateOne $adding $gid $filename]
     }
     return $n
 }
 
-# adds the given file as 'U' or 'Z' or '='; returns 1 for 'U' or 'Z' or
-# 1 for '='
+# adds the given file as 'U' or 'Z' or 'S'; returns 1 for 'U' or 'Z' or
+# 1 for 'S'
 oo::define Store method UpdateOne {adding gid filename} {
     set added 1
     set oldFileData [my GetMostRecent $filename]
@@ -109,7 +120,7 @@ oo::define Store method UpdateOne {adding gid filename} {
     if {[$oldFileData is_valid] && \
             [$oldFileData kind] eq [$fileData kind] && \
             [$oldFileData data] eq [$fileData data]} {
-        $fileData kind =
+        $fileData kind S
         $fileData pgid [$oldFileData gid]
         $fileData clear_data
         set added 0
@@ -125,7 +136,7 @@ oo::define Store method UpdateOne {adding gid filename} {
     if {[my verbose]} {
         set action [expr {$adding ? "added" : "updated"}]
         switch $kind {
-            = { puts "unchanged \"$filename\"" }
+            S { puts "unchanged \"$filename\"" }
             U { puts "$action \"$filename\"" }
             Z { puts "$action \"$filename\" (zlib compressed)" }
         }
@@ -135,13 +146,12 @@ oo::define Store method UpdateOne {adding gid filename} {
 
 oo::define Store method GetMostRecent {filename} {
     set gid [$Db eval {SELECT COALESCE(gid, 0) FROM Files \
-                       WHERE filename = :filename \
-                       AND kind != $::SAME_AS_PREV}]
+                       WHERE filename = :filename AND kind != 'S'}]
     if {$gid != 0} {
         set data [$Db eval {SELECT gid, filename, kind, usize, zsize, \
                             pgid, data FROM Files \
                             WHERE gid = :gid AND filename = :filename}]
-        set fileData [FileData new {*}data]
+        set fileData [FileData new {*}$data]
     } else {
         set fileData [FileData new]
     }

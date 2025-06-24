@@ -41,7 +41,7 @@ oo::define FileData classmethod load {gid filename} {
 }
 
 oo::define FileData method is_valid {} {
-    return [string match "\[UZ=]" $Kind]
+    return [string match {[UZS]} $Kind]
 }
 
 oo::define FileData method gid {{gid 0}} {
@@ -94,3 +94,8 @@ oo::define FileData method data {{data ""}} {
 }
 
 oo::define FileData method clear_data {} { set Data "" }
+
+oo::define FileData method to_string {} {
+    return "FileData Gid=$Gid Filename=$Filename Kind=$Kind Usize=$Usize \
+            Zsize=$Zsize Pgid=$Pgid Data(len)=[string length $Data]"
+}

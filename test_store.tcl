@@ -5,15 +5,14 @@ const APPPATH [file normalize [file dirname [info script]]]
 tcl::tm::path add $APPPATH
 
 package require globals
+package require lambda 1
 package require misc
 package require store
 
 proc test1 {} {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
-    puts "Store verbose [Store verbose]"
     Store set_verbose true
-    puts "Store verbose [Store verbose]"
     set filename /tmp/${procname}.db
     file delete $filename
     puts "using [misc::sqlite_version]"
@@ -33,7 +32,7 @@ proc test2 verbose {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
     Store set_verbose $verbose
-    puts "Store verbose [Store verbose]"
+    puts "verbose [Store verbose]"
     set filename /tmp/${procname}.db
     file delete $filename
     set str [Store new $filename]

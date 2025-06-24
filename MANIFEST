@@ -1,4 +1,6 @@
-# TODO fix bug where README.md is Z rather than = on update
+# TODO complete Store API
+# TODO add Report callback (lambda) to Store API & try to get working in
+# parallel with Verbose; if successful, drop Verbose in favour of Report
 
 store
 app-1.tm

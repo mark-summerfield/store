@@ -109,7 +109,7 @@ oo::define Store method UpdateOne {adding gid filename} {
     if {[$oldFileData is_valid] && \
             [$oldFileData kind] eq [$fileData kind] && \
             [$oldFileData data] eq [$fileData data]} {
-        $fileData kind $::SAME_AS_PREV
+        $fileData kind =
         $fileData pgid [$oldFileData gid]
         $fileData clear_data
         set added 0
@@ -124,12 +124,10 @@ oo::define Store method UpdateOne {adding gid filename} {
         (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     if {[my verbose]} {
         set action [expr {$adding ? "added" : "updated"}]
-        if {$kind eq $::SAME_AS_PREV} {
-            puts "unchanged \"$filename\""
-        } elseif {$kind eq $::UNCOMPRESSED} {
-            puts "$action \"$filename\""
-        } elseif {$kind eq $::ZLIB_COMPRESSED} {
-            puts "$action \"$filename\" (zlib compressed)"
+        switch $kind {
+            = { puts "unchanged \"$filename\"" }
+            U { puts "$action \"$filename\"" }
+            Z { puts "$action \"$filename\" (zlib compressed)" }
         }
     }
     return $added

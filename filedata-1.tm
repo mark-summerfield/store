@@ -32,10 +32,10 @@ oo::define FileData classmethod load {gid filename} {
     if {$usize <= $zsize} {
         set data $udata
         set zsize 0
-        set kind $::UNCOMPRESSED
+        set kind U
     } else {
         set data $zdata
-        set kind $::ZLIB_COMPRESSED
+        set kind Z
     }
     return [FileData new $gid $filename $kind $usize $zsize $gid $data]
 }

@@ -29,10 +29,11 @@ proc test1 {} {
     $str destroy 
 }
 
-proc test2 {} {
+proc test2 verbose {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
-    Store set_verbose true
+    Store set_verbose $verbose
+    puts "Store verbose [Store verbose]"
     set filename /tmp/${procname}.db
     file delete $filename
     set str [Store new $filename]
@@ -45,4 +46,5 @@ proc test2 {} {
 }
 
 test1
-test2
+test2 false
+test2 true

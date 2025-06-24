@@ -9,3 +9,9 @@ proc misc::sqlite_version {} {
     $db close
     return $version
 }
+
+proc misc::n_s size {
+    set n [expr {$size == 1 ? "one" : $size}]
+    set s [expr {$size == 1 ? "" : "s"}]
+    return [list $n $s]
+}

@@ -58,18 +58,15 @@ oo::define Store method last_generation {} {
 # application itself.)
 oo::define Store method add {args} {
     set size [llength $args]
-    set n [expr {$size == 1 ? "one" : $size}]
-    set s [expr {$size == 1 ? "" : "s"}]
+    lassign [misc::n_s $size] n s
     set filenames [my filenames]
     if {[my verbose]} {
         puts -nonewline "adding $n new file$s"
         set size2 [llength $filenames]
         if {$size2 > 0 } {
-            set n2 [expr {$size2 == 1 ? "one" : $size2}]
-            set s2 [expr {$size2 == 1 ? "" : "s"}]
-            puts -nonewline "; updating $n2 file$s2"
+            lassign [misc::n_s $size2] n2 s2
+            puts -nonewline " and updating $n2 file$s2"
         }
-        puts ""
     }
     set filenames [lsort -nocase [list {*}$filenames {*}$args]]
     return [my Update "added $n new file$s" true {*}$filenames]
@@ -82,7 +79,7 @@ oo::define Store method add {args} {
 oo::define Store method update {message} {
     set gid [my last_generation]
     if {$gid == 0} { return 0 }
-    if {[my verbose]} { puts "updating: $message" }
+    if {[my verbose]} { puts -nonewline "updating \"$message\"" }
     return [my Update $message false {*}[my filenames $gid]]
 }
 
@@ -103,7 +100,7 @@ oo::define Store method Update {message adding args} {
     }
     $Db eval {INSERT INTO Generations (message) VALUES ($message)}
     set gid [$Db last_insert_rowid]
-    if {[my verbose]} { puts "created generation #$gid" }
+    if {[my verbose]} { puts " as generation #$gid" }
     set n 0
     foreach filename [lsort -nocase $filenames] {
         incr n [my UpdateOne $adding $gid $filename]

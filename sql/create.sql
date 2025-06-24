@@ -26,7 +26,7 @@ CREATE TABLE Files (
     kind TEXT NOT NULL,
     usize INTEGER NOT NULL, -- uncompressed size
     zsize INTEGER, -- zlib-compressed size
-    pgid INTEGER,
+    pgid INTEGER NOT NULL, -- set to gid if 'U' or 'Z' or to parent if '='
     data BLOB,
 
     CHECK(kind IN ('U', 'Z', '=')),

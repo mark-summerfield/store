@@ -11,25 +11,37 @@ package require store
 
 proc test1 {} {
     set procname [lindex [info level 0] 0]
-    puts "##### $procname ##############################################"
+    puts -nonewline "$procname "
+    set ok true
     set filename /tmp/${procname}.db
     file delete $filename
-    puts "using [misc::sqlite_version]"
+    set sqlite_version [misc::sqlite_version]
+    if {![string match {SQLite 3.*} $sqlite_version]} {
+        puts "FAIL: expected SQLite 3.x.y; got $sqlite_version"
+        set ok false
+    }
     set str [Store new $filename]
-    puts "store $str is [expr {[$str is_closed] ? "closed" : "open"}]"
+    if {[$str is_closed]} {
+        puts "FAIL: expected store to be open"
+        set ok false
+    }
     set gid [$str last_generation]
-    puts "last_generation [expr {$gid == 0 ? "none" : $gid}]"
+    if {$gid != 0} {
+        puts "FAIL: expected no last generation; got $gid"
+        set ok false
+    }
     if {[$str filename] ne $filename} {
-        puts "expected '$filename'; got '[str filename]'"
-    } else {
-        puts "saved '[$str filename]'"
+        puts "FAIL: expected '$filename'; got '[str filename]'"
+        set ok false
     }
     $str destroy 
+    if {$ok} { puts OK }
 }
 
 proc test2 {} {
     set procname [lindex [info level 0] 0]
-    puts "##### $procname ##############################################"
+    puts -nonewline "$procname "
+    set ok true
     set filename /tmp/${procname}.db
     file delete $filename
     set str [Store new $filename]
@@ -38,14 +50,19 @@ proc test2 {} {
     $str update "should change nothing #1"
     $str update "should change nothing #2"
     $str destroy 
+    if {$ok} { puts OK }
 }
 
 proc test3 {} {
     set procname [lindex [info level 0] 0]
-    puts "##### $procname ##############################################"
+    puts -nonewline "$procname "
     set filename /tmp/${procname}.db
     file delete $filename
-    set str [Store new $filename [lambda {message} { puts $message }]]
+    set ::messages [list]
+    set str [Store new $filename [lambda {message} {
+        lappend ::messages "$message\n"
+        #puts $message
+    }]]
     $str add sql/prepare.sql sql/create.sql app-1.tm store-1.tm
     $str add README.md
     $str update "should change nothing #[$str last_generation]"
@@ -61,6 +78,70 @@ proc test3 {} {
     $str update "should change nothing #[$str last_generation]"
     $str update "should change nothing #[$str last_generation]"
     $str destroy 
+    set ::messages [string cat {*}$::messages]
+    if {$::messages ne $::MESSAGES} {
+        puts "FAIL: expected\n$::MESSAGES\n--- got ---\n$::messages"
+    } else {
+        puts OK
+    }
+}
+
+const MESSAGES {adding 4 new files
+created generation #1
+added "app-1.tm" (compressed)
+added "sql/create.sql" (compressed)
+added "sql/prepare.sql" (compressed)
+added "store-1.tm" (compressed)
+adding one new file
+updating 4 files
+created generation #2
+same as generation #1 "app-1.tm"
+added "README.md" (compressed)
+same as generation #1 "sql/create.sql"
+same as generation #1 "sql/prepare.sql"
+same as generation #1 "store-1.tm"
+updating "should change nothing #2"
+created generation #3
+same as generation #1 "app-1.tm"
+same as generation #2 "README.md"
+same as generation #1 "sql/create.sql"
+same as generation #1 "sql/prepare.sql"
+same as generation #1 "store-1.tm"
+updating "should change nothing #3"
+created generation #4
+same as generation #1 "app-1.tm"
+same as generation #2 "README.md"
+same as generation #1 "sql/create.sql"
+same as generation #1 "sql/prepare.sql"
+same as generation #1 "store-1.tm"
+updating "should change to new README.md #4"
+created generation #5
+same as generation #1 "app-1.tm"
+updated "README.md" (compressed)
+same as generation #1 "sql/create.sql"
+same as generation #1 "sql/prepare.sql"
+same as generation #1 "store-1.tm"
+updating "should restore old README.md #5"
+created generation #6
+same as generation #1 "app-1.tm"
+same as generation #2 "README.md"
+same as generation #1 "sql/create.sql"
+same as generation #1 "sql/prepare.sql"
+same as generation #1 "store-1.tm"
+updating "should change nothing #6"
+created generation #7
+same as generation #1 "app-1.tm"
+same as generation #2 "README.md"
+same as generation #1 "sql/create.sql"
+same as generation #1 "sql/prepare.sql"
+same as generation #1 "store-1.tm"
+updating "should change nothing #7"
+created generation #8
+same as generation #1 "app-1.tm"
+same as generation #2 "README.md"
+same as generation #1 "sql/create.sql"
+same as generation #1 "sql/prepare.sql"
+same as generation #1 "store-1.tm"
 }
 
 test1

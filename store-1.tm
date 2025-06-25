@@ -123,7 +123,7 @@ oo::define Store method UpdateOne {adding gid filename} {
         (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     set action [expr {$adding ? "added" : "updated"}]
     switch $kind {
-        S { {*}$Reporter "unchanged \"$filename\"" }
+        S { {*}$Reporter "same as generation #$pgid \"$filename\"" }
         U { {*}$Reporter "$action \"$filename\"" }
         Z { {*}$Reporter "$action \"$filename\" (compressed)" }
     }

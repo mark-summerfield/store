@@ -27,7 +27,7 @@ oo::define FileData constructor {{gid 0} {filename ""} {kind ""} \
 oo::define FileData classmethod load {gid filename} {
     set udata [readFile $filename binary]
     set usize [string length $udata]
-    set zdata [zlib compress $udata 9]
+    set zdata [zlib deflate $udata 9]
     set zsize [string length $zdata]
     if {$usize <= $zsize} {
         set data $udata

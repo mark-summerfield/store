@@ -135,7 +135,7 @@ oo::define Store method UpdateOne {adding gid filename} {
         switch $kind {
             S { puts "unchanged \"$filename\"" }
             U { puts "$action \"$filename\"" }
-            Z { puts "$action \"$filename\" (zlib compressed)" }
+            Z { puts "$action \"$filename\" (compressed)" }
         }
     }
     return $added

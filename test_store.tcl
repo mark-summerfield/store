@@ -12,7 +12,7 @@ package require store
 proc test1 {} {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
-    Store set_verbose true
+    #Store set_verbose true
     set filename /tmp/${procname}.db
     file delete $filename
     puts "using [misc::sqlite_version]"
@@ -28,11 +28,13 @@ proc test1 {} {
     $str destroy 
 }
 
-proc test2 verbose {
+proc test2 {} {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
-    Store set_verbose $verbose
-    puts "verbose [Store verbose]"
+    set reporter [lambda {message} { puts $message }]
+    Store set_reporter $reporter
+    #Store set_verbose $verbose
+    #puts "verbose [Store verbose]"
     set filename /tmp/${procname}.db
     file delete $filename
     set str [Store new $filename]
@@ -45,5 +47,4 @@ proc test2 verbose {
 }
 
 test1
-test2 false
-test2 true
+test2

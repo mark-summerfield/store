@@ -2,12 +2,14 @@
 
 package require filedata
 package require globals
+package require lambda 1
 package require misc
 package require sqlite3 3
 
 oo::class create Store {
     initialize {
         variable Verbose false
+        variable Reporter ""
     }
     variable Filename
     variable Db
@@ -21,6 +23,21 @@ oo::define Store classmethod set_verbose verbose {
 oo::define Store classmethod verbose {} {
     my variable Verbose
     return $Verbose
+}
+
+oo::define Store classmethod set_reporter reporter {
+    my variable Reporter
+    set Reporter $reporter
+}
+
+oo::define Store classmethod reporter {} {
+    my variable Reporter
+    return $Reporter
+}
+
+oo::define Store classmethod has_reporter {} {
+    my variable Reporter
+    return [expr {$Reporter ne ""}]
 }
 
 # creates database if it doesn't exist
@@ -68,6 +85,14 @@ oo::define Store method add {args} {
             puts -nonewline " and updating $n2 file$s2"
         }
     }
+    if {[my has_reporter]} {
+        [my reporter] "adding $n new file$s"
+        set size2 [llength $filenames]
+        if {$size2 > 0 } {
+            lassign [misc::n_s $size2] n2 s2
+            [my reporter] "updating $n2 file$s2"
+        }
+    }
     set filenames [lsort -nocase [list {*}$filenames {*}$args]]
     return [my Update "added $n new file$s" true {*}$filenames]
 }
@@ -80,6 +105,7 @@ oo::define Store method update {message} {
     set gid [my last_generation]
     if {$gid == 0} { return 0 }
     if {[my verbose]} { puts -nonewline "updating \"$message\"" }
+    if {[my has_reporter]} { [my reporter] "updating \"$message\"" }
     return [my Update $message false {*}[my filenames $gid]]
 }
 
@@ -90,17 +116,19 @@ oo::define Store method Update {message adding args} {
     foreach filename $args {
         if {[file isfile $filename]} {
             lappend filenames $filename
-        } elseif {[my verbose]} {
-            puts "skipped missing or non-file \"$filename\""
+        } elseif {[my has_reporter]} {
+            [my reporter] "skipped missing or non-file \"$filename\""
         }
     }
     if {[llength $filenames] == 0} {
         if {[my verbose]} { puts "no files to update" }
+        if {[my has_reporter]} { [my reporter] "no files to update" }
         return 0
     }
     $Db eval {INSERT INTO Generations (message) VALUES ($message)}
     set gid [$Db last_insert_rowid]
     if {[my verbose]} { puts " as generation #$gid" }
+    if {[my has_reporter]} { [my reporter] "created generation #$gid" }
     set n 0
     foreach filename [lsort -nocase $filenames] {
         incr n [my UpdateOne $adding $gid $filename]
@@ -136,6 +164,14 @@ oo::define Store method UpdateOne {adding gid filename} {
             S { puts "unchanged \"$filename\"" }
             U { puts "$action \"$filename\"" }
             Z { puts "$action \"$filename\" (compressed)" }
+        }
+    }
+    if {[my has_reporter]} {
+        set action [expr {$adding ? "added" : "updated"}]
+        switch $kind {
+            S { [my reporter] "unchanged \"$filename\"" }
+            U { [my reporter] "$action \"$filename\"" }
+            Z { [my reporter] "$action \"$filename\" (compressed)" }
         }
     }
     return $added

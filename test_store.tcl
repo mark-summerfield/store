@@ -12,7 +12,6 @@ package require store
 proc test1 {} {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
-    #Store set_verbose true
     set filename /tmp/${procname}.db
     file delete $filename
     puts "using [misc::sqlite_version]"
@@ -28,26 +27,42 @@ proc test1 {} {
     $str destroy 
 }
 
-proc test2 with_reporter {
+proc test2 {} {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
-    #Store set_verbose $verbose
-    #puts "verbose [Store verbose]"
     set filename /tmp/${procname}.db
     file delete $filename
-    if {$with_reporter} {
-        set str [Store new $filename [lambda {message} { puts $message }]]
-    } else {
-        set str [Store new $filename]
-    }
+    set str [Store new $filename]
     $str add sql/prepare.sql sql/create.sql app-1.tm store-1.tm
     $str add README.md
     $str update "should change nothing #1"
     $str update "should change nothing #2"
-    # TODO add another generation but this means changing a file!
+    $str destroy 
+}
+
+proc test3 {} {
+    set procname [lindex [info level 0] 0]
+    puts "##### $procname ##############################################"
+    set filename /tmp/${procname}.db
+    file delete $filename
+    set str [Store new $filename [lambda {message} { puts $message }]]
+    $str add sql/prepare.sql sql/create.sql app-1.tm store-1.tm
+    $str add README.md
+    $str update "should change nothing #[$str last_generation]"
+    $str update "should change nothing #[$str last_generation]"
+    # change README.md
+    set readme [readFile README.md]
+    set readmex "$readme\nanother line\nand more!"
+    writeFile README.md $readmex
+    $str update "should change to new README.md #[$str last_generation]"
+    # restore original README.md
+    writeFile README.md $readme
+    $str update "should restore old README.md #[$str last_generation]"
+    $str update "should change nothing #[$str last_generation]"
+    $str update "should change nothing #[$str last_generation]"
     $str destroy 
 }
 
 test1
-test2 false
-test2 true
+test2
+test3

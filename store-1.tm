@@ -7,22 +7,9 @@ package require misc
 package require sqlite3 3
 
 oo::class create Store {
-    initialize {
-        variable Verbose false
-    }
     variable Filename
     variable Db
     variable Reporter
-}
-
-oo::define Store classmethod set_verbose verbose {
-    my variable Verbose
-    set Verbose $verbose
-}
-
-oo::define Store classmethod verbose {} {
-    my variable Verbose
-    return $Verbose
 }
 
 # creates database if it doesn't exist
@@ -67,19 +54,11 @@ oo::define Store method add {args} {
     set size [llength $args]
     lassign [misc::n_s $size] n s
     set filenames [my filenames]
-    if {[my verbose]} {
-        puts -nonewline "adding $n new file$s"
-        set size2 [llength $filenames]
-        if {$size2 > 0 } {
-            lassign [misc::n_s $size2] n2 s2
-            puts -nonewline " and updating $n2 file$s2"
-        }
-    }
-    $Reporter "adding $n new file$s"
+    {*}$Reporter "adding $n new file$s"
     set size2 [llength $filenames]
     if {$size2 > 0 } {
         lassign [misc::n_s $size2] n2 s2
-        $Reporter "updating $n2 file$s2"
+        {*}$Reporter "updating $n2 file$s2"
     }
     set filenames [lsort -nocase [list {*}$filenames {*}$args]]
     return [my Update "added $n new file$s" true {*}$filenames]
@@ -92,8 +71,7 @@ oo::define Store method add {args} {
 oo::define Store method update {message} {
     set gid [my last_generation]
     if {$gid == 0} { return 0 }
-    if {[my verbose]} { puts -nonewline "updating \"$message\"" }
-    $Reporter "updating \"$message\""
+    {*}$Reporter "updating \"$message\""
     return [my Update $message false {*}[my filenames $gid]]
 }
 
@@ -105,18 +83,16 @@ oo::define Store method Update {message adding args} {
         if {[file isfile $filename]} {
             lappend filenames $filename
         } else {
-            $Reporter "skipped missing or non-file \"$filename\""
+            {*}$Reporter "skipped missing or non-file \"$filename\""
         }
     }
     if {[llength $filenames] == 0} {
-        if {[my verbose]} { puts "no files to update" }
-        $Reporter "no files to update"
+        {*}$Reporter "no files to update"
         return 0
     }
     $Db eval {INSERT INTO Generations (message) VALUES ($message)}
     set gid [$Db last_insert_rowid]
-    if {[my verbose]} { puts " as generation #$gid" }
-    $Reporter "created generation #$gid"
+    {*}$Reporter "created generation #$gid"
     set n 0
     foreach filename [lsort -nocase $filenames] {
         incr n [my UpdateOne $adding $gid $filename]
@@ -128,53 +104,39 @@ oo::define Store method Update {message adding args} {
 # 1 for 'S'
 oo::define Store method UpdateOne {adding gid filename} {
     set added 1
-    set oldFileData [my GetMostRecent $filename]
     set fileData [FileData load $gid $filename]
-    if {[$oldFileData is_valid] && \
-            [$oldFileData kind] eq [$fileData kind] && \
-            [$oldFileData data] eq [$fileData data]} {
-        $fileData kind S
-        $fileData pgid [$oldFileData gid]
-        $fileData clear_data
+    set data [$fileData data]
+    set oldGid [my FindMatch $gid $filename $data]
+    if {$oldGid != ""} {
+        set kind S
+        set pgid $oldGid
+        set data ""
         set added 0
+    } else {
+        set kind [$fileData kind]
+        set pgid [$fileData pgid]
     }
-    set kind [$fileData kind]
     set usize [$fileData usize]
     set zsize [$fileData zsize]
-    set pgid [$fileData pgid]
-    set data [$fileData data]
     $Db eval {INSERT INTO Files \
         (gid, filename, kind, usize, zsize, pgid, data) VALUES \
         (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
-    if {[my verbose]} {
-        set action [expr {$adding ? "added" : "updated"}]
-        switch $kind {
-            S { puts "unchanged \"$filename\"" }
-            U { puts "$action \"$filename\"" }
-            Z { puts "$action \"$filename\" (compressed)" }
-        }
-    }
     set action [expr {$adding ? "added" : "updated"}]
     switch $kind {
-        S { $Reporter "unchanged \"$filename\"" }
-        U { $Reporter "$action \"$filename\"" }
-        Z { $Reporter "$action \"$filename\" (compressed)" }
+        S { {*}$Reporter "unchanged \"$filename\"" }
+        U { {*}$Reporter "$action \"$filename\"" }
+        Z { {*}$Reporter "$action \"$filename\" (compressed)" }
     }
     return $added
 }
 
-oo::define Store method GetMostRecent {filename} {
-    set gid [$Db eval {SELECT COALESCE(gid, 0) FROM Files \
-                       WHERE filename = :filename AND kind != 'S'}]
-    if {$gid != 0} {
-        set data [$Db eval {SELECT gid, filename, kind, usize, zsize, \
-                            pgid, data FROM Files \
-                            WHERE gid = :gid AND filename = :filename}]
-        set fileData [FileData new {*}$data]
-    } else {
-        set fileData [FileData new]
-    }
-    return $fileData
+oo::define Store method FindMatch {gid filename data} {
+    return [$Db eval {
+        SELECT gid FROM Files \
+        WHERE filename = :filename AND kind IN ('U', 'Z') AND data = :data
+            AND gid != :gid
+        ORDER BY gid DESC LIMIT 1
+    }]
 }
 
 # extracts all files at last or given gid into the current dir or only

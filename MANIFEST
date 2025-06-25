@@ -1,5 +1,4 @@
-# TODO add Report callback (lambda) to Store API & try to get working in
-# parallel with Verbose; if successful, drop Verbose in favour of Report
+# TODO get Reporter working & drop Verbose
 # TODO complete Store API
 
 store

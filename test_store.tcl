@@ -28,16 +28,18 @@ proc test1 {} {
     $str destroy 
 }
 
-proc test2 {} {
+proc test2 with_reporter {
     set procname [lindex [info level 0] 0]
     puts "##### $procname ##############################################"
-    set reporter [lambda {message} { puts $message }]
-    Store set_reporter $reporter
     #Store set_verbose $verbose
     #puts "verbose [Store verbose]"
     set filename /tmp/${procname}.db
     file delete $filename
-    set str [Store new $filename]
+    if {$with_reporter} {
+        set str [Store new $filename [lambda {message} { puts $message }]]
+    } else {
+        set str [Store new $filename]
+    }
     $str add sql/prepare.sql sql/create.sql app-1.tm store-1.tm
     $str add README.md
     $str update "should change nothing #1"
@@ -47,4 +49,5 @@ proc test2 {} {
 }
 
 test1
-test2
+test2 false
+test2 true

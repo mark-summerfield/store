@@ -139,9 +139,24 @@ oo::define Store method FindMatch {gid filename data} {
     }]
 }
 
+# lists all generations (gid x created x tag)
+oo::define Store method list {} {
+    # TODO
+    puts "TODO list"
+}
+
+# deletes the given filename in every generation
+oo::define Store method purge {filename} {
+    # TODO
+    puts "TODO purge"
+}
+
 # extracts all files at last or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
-# path/filename1.ext → path/filename1#gid.ext etc
+# path/filename1.ext → path/filename1#gid.ext,
+# path/filenam2 → path/filename2#gid, etc
+# set ctime to given gid's created time; mtime to most recent Z or U's
+# gid's created time; atime to now
 oo::define Store method extract {{gid 0} args} {
     if {$gid == 0} { set gid [my last_generation] }
     # TODO
@@ -160,16 +175,4 @@ oo::define Store method filenames {{gid 0}} {
     if {$gid == 0} { set gid [my last_generation] }
     return [$Db eval {SELECT filename FROM Files WHERE gid = $gid \
             ORDER BY LOWER(filename)}]
-}
-
-# lists all generations (gid x created x tag)
-oo::define Store method list {} {
-    # TODO
-    puts "TODO list"
-}
-
-# deletes the given filename in every generation
-oo::define Store method purge {filename} {
-    # TODO
-    puts "TODO purge"
 }

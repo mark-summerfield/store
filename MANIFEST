@@ -47,11 +47,8 @@ st.sh
 #	# extract all files at last or given gid into the current dir or
 #	# the specified files using naming
 #	# path/filename1.ext → path/filename1#gid.ext etc
-#   -r|--restore|restore <last|gid> [filename1 [filename2 [... filenameN]]]>
-#	# restore all files at last or given gid into the current dir or
-#	# the specified files using their original names _overwriting_ the
-#	# current versions; if _any_ of the files to be overwritten has
-#	# unstored changes, does _nothing_ and reports the problem
+#   -r|--restore|restore <last|gid> <folder>
+#	# restore all files at last or given gid into the given folder
 #   -f|--filenames|filenames <last|gid>
 #	# print the latest or given generation's filenames to stdout
 #   -l|--list|list [last|gid]

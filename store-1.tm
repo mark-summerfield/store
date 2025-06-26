@@ -148,11 +148,8 @@ oo::define Store method extract {{gid 0} args} {
     puts "TODO extract"
 }
 
-# restore all files at the last or given gid into the current dir or
-# the specified files using their original names _overwriting_ the
-# current versions; if _any_ of the files to be overwritten has
-# unstored changes, does _nothing_ and reports the problem
-oo::define Store method restore {{gid 0} args} {
+# restore all files at last or given gid into the given folder
+oo::define Store method restore {folder {gid 0}} {
     if {$gid == 0} { set gid [my last_generation] }
     # TODO
     puts "TODO restore"

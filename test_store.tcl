@@ -77,7 +77,6 @@ proc test3 {} {
     $str update "should restore old README.md #[$str last_generation]"
     $str update "should change nothing #[$str last_generation]"
     $str update "should change nothing #[$str last_generation]"
-    puts ""
     foreach {gid created message} [$str generations] {
         lappend ::messages "gid=$gid message=\"$message\"\n"
     }

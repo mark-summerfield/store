@@ -77,6 +77,14 @@ proc test3 {} {
     $str update "should restore old README.md #[$str last_generation]"
     $str update "should change nothing #[$str last_generation]"
     $str update "should change nothing #[$str last_generation]"
+    puts ""
+    foreach {gid created message} [$str generations] {
+        lappend ::messages "gid=$gid message=\"$message\"\n"
+    }
+    set n [$str purge app-1.tm]
+    if {$n != 8} {
+        puts "FAIL: expected 8 deletions of app-1.tm; got $n"
+    }
     $str destroy 
     set ::messages [string cat {*}$::messages]
     if {$::messages ne $::MESSAGES} {
@@ -142,6 +150,14 @@ same as generation #2 "README.md"
 same as generation #1 "sql/create.sql"
 same as generation #1 "sql/prepare.sql"
 same as generation #1 "store-1.tm"
+gid=8 message="should change nothing #7"
+gid=7 message="should change nothing #6"
+gid=6 message="should restore old README.md #5"
+gid=5 message="should change to new README.md #4"
+gid=4 message="should change nothing #3"
+gid=3 message="should change nothing #2"
+gid=2 message="added one new file"
+gid=1 message="added 4 new files"
 }
 
 test1

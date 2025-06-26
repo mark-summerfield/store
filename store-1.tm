@@ -90,7 +90,7 @@ oo::define Store method Update {message adding args} {
         {*}$Reporter "no files to update"
         return 0
     }
-    $Db eval {INSERT INTO Generations (message) VALUES ($message)}
+    $Db eval {INSERT INTO Generations (message) VALUES (:message)}
     set gid [$Db last_insert_rowid]
     {*}$Reporter "created generation #$gid"
     set n 0
@@ -139,24 +139,37 @@ oo::define Store method FindMatch {gid filename data} {
     }]
 }
 
-# lists all generations (gid x created x tag)
-oo::define Store method list {} {
-    # TODO
-    puts "TODO list"
+# lists all generations (gid x created x message)
+oo::define Store method generations {} {
+    return [$Db eval { SELECT gid, created, message FROM ViewGenerations }]
 }
 
-# deletes the given filename in every generation
-oo::define Store method purge {filename} {
-    # TODO
-    puts "TODO purge"
+# returns a list of the last or given gid's filenames
+oo::define Store method filenames {{gid 0}} {
+    if {$gid == 0} { set gid [my last_generation] }
+    return [$Db eval {SELECT filename FROM Files WHERE gid = :gid \
+            ORDER BY LOWER(filename)}]
 }
+
+# deletes the given filename in every generation and returns the number
+# of records deleted (which could be zero)
+oo::define Store method purge {filename} {
+    $Db eval {DELETE FROM Files WHERE filename = :filename}
+    return [$Db changes]
+}
+
+# TODO both the below methods may need to create intermediate folders
+# (and restore must create the given folder which must not already
+# exist)
+# TODO both will need to set each file's [cma]time
 
 # extracts all files at last or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
 # path/filename1.ext → path/filename1#gid.ext,
 # path/filenam2 → path/filename2#gid, etc
-# set ctime to given gid's created time; mtime to most recent Z or U's
-# gid's created time; atime to now
+# for each extracted file sets its ctime to the given gid's created
+# time, its mtime to the most recent Z or U's gid's created time, and
+# its atime to now
 oo::define Store method extract {{gid 0} args} {
     if {$gid == 0} { set gid [my last_generation] }
     # TODO
@@ -164,15 +177,11 @@ oo::define Store method extract {{gid 0} args} {
 }
 
 # restore all files at last or given gid into the given folder
+# for each restored file sets its ctime to the given gid's created
+# time, its mtime to the most recent Z or U's gid's created time, and
+# its atime to now
 oo::define Store method restore {folder {gid 0}} {
     if {$gid == 0} { set gid [my last_generation] }
     # TODO
     puts "TODO restore"
-}
-
-# returns a list of the last or given gid's filenames
-oo::define Store method filenames {{gid 0}} {
-    if {$gid == 0} { set gid [my last_generation] }
-    return [$Db eval {SELECT filename FROM Files WHERE gid = $gid \
-            ORDER BY LOWER(filename)}]
 }

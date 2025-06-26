@@ -52,7 +52,7 @@ st.sh
 #   -f|--filenames|filenames <last|gid>
 #	# print the latest or given generation's filenames to stdout
 #   -l|--list|list [last|gid]
-#	# lists all generations (gid x created x tag)
+#	# lists all generations (gid x created x message)
 #   -P|--purge|purge <filename>
 #	# delete the given filename in every generation
 

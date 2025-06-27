@@ -1,5 +1,4 @@
 # TODO CLI
-# NOTE make into a single store.tcl file?
 
 store
 app-1.tm

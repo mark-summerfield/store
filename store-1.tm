@@ -20,7 +20,7 @@ oo::define Store constructor {filename {reporter ""}} {
     } else {
         set Reporter $reporter
     }
-    set Db ::STR#[string range [clock clicks] end-8 end]
+    set Db [self]#DB
     set exists [file isfile $Filename]
     sqlite3 $Db $Filename
     $Db eval [readFile $::APPPATH/sql/prepare.sql] 

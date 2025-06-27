@@ -100,6 +100,14 @@ proc test3 {} {
         set ok false
     }
     file delete sql/prepare#1.sql
+    $str restore 4 /tmp/$procname
+    set create1 [readFile /tmp/$procname/sql/create.sql]
+    set create2 [readFile sql/create.sql]
+    if {$create1 ne $create2} {
+        puts "FAIL: expected\n$create1\n--- got ---\n$create2"
+        set ok false
+    }
+    file delete -force /tmp/$procname
     $str destroy 
     set ::messages [string cat {*}$::messages]
     if {$::messages ne $::MESSAGES} {
@@ -174,7 +182,11 @@ gid=3 message="should change nothing #2"
 gid=2 message="added one new file"
 gid=1 message="added 4 new files"
 extracted "sql/prepare.sql" → "sql/prepare#1.sql"
-extracted "README.md" → "./README#5.md"
+extracted "README.md" → "README#5.md"
+restored "README.md" → "/tmp/test3/README.md"
+restored "sql/create.sql" → "/tmp/test3/sql/create.sql"
+restored "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
+restored "store-1.tm" → "/tmp/test3/store-1.tm"
 }
 
 test1

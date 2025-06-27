@@ -161,30 +161,24 @@ oo::define Store method purge {filename} {
 # extracts all files at last or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
 # path/filename1.ext → path/filename1#gid.ext,
-# path/filenam2 → path/filename2#gid, etc
+# path/filename2 → path/filename2#gid, etc
 oo::define Store method extract {{gid 0} args} {
     if {$gid == 0} { set gid [my last_generation] }
-    if {[llength $args] == 0} {
-        set filenames [my filenames $gid]
-    } else {
-        set filenames $args
-    }
+    set filenames [expr {[llength $args] ? $args : [my filenames $gid]}]
     foreach filename $filenames {
-        my ExtractOne extracted $gid $filename [file dirname $filename] \
-            [file tail $filename]
+        my ExtractOne extracted $gid $filename $filename
     }
 }
 
 # restore all files at last or given gid into the given folder
-oo::define Store method restore {folder {gid 0}} {
-    if {$gid == 0} { set gid [my last_generation] }
-    # TODO
-    # my ExtractOne restored $gid $filename \
-    #   $folder/[file dirname $filename] [file tail $filename]
-    puts "TODO restore"
+oo::define Store method restore {{gid 0} folder} {
+    set filenames [my filenames $gid]
+    foreach filename $filenames {
+        my ExtractOne restored $gid $filename [file join $folder $filename]
+    }
 }
 
-oo::define Store method ExtractOne {action gid filename folder basename} {
+oo::define Store method ExtractOne {action gid filename target} {
     lassign [$Db eval {SELECT kind, pgid FROM Files WHERE gid = :gid \
                        AND filename = :filename}] kind pgid
     if {$kind eq "S"} {
@@ -195,16 +189,21 @@ oo::define Store method ExtractOne {action gid filename folder basename} {
         lassign [$Db eval {SELECT kind, data FROM Files WHERE gid = :gid \
                            AND filename = :filename}] kind data
     }
-    if {$kind eq "Z"} {
-        set data [zlib inflate $data]
-    }
-    set target [target_name $gid $folder/$basename]
+    if {$kind eq "Z"} { set data [zlib inflate $data] }
+    set target [prepare_target $action $gid $target]
     writeFile $target binary $data
     {*}$Reporter "$action \"$filename\" → \"$target\""
 }
 
 
-proc target_name {gid filename} {
-    set ext [file extension $filename]
-    return "[file rootname $filename]#$gid$ext"
+proc prepare_target {action gid filename} {
+    if {$action eq "extracted"} {
+        set ext [file extension $filename]
+        set target "[file rootname $filename]#$gid$ext"
+    } else {
+        set target $filename
+    }
+    set dirname [file dirname $target]
+    if {![file isdirectory $dirname]} { file mkdir $dirname }
+    return $target
 }

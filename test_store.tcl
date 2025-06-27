@@ -54,6 +54,7 @@ proc test2 {} {
 }
 
 proc test3 {} {
+    set ok true
     set procname [lindex [info level 0] 0]
     puts -nonewline "$procname "
     set filename /tmp/${procname}.db
@@ -69,7 +70,7 @@ proc test3 {} {
     $str update "should change nothing #[$str last_generation]"
     # change README.md
     set readme [readFile README.md]
-    set readmex "$readme\nanother line\nand more!"
+    set readmex "$readme\nanother line\nand more!\n"
     writeFile README.md $readmex
     $str update "should change to new README.md #[$str last_generation]"
     # restore original README.md
@@ -83,14 +84,29 @@ proc test3 {} {
     set n [$str purge app-1.tm]
     if {$n != 8} {
         puts "FAIL: expected 8 deletions of app-1.tm; got $n"
+        set ok false
     }
+    $str extract 5 sql/prepare.sql README.md
+    set readmex2 [readFile README#5.md]
+    if {$readmex2 ne $readmex} {
+        puts "FAIL: expected\n$readmex\n--- got ---\n$readmex"
+        set ok false
+    }
+    file delete README#5.md
+    set prep1 [readFile sql/prepare.sql]
+    set prep2 [readFile sql/prepare#1.sql]
+    if {$prep1 ne $prep2} {
+        puts "FAIL: expected\n$prep1\n--- got ---\n$prep1"
+        set ok false
+    }
+    file delete sql/prepare#1.sql
     $str destroy 
     set ::messages [string cat {*}$::messages]
     if {$::messages ne $::MESSAGES} {
         puts "FAIL: expected\n$::MESSAGES\n--- got ---\n$::messages"
-    } else {
-        puts OK
+        set ok false
     }
+    if {$ok} { puts OK }
 }
 
 const MESSAGES {adding 4 new files
@@ -157,6 +173,8 @@ gid=4 message="should change nothing #3"
 gid=3 message="should change nothing #2"
 gid=2 message="added one new file"
 gid=1 message="added 4 new files"
+extracted "sql/prepare.sql" → "sql/prepare#1.sql"
+extracted "README.md" → "README#5.md"
 }
 
 test1

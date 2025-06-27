@@ -167,21 +167,47 @@ oo::define Store method purge {filename} {
 # the specified files, in both cases using the naming convention
 # path/filename1.ext → path/filename1#gid.ext,
 # path/filenam2 → path/filename2#gid, etc
-# for each extracted file sets its ctime to the given gid's created
-# time, its mtime to the most recent Z or U's gid's created time, and
-# its atime to now
 oo::define Store method extract {{gid 0} args} {
     if {$gid == 0} { set gid [my last_generation] }
-    # TODO
-    puts "TODO extract"
+    if {[llength $args] == 0} {
+        set filenames [my filenames $gid]
+    } else {
+        set filenames $args
+    }
+    foreach filename $filenames {
+        my ExtractOne extracted $gid $filename
+    }
 }
 
 # restore all files at last or given gid into the given folder
-# for each restored file sets its ctime to the given gid's created
-# time, its mtime to the most recent Z or U's gid's created time, and
-# its atime to now
 oo::define Store method restore {folder {gid 0}} {
     if {$gid == 0} { set gid [my last_generation] }
     # TODO
+    # my ExtractOne restored $gid $filename $target
     puts "TODO restore"
+}
+
+oo::define Store method ExtractOne {action gid filename} {
+    lassign [$Db eval {SELECT kind, pgid FROM Files WHERE gid = :gid \
+                       AND filename = :filename}] kind pgid
+    if {$kind eq "S"} {
+        lassign [$Db eval {SELECT kind, data FROM Files WHERE gid = :pgid \
+                           AND filename = :filename}] kind data
+        set gid $pgid
+    } else {
+        lassign [$Db eval {SELECT kind, data FROM Files WHERE gid = :gid \
+                           AND filename = :filename}] kind data
+    }
+    if {$kind eq "Z"} {
+        set data [zlib inflate $data]
+    }
+    set target [target_name $gid $filename]
+    writeFile $target binary $data
+    {*}$Reporter "$action \"$filename\" → \"$target\""
+}
+
+
+proc target_name {gid filename} {
+    set ext [file extension $filename]
+    return "[file rootname $filename]#$gid$ext"
 }

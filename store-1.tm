@@ -158,11 +158,6 @@ oo::define Store method purge {filename} {
     return [$Db changes]
 }
 
-# TODO both the below methods may need to create intermediate folders
-# (and restore must create the given folder which must not already
-# exist)
-# TODO both will need to set each file's [cma]time
-
 # extracts all files at last or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
 # path/filename1.ext → path/filename1#gid.ext,
@@ -175,7 +170,8 @@ oo::define Store method extract {{gid 0} args} {
         set filenames $args
     }
     foreach filename $filenames {
-        my ExtractOne extracted $gid $filename
+        my ExtractOne extracted $gid $filename [file dirname $filename] \
+            [file tail $filename]
     }
 }
 
@@ -183,11 +179,12 @@ oo::define Store method extract {{gid 0} args} {
 oo::define Store method restore {folder {gid 0}} {
     if {$gid == 0} { set gid [my last_generation] }
     # TODO
-    # my ExtractOne restored $gid $filename $target
+    # my ExtractOne restored $gid $filename \
+    #   $folder/[file dirname $filename] [file tail $filename]
     puts "TODO restore"
 }
 
-oo::define Store method ExtractOne {action gid filename} {
+oo::define Store method ExtractOne {action gid filename folder basename} {
     lassign [$Db eval {SELECT kind, pgid FROM Files WHERE gid = :gid \
                        AND filename = :filename}] kind pgid
     if {$kind eq "S"} {
@@ -201,7 +198,7 @@ oo::define Store method ExtractOne {action gid filename} {
     if {$kind eq "Z"} {
         set data [zlib inflate $data]
     }
-    set target [target_name $gid $filename]
+    set target [target_name $gid $folder/$basename]
     writeFile $target binary $data
     {*}$Reporter "$action \"$filename\" → \"$target\""
 }

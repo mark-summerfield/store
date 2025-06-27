@@ -174,7 +174,7 @@ gid=3 message="should change nothing #2"
 gid=2 message="added one new file"
 gid=1 message="added 4 new files"
 extracted "sql/prepare.sql" → "sql/prepare#1.sql"
-extracted "README.md" → "README#5.md"
+extracted "README.md" → "./README#5.md"
 }
 
 test1

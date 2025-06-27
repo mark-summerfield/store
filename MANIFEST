@@ -20,7 +20,7 @@ st.sh
 # CLI API
 #   default action is update (i.e., create new generation) with no message
 #	if no existing dirname1.str givens an error message saying to
-#	use add; otherwise creates new generation with 'R' or 'r' or '='
+#	use add; otherwise creates new generation with 'R' or 'r' or 'S'
 #	for every file present in the _last_ generation that hasn't been
 #	deleted
 #   -m|--message|message <any text> # update with message
@@ -51,7 +51,7 @@ st.sh
 #	# restore all files at last or given gid into the given folder
 #   -f|--filenames|filenames <last|gid>
 #	# print the latest or given generation's filenames to stdout
-#   -l|--list|list [last|gid]
+#   -g|--generations|generations [last|gid]
 #	# lists all generations (gid x created x message)
 #   -P|--purge|purge <filename>
 #	# delete the given filename in every generation

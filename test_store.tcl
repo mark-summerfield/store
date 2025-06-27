@@ -189,6 +189,7 @@ restored "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
 restored "store-1.tm" → "/tmp/test3/store-1.tm"
 }
 
+cd $::APPPATH
 test1
 test2
 test3

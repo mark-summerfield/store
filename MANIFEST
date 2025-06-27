@@ -17,21 +17,10 @@ st.sh
 
 #
 # CLI API
-#   default action is update (i.e., create new generation) with no message
-#	if no existing dirname1.str givens an error message saying to
-#	use add; otherwise creates new generation with 'R' or 'r' or 'S'
-#	for every file present in the _last_ generation that hasn't been
-#	deleted
-#   -m|--message|message <any text> # update with message
+#   store <subcommand> ...
 #
-#   -h|--help|help # usage
-#   --version|version
-# 
-#   -v|--verbose|verbose # give more info on action
-#
-#   -g|--gui|gui # launch GUI
-#   -a|--add|add [filename1|dirname1 [... filename|dirnameN]]
-#	creates dirname.str if it doesn't exist
+#   a|add [filename1|dirname1 [... filename|dirnameN]]
+#	creates .dirname.str if it doesn't exist
 #	creates a new generation adding all files in the current dir and
 #	all given filenames and all files in the given dirs (if any
 #	given), but excluding hidden files and excluded files:
@@ -39,20 +28,31 @@ st.sh
 #	database. When adding new files the application must exclude any
 #	files/globs listed in .gitignore or .hginore files as well as
 #	hidden files and sensible default ignores.
-#   -d|--diff|diff <last|gid1> [last|gid2] <filename> 
-#	# diff the last or given gid1 of filename against one in current
-#	# dir or against last or gid2 if given
-#   -e|--extract|extract <last|gid> [filename1 [filename2 [... filenameN]]]>
+#   u|update [-v|--verbose] [any message text]
+#	create new generation with message if given if no existing
+#	.dirname1.str givens an error message saying to use add;
+#	otherwise creates new generation with 'U' or 'Z' or 'S' for
+#	every file present in the _last_ generation that hasn't been
+#	deleted
+#   e|extract <last|gid> [filename1 [filename2 [... filenameN]]]>
 #	# extract all files at last or given gid into the current dir or
 #	# the specified files using naming
 #	# path/filename1.ext → path/filename1#gid.ext etc
-#   -r|--restore|restore <last|gid> <folder>
-#	# restore all files at last or given gid into the given folder
-#   -f|--filenames|filenames <last|gid>
+#   c|copy <last|gid> <folder>
+#	# copy all files at last or given gid into the given folder
+#   f|filenames <last|gid>
 #	# print the latest or given generation's filenames to stdout
-#   -g|--generations|generations [last|gid]
+#   g|generations|generations [last|gid]
 #	# lists all generations (gid x created x message)
-#   -P|--purge|purge <filename>
+#   p||purge <filename>
 #	# delete the given filename in every generation
+#   g|gui
+#	launch GUI
+#   h|help|-h|--help
+#	usage
+#   v|version|-v|--version
+#   d|diff <last|gid1> [last|gid2] <filename> 
+#	# diff the last or given gid1 of filename against one in current
+#	# dir or against last or gid2 if given
 
 # vim: syn=yaml

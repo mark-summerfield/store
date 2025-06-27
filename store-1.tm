@@ -167,15 +167,15 @@ oo::define Store method extract {{gid 0} args} {
     }
 }
 
-# restore all files at last or given gid into the given folder (which
+# copy all files at last or given gid into the given folder (which
 # must not already exist)
-oo::define Store method restore {{gid 0} folder} {
+oo::define Store method copy {{gid 0} folder} {
     if {[file isdirectory $folder]} {
-        error "can only restore into a new nonexistent folder"
+        error "can only copy into a new nonexistent folder"
     }
     set filenames [my filenames $gid]
     foreach filename $filenames {
-        my ExtractOne restored $gid $filename [file join $folder $filename]
+        my ExtractOne copied $gid $filename [file join $folder $filename]
     }
 }
 

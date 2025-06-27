@@ -5,7 +5,6 @@ app-1.tm
 store-1.tm
 filedata-1.tm
 misc-1.tm
-globals-1.tm
 
 test_store.tcl
 

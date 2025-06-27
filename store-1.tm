@@ -1,7 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require filedata
-package require globals
 package require lambda 1
 package require misc
 package require sqlite3 3
@@ -12,14 +11,12 @@ oo::class create Store {
     variable Reporter
 }
 
-# creates database if it doesn't exist
+# creates database if it doesn't exist; sets reporter to ignore messages
+# unless the caller overrides
 oo::define Store constructor {filename {reporter ""}} {
     set Filename $filename
-    if {$reporter eq ""} {
-        set Reporter [lambda {message} {}]
-    } else {
-        set Reporter $reporter
-    }
+    set Reporter [expr {$reporter eq "" ? [lambda {message} {}] \
+                                        : $reporter}]
     set Db [self]#DB
     set exists [file isfile $Filename]
     sqlite3 $Db $Filename
@@ -43,21 +40,20 @@ oo::define Store method is_closed {} { catch {$Db version} }
 oo::define Store method filename {} { return $Filename }
 
 oo::define Store method last_generation {} {
-    set gid [$Db eval {SELECT * FROM LastGeneration}]
-    expr {$gid == "{}" ? 0 : int($gid)}
+    return [$Db eval {SELECT gid FROM LastGeneration}]
 }
 
-# Creates new generation with 'U' or 'Z' or 'S' for every given file
+# creates new generation with 'U' or 'Z' or 'S' for every given file and
 # returns the number of files added. (Excludes should be handled by the
 # application itself.)
 oo::define Store method add {args} {
     set size [llength $args]
     lassign [misc::n_s $size] n s
-    set filenames [my filenames]
     {*}$Reporter "adding $n new file$s"
-    set size2 [llength $filenames]
-    if {$size2 > 0 } {
-        lassign [misc::n_s $size2] n2 s2
+    set filenames [my filenames]
+    set size [llength $filenames]
+    if {$size > 0 } {
+        lassign [misc::n_s $size] n2 s2
         {*}$Reporter "updating $n2 file$s2"
     }
     set filenames [lsort -nocase [list {*}$filenames {*}$args]]
@@ -66,11 +62,11 @@ oo::define Store method add {args} {
 
 # if at least one prev generation exists, creates new generation with
 # 'U' or 'Z' or 'S' for every file present in the _last_ generation that
-# hasn't been deleted and returns the number updated; otherwise does
-# nothing and returns 0
+# hasn't been deleted and returns the number updated (which could be 0);
+# must only be used after at least one call to add
 oo::define Store method update {message} {
     set gid [my last_generation]
-    if {$gid == 0} { return 0 }
+    if {$gid == 0} { error "can only update a non-empty store" }
     {*}$Reporter "updating \"$message\""
     return [my Update $message false {*}[my filenames $gid]]
 }
@@ -101,13 +97,13 @@ oo::define Store method Update {message adding args} {
 }
 
 # adds the given file as 'U' or 'Z' or 'S'; returns 1 for 'U' or 'Z' or
-# 1 for 'S'
+# 0 for 'S'
 oo::define Store method UpdateOne {adding gid filename} {
     set added 1
     set fileData [FileData load $gid $filename]
     set data [$fileData data]
     set oldGid [my FindMatch $gid $filename $data]
-    if {$oldGid != ""} {
+    if {$oldGid != 0} {
         set kind S
         set pgid $oldGid
         set data ""
@@ -119,27 +115,28 @@ oo::define Store method UpdateOne {adding gid filename} {
     set usize [$fileData usize]
     set zsize [$fileData zsize]
     $Db eval {INSERT INTO Files \
-        (gid, filename, kind, usize, zsize, pgid, data) VALUES \
-        (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
+              (gid, filename, kind, usize, zsize, pgid, data) VALUES \
+              (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     set action [expr {$adding ? "added" : "updated"}]
     switch $kind {
         S { {*}$Reporter "same as generation #$pgid \"$filename\"" }
         U { {*}$Reporter "$action \"$filename\"" }
-        Z { {*}$Reporter "$action \"$filename\" (compressed)" }
+        Z { {*}$Reporter "$action \"$filename\" (deflated)" }
     }
     return $added
 }
 
 oo::define Store method FindMatch {gid filename data} {
-    return [$Db eval {
+    set gid [$Db eval {
         SELECT gid FROM Files \
         WHERE filename = :filename AND kind IN ('U', 'Z') AND data = :data
             AND gid != :gid
         ORDER BY gid DESC LIMIT 1
     }]
+    return [expr {$gid eq "" ? 0 : $gid}]
 }
 
-# lists all generations (gid x created x message)
+# lists all generations (gid, created, message)
 oo::define Store method generations {} {
     return [$Db eval { SELECT gid, created, message FROM ViewGenerations }]
 }
@@ -148,11 +145,11 @@ oo::define Store method generations {} {
 oo::define Store method filenames {{gid 0}} {
     if {$gid == 0} { set gid [my last_generation] }
     return [$Db eval {SELECT filename FROM Files WHERE gid = :gid \
-            ORDER BY LOWER(filename)}]
+                      ORDER BY LOWER(filename)}]
 }
 
 # deletes the given filename in every generation and returns the number
-# of records deleted (which could be zero)
+# of records deleted (which could be 0)
 oo::define Store method purge {filename} {
     $Db eval {DELETE FROM Files WHERE filename = :filename}
     return [$Db changes]
@@ -170,8 +167,12 @@ oo::define Store method extract {{gid 0} args} {
     }
 }
 
-# restore all files at last or given gid into the given folder
+# restore all files at last or given gid into the given folder (which
+# must not already exist)
 oo::define Store method restore {{gid 0} folder} {
+    if {[file isdirectory $folder]} {
+        error "can only restore into a new nonexistent folder"
+    }
     set filenames [my filenames $gid]
     foreach filename $filenames {
         my ExtractOne restored $gid $filename [file join $folder $filename]

@@ -1,6 +1,5 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require globals
 package require sqlite3 3
 
 oo::class create FileData {
@@ -45,56 +44,43 @@ oo::define FileData method is_valid {} {
 }
 
 oo::define FileData method gid {{gid 0}} {
-    if {$gid != 0} {
-        set Gid $gid
-    }
+    if {$gid != 0} { set Gid $gid }
     return $Gid
 }
 
 oo::define FileData method filename {{filename ""}} {
-    if {$filename ne ""} {
-        set Filename $filename
-    }
+    if {$filename ne ""} { set Filename $filename }
     return $Filename
 }
 
 oo::define FileData method kind {{kind ""}} {
-    if {$kind ne ""} {
-        set Kind $kind
-    }
+    if {$kind ne ""} { set Kind $kind }
     return $Kind
 }
 
 oo::define FileData method usize {{usize 0}} {
-    if {$usize != 0} {
-        set Usize $usize
-    }
+    if {$usize != 0} { set Usize $usize }
     return $Usize
 }
 
 oo::define FileData method zsize {{zsize 0}} {
-    if {$zsize != 0} {
-        set Zsize $zsize
-    }
+    if {$zsize != 0} { set Zsize $zsize }
     return $Zsize
 }
 
 oo::define FileData method pgid {{pgid 0}} {
-    if {$pgid != 0} {
-        set Pgid $pgid
-    }
+    if {$pgid != 0} { set Pgid $pgid }
     return $Pgid
 }
 
 oo::define FileData method data {{data ""}} {
-    if {$data ne ""} {
-        set Data $data
-    }
+    if {$data ne ""} { set Data $data }
     return $Data
 }
 
 oo::define FileData method clear_data {} { set Data "" }
 
+# for debugging
 oo::define FileData method to_string {} {
     return "FileData Gid=$Gid Filename=$Filename Kind=$Kind Usize=$Usize \
             Zsize=$Zsize Pgid=$Pgid Data(len)=[string length $Data]"

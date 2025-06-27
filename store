@@ -3,6 +3,7 @@
 
 const APPPATH [file normalize [file dirname [info script]]]
 tcl::tm::path add $APPPATH
+const VERSION 0.1.0
 
 package require app
 

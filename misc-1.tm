@@ -3,15 +3,16 @@
 namespace eval misc {}
 
 proc misc::sqlite_version {} {
-    set db ::STR#[string range [clock clicks] end-8 end]
+    set db ::DB#[string range [clock clicks] end-8 end]
     sqlite3 $db :memory:
-    set version "SQLite [$db version]"
-    $db close
-    return $version
+    try {
+        return "SQLite [$db version]"
+    } finally {
+        $db close
+    }
 }
 
 proc misc::n_s size {
-    set n [expr {$size == 1 ? "one" : $size}]
-    set s [expr {$size == 1 ? "" : "s"}]
-    return [list $n $s]
+    if {$size == 1} { return [list "one" ""] }
+    return [list $size "s"]
 }

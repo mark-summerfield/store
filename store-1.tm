@@ -24,6 +24,9 @@ oo::define Store constructor {filename {reporter ""}} {
     if {!$exists} {
         $Db eval [readFile $::APPPATH/sql/create.sql] 
         $Db eval [readFile $::APPPATH/sql/insert.sql] 
+        {*}$Reporter "created $Filename"
+    } else {
+        {*}$Reporter "opened $Filename"
     }
 }
 
@@ -157,7 +160,9 @@ oo::define Store method ignore {args} {
 # delete filenames or dirnames or globs to ignore
 oo::define Store method unignore {args} {
     $Db transaction {
-        foreach pattern $args { $Db eval { DELETE FROM Ignores :pattern } }
+        foreach pattern $args {
+            $Db eval { DELETE FROM Ignores WHERE pattern = :pattern }
+        }
     }
 }
 

@@ -186,9 +186,9 @@ oo::define Store method ExtractOne {action gid filename target} {
     {*}$Reporter "$action \"$filename\" → \"$target\""
 }
 
-# Returns the gid and data for the given filename at the given gid;
-# The returned gid will be == the given gid if the data is U or Z or will be
-# the pgid where the data is U or Z if the data at the given gid is S
+# Returns the gid and data for the given filename at the given gid; The
+# returned gid will equal the given gid if the data is U or Z or will be the
+# pgid where the data is U or Z if the data at the given gid is S
 oo::define Store method get {gid filename} {
     lassign [$Db eval {SELECT kind, pgid FROM Files WHERE gid = :gid \
                        AND filename = :filename}] kind pgid

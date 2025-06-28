@@ -38,3 +38,5 @@ CREATE TABLE Files (
     FOREIGN KEY(gid) REFERENCES Generations(gid),
     PRIMARY KEY(gid, filename)
 );
+
+CREATE TABLE Ignores (pattern TEXT PRIMARY KEY NOT NULL) WITHOUT ROWID;

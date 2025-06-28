@@ -136,6 +136,20 @@ oo::define Store method FindMatch {gid filename data} {
     return [expr {$gid eq "" ? 0 : $gid}]
 }
 
+oo::define Store method ignores {} {
+    return [$Db eval { SELECT pattern FROM Ignores
+                       ORDER BY LOWER(pattern) }]
+}
+
+oo::define Store method ignore {args} {
+    $Db transaction {
+        foreach pattern $args
+    }
+}
+
+oo::define Store method unignore {args} {
+}
+
 # lists all generations (gid, created, message)
 oo::define Store method generations {} {
     return [$Db eval { SELECT gid, created, message FROM ViewGenerations }]

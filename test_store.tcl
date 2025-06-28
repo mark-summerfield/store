@@ -222,8 +222,36 @@ proc test4 {} {
     if {$ok} { puts OK }
 }
 
+proc test5 {} {
+    set procname [lindex [info level 0] 0]
+    puts -nonewline "$procname "
+    set ok true
+    set filename /tmp/${procname}.db
+    file delete $filename
+    set expecteds {{*.a} {*.bak} {*.class} {*.dll} {*.exe} {*.jar} {*.ld} \
+        {*.ldx} {*.li} {*.lix} {*.o} {*.obj} {*.py[co]} {*.rs.bk} \
+        {*.so} {*.sw[nop]} {*.tmp} {*~} {[#]*#} {__pycache__} \
+        {louti[0-9]*} {moc_*.cpp} {qrc_*.cpp} {test.*} {ui_*.h} {zOld}}
+    set str [Store new $filename]
+    try {
+        set i 0
+        foreach pattern [$str ignores] {
+            set expected [lindex $expecteds $i]
+            if {$pattern ne $expected} {
+                puts "FAIL: expected \"$expected\"; got \"$pattern\""
+                set ok false
+            }
+            incr i
+        }
+    } finally {
+        $str destroy 
+    }
+    if {$ok} { puts OK }
+}
+
 cd $::APPPATH
 test1
 test2
 test3
 test4
+test5

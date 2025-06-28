@@ -23,6 +23,7 @@ oo::define Store constructor {filename {reporter ""}} {
     $Db eval [readFile $::APPPATH/sql/prepare.sql] 
     if {!$exists} {
         $Db eval [readFile $::APPPATH/sql/create.sql] 
+        $Db eval [readFile $::APPPATH/sql/insert.sql] 
     }
 }
 
@@ -44,8 +45,8 @@ oo::define Store method last_generation {} {
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file and
-# returns the number of files added. (Excludes should be handled by the
-# application itself.)
+# returns the number of files added.
+# Note that ignores should be handled by the application itself.
 oo::define Store method add {args} {
     set size [llength $args]
     lassign [misc::n_s $size] n s
@@ -136,18 +137,28 @@ oo::define Store method FindMatch {gid filename data} {
     return [expr {$gid eq "" ? 0 : $gid}]
 }
 
+# returns the filenames, dirnames, and globs to ignore
 oo::define Store method ignores {} {
     return [$Db eval { SELECT pattern FROM Ignores
                        ORDER BY LOWER(pattern) }]
 }
 
+# add filenames or dirnames or globs to ignore;
+# note that hidden files are ignored by default so need not be added
 oo::define Store method ignore {args} {
     $Db transaction {
-        foreach pattern $args
+        foreach pattern $args {
+            $Db eval { INSERT OR REPLACE INTO Ignores (pattern)
+                       VALUES (:pattern) }
+        }
     }
 }
 
+# delete filenames or dirnames or globs to ignore
 oo::define Store method unignore {args} {
+    $Db transaction {
+        foreach pattern $args { $Db eval { DELETE FROM Ignores :pattern } }
+    }
 }
 
 # lists all generations (gid, created, message)

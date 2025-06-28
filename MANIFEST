@@ -10,6 +10,7 @@ test_store.tcl
 
 sql/prepare.sql
 sql/create.sql
+sql/insert.sql
 
 README.md
 
@@ -23,7 +24,7 @@ st.sh
 #	creates a new generation adding all specified files and all files in
 #	the specified directories, but excluding those matching the ignored
 #	names/globs. If verbose any files or folders _not_ being added and
-#	_not_ excluded shoule be listed as 'not added'
+#	_not_ ignored shoule be listed as 'not added'
 #   u|update [-v|--verbose] [any message text]
 #	if no store exists (i.e., .dirname.str) reports and error and exits;
 #	otherwise creates a new generation updating files from the _last_
@@ -43,8 +44,9 @@ st.sh
 #	print the latest or given generation's filenames to stdout
 #   g|generations|generations
 #	lists all generations (gid x created x message)
-#   i|ignore <filename1|glob1> [filename2|glob2 [... filenameN|globN]]
+#   i|ignore <filename1|dirname1|glob1> [filename2|dirname2|glob2 [... #   filenameN|dirnameN|globN]]
 #	add these to the ignores; use quotes to prevent shell expansion
+#	note that hidden files are ignored by default so need not be added
 #   U|unignore <filename1|glob1> [filename2|glob2 [... filenameN|globN]]
 #	remove these from the ignores; use quotes to prevent shell expansion
 #   p||purge <filename>

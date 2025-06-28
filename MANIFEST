@@ -31,17 +31,19 @@ st.sh
 #	otherwise creates a new generation updating files from the _last_
 #	generation. If verbose any files or folders _not_ being updated and
 #	_not_ ignored shoule be listed as 'not added'
-#   e|extract [verbose] <last|gid> [filename1 [filename2 [... filenameN]]]>
+#   p|print [#gid] <filename>
+#	print the last of given gid of filename to stdout
+#   e|extract [verbose] [#gid] [filename1 [filename2 [... filenameN]]]>
 #	extract all files at last or given gid into the current dir or the
 #	specified files using naming path/filename1.ext →
 #	path/filename1#gid.ext etc
-#   c|copy [] <last|gid> <folder>
+#   c|copy [] [#gid] <folder>
 #	copy all files at last or given gid into the given (non-existing)
 #	folder
-#   d|diff <last|gid1> [last|gid2] <filename> 
+#   d|diff <#gid1> [#gid2] <filename> 
 #	diff the last or given gid1 of filename against one in current dir
 #	or against last or gid2 if given
-#   f|filenames <last|gid>
+#   f|filenames <#gid>
 #	print the latest or given generation's filenames to stdout
 #   g|generations|generations
 #	lists all generations (gid x created x message)
@@ -50,7 +52,7 @@ st.sh
 #	note that hidden files are ignored by default so need not be added
 #   U|unignore <filename1|glob1> [filename2|glob2 [... filenameN|globN]]
 #	remove these from the ignores; use quotes to prevent shell expansion
-#   p||purge <filename>
+#   P|purge <filename>
 #	delete the given filename in every generation
 #   g|gui
 #	launch GUI

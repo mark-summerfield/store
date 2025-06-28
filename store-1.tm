@@ -134,7 +134,7 @@ oo::define Store method FindMatch {gid filename data} {
     set gid [$Db eval {
         SELECT gid FROM Files \
         WHERE filename = :filename AND kind IN ('U', 'Z') AND data = :data
-            AND gid != :gid
+              AND gid != :gid
         ORDER BY gid DESC LIMIT 1
     }]
     return [expr {$gid eq "" ? 0 : $gid}]
@@ -142,8 +142,7 @@ oo::define Store method FindMatch {gid filename data} {
 
 # returns the filenames, dirnames, and globs to ignore
 oo::define Store method ignores {} {
-    return [$Db eval { SELECT pattern FROM Ignores
-                       ORDER BY LOWER(pattern) }]
+    return [$Db eval {SELECT pattern FROM Ignores ORDER BY LOWER(pattern)}]
 }
 
 # add filenames or dirnames or globs to ignore;
@@ -151,8 +150,8 @@ oo::define Store method ignores {} {
 oo::define Store method ignore {args} {
     $Db transaction {
         foreach pattern $args {
-            $Db eval { INSERT OR REPLACE INTO Ignores (pattern)
-                       VALUES (:pattern) }
+            $Db eval {INSERT OR REPLACE INTO Ignores (pattern)
+                      VALUES (:pattern)}
         }
     }
 }
@@ -161,14 +160,14 @@ oo::define Store method ignore {args} {
 oo::define Store method unignore {args} {
     $Db transaction {
         foreach pattern $args {
-            $Db eval { DELETE FROM Ignores WHERE pattern = :pattern }
+            $Db eval {DELETE FROM Ignores WHERE pattern = :pattern}
         }
     }
 }
 
 # lists all generations (gid, created, message)
 oo::define Store method generations {} {
-    return [$Db eval { SELECT gid, created, message FROM ViewGenerations }]
+    return [$Db eval {SELECT gid, created, message FROM ViewGenerations}]
 }
 
 # returns a list of the last or given gid's filenames

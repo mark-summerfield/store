@@ -15,44 +15,43 @@ README.md
 
 st.sh
 
-#
 # CLI API
 #   store <subcommand> ...
 #
-#   a|add [filename1|dirname1 [... filename|dirnameN]]
-#	creates .dirname.str if it doesn't exist
-#	creates a new generation adding all files in the current dir and
-#	all given filenames and all files in the given dirs (if any
-#	given), but excluding hidden files and excluded files:
-#	Excludes are managed by the application itself not by the Store
-#	database. When adding new files the application must exclude any
-#	files/globs listed in .gitignore or .hginore files as well as
-#	hidden files and sensible default ignores.
+#   a|add [-v|--verbose] [filename1|dirname1 [... filename|dirnameN]]
+#	creates a new store called .dirname.str if it doesn't exist and
+#	creates a new generation adding all specified files and all files in
+#	the specified directories, but excluding those matching the
+#	names/globs listed in .gitignore or .hginore files as well as hidden
+#	files and sensible default ignores. If verbose any files or folders
+#	_not_ being added and _not_ excluded shoule be listed as 'not added'
+#	with 'add to .gitignore to avoid this reminder'
 #   u|update [-v|--verbose] [any message text]
-#	create new generation with message if given if no existing
-#	.dirname1.str givens an error message saying to use add;
-#	otherwise creates new generation with 'U' or 'Z' or 'S' for
-#	every file present in the _last_ generation that hasn't been
-#	deleted
-#   e|extract <last|gid> [filename1 [filename2 [... filenameN]]]>
-#	# extract all files at last or given gid into the current dir or
-#	# the specified files using naming
-#	# path/filename1.ext → path/filename1#gid.ext etc
-#   c|copy <last|gid> <folder>
-#	# copy all files at last or given gid into the given folder
+#	if no store exists (i.e., .dirname.str) reports and error and exits;
+#	otherwise creates a new generation updating files from the _last_
+#	generation. If verbose any files or folders _not_ being updated and
+#	_not_ excluded shoule be listed as 'not added' with 'add to
+#	.gitignore to avoid this reminder'
+#   e|extract [-v|--verbose] <last|gid> [filename1 [filename2 [... filenameN]]]>
+#	extract all files at last or given gid into the current dir or the
+#	specified files using naming path/filename1.ext →
+#	path/filename1#gid.ext etc
+#   c|copy [-v|--verbose] <last|gid> <folder>
+#	copy all files at last or given gid into the given (non-existing)
+#	folder
+#   d|diff <last|gid1> [last|gid2] <filename> 
+#	diff the last or given gid1 of filename against one in current dir
+#	or against last or gid2 if given
 #   f|filenames <last|gid>
-#	# print the latest or given generation's filenames to stdout
-#   g|generations|generations [last|gid]
-#	# lists all generations (gid x created x message)
+#	print the latest or given generation's filenames to stdout
+#   g|generations|generations
+#	lists all generations (gid x created x message)
 #   p||purge <filename>
-#	# delete the given filename in every generation
+#	delete the given filename in every generation
 #   g|gui
 #	launch GUI
 #   h|help|-h|--help
 #	usage
 #   v|version|-v|--version
-#   d|diff <last|gid1> [last|gid2] <filename> 
-#	# diff the last or given gid1 of filename against one in current
-#	# dir or against last or gid2 if given
 
 # vim: syn=yaml

@@ -66,7 +66,7 @@ oo::define Store method add {args} {
 # must only be used after at least one call to add
 oo::define Store method update {message} {
     set gid [my last_generation]
-    if {$gid == 0} { error "can only update a non-empty store" }
+    if {$gid == 0} { error "can only update an existing non-empty store" }
     {*}$Reporter "updating \"$message\""
     return [my Update $message false {*}[my filenames $gid]]
 }

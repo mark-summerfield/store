@@ -206,7 +206,7 @@ proc test4 {} {
     set str [Store new $filename]
     try {
         catch { $str update "should cause error" } err_message
-        if {$err_message ne "can only update a non-empty store"} {
+        if {$err_message ne "can only update an existing non-empty store"} {
             puts "FAIL: expected non-empty store error; got $err_message"
             set ok false
         }

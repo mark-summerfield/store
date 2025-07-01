@@ -1,6 +1,5 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require lambda 1
 package require store
 
 namespace eval app {}
@@ -9,8 +8,8 @@ proc app::main {} {
     if {$::argc == 0 || [lsearch -exact $::argv -h] >= 0 || \
                         [lsearch -exact $::argv help] >= 0 || \
                         [lsearch -exact $::argv --help] >= 0} usage
-    set filename .[file tail [pwd]].str
     set reporter ""
+    set filename .[file tail [pwd]].str
     set command [lindex $::argv 0]
     set args [lrange $::argv 1 end]
     set first [lindex $args 0]
@@ -40,7 +39,7 @@ proc app::main {} {
         g -
         generations { generations $filename $args }
         G -
-        gui { gui }
+        gui { gui $filename }
         i -
         ignore { ignore $filename $args }
         I -
@@ -62,62 +61,71 @@ proc app::main {} {
 }
 
 proc app::add {reporter filename args} {
-    {*}$reporter "add reporter=$reporter store=$filename args=$args"
+    puts "TODO add reporter=$reporter store=$filename args=$args"
 }
 
 proc app::update {reporter filename args} {
-    {*}$reporter "update reporter=$reporter store=$filename args=$args"
+    puts "TODO update reporter=$reporter store=$filename args=$args"
 }
 
 proc app::extract {reporter filename args} {
-    {*}$reporter "extract reporter=$reporter store=$filename args=$args"
+    puts "TODO extract reporter=$reporter store=$filename args=$args"
 }
 
 proc app::copy {reporter filename args} {
-    {*}$reporter "copy reporter=$reporter store=$filename args=$args"
+    puts "TODO copy reporter=$reporter store=$filename args=$args"
 }
 
 proc app::print {filename args} {
-    puts "print store=$filename args=$args"
+    puts "TODO print store=$filename args=$args"
 }
 
 proc app::diff {filename args} {
-    puts "diff store=$filename args=$args"
+    puts "TODO diff store=$filename args=$args"
 }
 
 proc app::filenames {filename args} {
-    puts "filenames store=$filename args=$args"
+    puts "TODO filenames store=$filename args=$args"
 }
 
 proc app::generations {filename args} {
-    puts "generations store=$filename args=$args"
+    puts "TODO generations store=$filename args=$args"
 }
 
 proc app::ignore {filename args} {
-    puts "ignore store=$filename args=$args"
+    puts "TODO ignore store=$filename args=$args"
 }
 
 proc app::ignores filename {
-    puts "ignores store=$filename"
+    puts "TODO ignores store=$filename"
 }
 
 proc app::unignore {filename args} {
-    puts "unignore store=$filename args=$args"
+    puts "TODO unignore store=$filename args=$args"
 }
 
 proc app::purge {filename args} {
-    puts "purge store=$filename args=$args"
+    puts "TODO purge store=$filename args=$args"
 }
 
 proc app::gui filename {
     package require tk
-    puts "gui store=$filename"
+    puts "TODO gui store=$filename"
 }
 
-proc app::warn message { puts stderr $message }
+proc app::warn message {
+    if {[dict exists [chan configure stderr] -mode]} { ;# tty
+        set reset "\033\[0m"
+        set red "\x1B\[31m"
+    } else { ;# redirected
+        set reset ""
+        set red ""
+    }
+    puts stderr "${red}$message${reset}"
+}
 
 proc app::usage {} {
-    lassign [esc_codes] reset bold italic red
+    lassign [esc_codes] reset bold italic
     puts "${italic}usage: ${reset}${bold}store${reset} <command> …
 
 Stores generational copies of specified files (excluding those
@@ -189,14 +197,12 @@ proc esc_codes {} {
         set reset "\033\[0m"
         set bold "\x1B\[1m"
         set italic "\x1B\[3m"
-        set red "\x1B\[31m"
     } else { ;# redirected
         set reset ""
         set bold ""
         set italic ""
-        set red ""
     }
-    return [list $reset $bold $italic $red]
+    return [list $reset $bold $italic]
 }
 
 proc app::version {} {
@@ -208,9 +214,8 @@ proc filtered_reporter message {
     if {[string match {added*} $message] || \
             [string match {same as*} $message] } {
         return
-    } else {
-        puts $message
     }
+    puts $message
 }
 
 proc full_reporter message { puts $message }

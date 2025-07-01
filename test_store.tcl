@@ -317,9 +317,8 @@ test3 $MESSAGES2 [lambda {message} {
             [string match {added*} $message] || \
             [string match {same as*} $message] } {
         return
-    } else {
-        lappend ::messages "$message\n"
     }
+    lappend ::messages "$message\n"
 }]
 test4
 test5

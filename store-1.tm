@@ -210,7 +210,7 @@ oo::define Store method copy {{gid 0} folder} {
 
 oo::define Store method ExtractOne {action gid filename target} {
     lassign [my get $gid $filename] gid data
-    set target [prepare_target $action $gid $target]
+    set target [PrepareTarget $action $gid $target]
     writeFile $target binary $data
     {*}$Reporter "$action \"$filename\" → \"$target\""
 }
@@ -233,7 +233,7 @@ oo::define Store method get {gid filename} {
     return [list $gid $data]
 }
 
-proc prepare_target {action gid filename} {
+proc PrepareTarget {action gid filename} {
     if {$action eq "extracted"} {
         set ext [file extension $filename]
         set target "[file rootname $filename]#$gid$ext"

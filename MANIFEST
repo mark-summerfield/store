@@ -16,48 +16,4 @@ README.md
 
 st.sh
 
-# CLI API (use different reporters for verbose & veryverbose)
-#   store <subcommand> [-v|--verbose|-V|--veryverbose] ...
-#   store <subcommand> ...
-#
-#   a|add [verbose] [filename1|dirname1 [... filename|dirnameN]]
-#	creates a new store called .dirname.str if it doesn't exist and
-#	creates a new generation adding all specified files and all files in
-#	the specified directories, but excluding those matching the ignored
-#	names/globs. If verbose any files or folders _not_ being added and
-#	_not_ ignored shoule be listed as 'not added'
-#   u|update [verbose] [any message text]
-#	if no store exists (i.e., .dirname.str) reports and error and exits;
-#	otherwise creates a new generation updating files from the _last_
-#	generation. If verbose any files or folders _not_ being updated and
-#	_not_ ignored shoule be listed as 'not added'
-#   p|print [#gid] <filename>
-#	print the last of given gid of filename to stdout
-#   e|extract [verbose] [#gid] [filename1 [filename2 [... filenameN]]]>
-#	extract all files at last or given gid into the current dir or the
-#	specified files using naming path/filename1.ext →
-#	path/filename1#gid.ext etc
-#   c|copy [] [#gid] <folder>
-#	copy all files at last or given gid into the given (non-existing)
-#	folder
-#   d|diff <#gid1> [#gid2] <filename> 
-#	diff the last or given gid1 of filename against one in current dir
-#	or against last or gid2 if given
-#   f|filenames <#gid>
-#	print the latest or given generation's filenames to stdout
-#   g|generations|generations
-#	lists all generations (gid x created x message)
-#   i|ignore <filename1|dirname1|glob1> [filename2|dirname2|glob2 [... #   filenameN|dirnameN|globN]]
-#	add these to the ignores; use quotes to prevent shell expansion
-#	note that hidden files are ignored by default so need not be added
-#   U|unignore <filename1|glob1> [filename2|glob2 [... filenameN|globN]]
-#	remove these from the ignores; use quotes to prevent shell expansion
-#   P|purge <filename>
-#	delete the given filename in every generation
-#   g|gui
-#	launch GUI
-#   h|help|-h|--help
-#	usage
-#   v|version|-v|--version
-
 # vim: syn=yaml

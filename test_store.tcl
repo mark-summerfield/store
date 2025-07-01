@@ -304,11 +304,13 @@ copied "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
 copied "store-1.tm" → "/tmp/test3/store-1.tm"
 }
 
+proc full_reporter message { lappend ::messages "$message\n" }
+
 cd $::APPPATH
 test1
 test2
 puts "test3 with full reporter"
-test3 $MESSAGES1 [lambda {message} { lappend ::messages "$message\n" }]
+test3 $MESSAGES1 full_reporter
 puts "test3 with filtered reporter"
 test3 $MESSAGES2 [lambda {message} {
     if {[string match {test3*} $message] || \

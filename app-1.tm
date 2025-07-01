@@ -6,76 +6,44 @@ package require gui
 namespace eval app {}
 
 proc app::main {} {
-    if {$::argc == 0 || [lsearch -exact $::argv -h] >= 0 || \
-                        [lsearch -exact $::argv help] >= 0 || \
-                        [lsearch -exact $::argv --help] >= 0} usage
-    set reporter ""
+    if {$::argc == 0} usage
     set filename .[file tail [pwd]].str
     set command [lindex $::argv 0]
-    set argv [lrange $::argv 1 end]
-    set first [lindex $argv 0]
-    switch $first {
-        -v -
-        --verbose {
-            set reporter filtered_reporter
-            set argv [lrange $argv 1 end]
-        }
-        -V -
-        --veryverbose {
-            set reporter full_reporter
-            set argv [lrange $argv 1 end]
-        }
-    }
+    lassign [get_reporter [lrange $::argv 1 end]] argv reporter
     switch $command {
-        a -
-        add { actions::add $reporter $filename $argv }
-        c -
-        copy { actions::copy $reporter $filename $argv }
-        d -
-        diff { actions::diff $filename $argv }
-        e -
-        extract { actions::extract $reporter $filename $argv }
-        f -
-        filenames { actions::filenames $filename $argv }
-        g -
-        generations { actions::generations $filename $argv }
-        G -
-        gui { gui::run $filename }
-        i -
-        ignore { actions::ignore $filename $argv }
-        I -
-        ignores { actions::ignores $filename }
-        p -
-        print { actions::print $filename $argv }
-        P -
-        purge { actions::purge $filename $argv }
-        u -
-        update { actions::update $reporter $filename $argv }
-        U -
-        unignore { actions::unignore $filename $argv }
-        -v -
-        --version -
-        v -
-        version { version }
+        a - add { actions::add $reporter $filename $argv }
+        c - copy { actions::copy $reporter $filename $argv }
+        d - diff { actions::diff $filename $argv }
+        e - extract { actions::extract $reporter $filename $argv }
+        f - filenames { actions::filenames $filename $argv }
+        g - generations { actions::generations $filename $argv }
+        G - gui { gui::run $filename }
+        h - help - -h - --help { usage } 
+        i - ignore { actions::ignore $filename $argv }
+        I - ignores { actions::ignores $filename }
+        p - print { actions::print $filename $argv }
+        P - purge { actions::purge $filename $argv }
+        u - update { actions::update $reporter $filename $argv }
+        U - unignore { actions::unignore $filename $argv }
+        v - version - -v - --version { version }
         default { warn "unrecognized command: \"$command\"" }
     }
 }
 
-proc app::verbose argv {
-    upvar $argv argv
+proc app::get_reporter argv {
+    set reporter ""
     set first [lindex $argv 0]
     switch $first {
-        -v -
-        --verbose {
+        -v - --verbose {
             set reporter filtered_reporter
             set argv [lrange $argv 1 end]
         }
-        -V -
-        --veryverbose {
+        -V - --veryverbose {
             set reporter full_reporter
             set argv [lrange $argv 1 end]
         }
     }
+    return [list $argv $reporter]
 }
 
 proc app::version {} {
@@ -92,6 +60,7 @@ proc app::warn message {
         set red ""
     }
     puts stderr "${red}$message${reset}"
+    exit 1
 }
 
 proc app::usage {} {

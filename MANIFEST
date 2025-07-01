@@ -1,5 +1,7 @@
 store
-app-1.tm # TODO
+app-1.tm
+actions-1.tm # TODO
+gui-1.tm
 store-1.tm
 filedata-1.tm
 misc-1.tm

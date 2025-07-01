@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require store
+package require actions
+package require gui
 
 namespace eval app {}
 
@@ -11,47 +12,47 @@ proc app::main {} {
     set reporter ""
     set filename .[file tail [pwd]].str
     set command [lindex $::argv 0]
-    set args [lrange $::argv 1 end]
-    set first [lindex $args 0]
+    set argv [lrange $::argv 1 end]
+    set first [lindex $argv 0]
     switch $first {
         -v -
         --verbose {
             set reporter filtered_reporter
-            set args [lrange $args 1 end]
+            set argv [lrange $argv 1 end]
         }
         -V -
         --veryverbose {
             set reporter full_reporter
-            set args [lrange $args 1 end]
+            set argv [lrange $argv 1 end]
         }
     }
     switch $command {
         a -
-        add { add $reporter $filename $args }
+        add { actions::add $reporter $filename $argv }
         c -
-        copy { copy $reporter $filename $args }
+        copy { actions::copy $reporter $filename $argv }
         d -
-        diff { diff $filename $args }
+        diff { actions::diff $filename $argv }
         e -
-        extract { extract $reporter $filename $args }
+        extract { actions::extract $reporter $filename $argv }
         f -
-        filenames { filenames $filename $args }
+        filenames { actions::filenames $filename $argv }
         g -
-        generations { generations $filename $args }
+        generations { actions::generations $filename $argv }
         G -
-        gui { gui $filename }
+        gui { gui::run $filename }
         i -
-        ignore { ignore $filename $args }
+        ignore { actions::ignore $filename $argv }
         I -
-        ignores { ignores $filename }
+        ignores { actions::ignores $filename }
         p -
-        print { print $filename $args }
+        print { actions::print $filename $argv }
         P -
-        purge { purge $filename $args }
+        purge { actions::purge $filename $argv }
         u -
-        update { update $reporter $filename $args }
+        update { actions::update $reporter $filename $argv }
         U -
-        unignore { unignore $filename $args }
+        unignore { actions::unignore $filename $argv }
         -v -
         --version -
         v -
@@ -60,57 +61,26 @@ proc app::main {} {
     }
 }
 
-proc app::add {reporter filename args} {
-    puts "TODO add reporter=$reporter store=$filename args=$args"
+proc app::verbose argv {
+    upvar $argv argv
+    set first [lindex $argv 0]
+    switch $first {
+        -v -
+        --verbose {
+            set reporter filtered_reporter
+            set argv [lrange $argv 1 end]
+        }
+        -V -
+        --veryverbose {
+            set reporter full_reporter
+            set argv [lrange $argv 1 end]
+        }
+    }
 }
 
-proc app::update {reporter filename args} {
-    puts "TODO update reporter=$reporter store=$filename args=$args"
-}
-
-proc app::extract {reporter filename args} {
-    puts "TODO extract reporter=$reporter store=$filename args=$args"
-}
-
-proc app::copy {reporter filename args} {
-    puts "TODO copy reporter=$reporter store=$filename args=$args"
-}
-
-proc app::print {filename args} {
-    puts "TODO print store=$filename args=$args"
-}
-
-proc app::diff {filename args} {
-    puts "TODO diff store=$filename args=$args"
-}
-
-proc app::filenames {filename args} {
-    puts "TODO filenames store=$filename args=$args"
-}
-
-proc app::generations {filename args} {
-    puts "TODO generations store=$filename args=$args"
-}
-
-proc app::ignore {filename args} {
-    puts "TODO ignore store=$filename args=$args"
-}
-
-proc app::ignores filename {
-    puts "TODO ignores store=$filename"
-}
-
-proc app::unignore {filename args} {
-    puts "TODO unignore store=$filename args=$args"
-}
-
-proc app::purge {filename args} {
-    puts "TODO purge store=$filename args=$args"
-}
-
-proc app::gui filename {
-    package require tk
-    puts "TODO gui store=$filename"
+proc app::version {} {
+    puts "store v$::VERSION"
+    exit 2
 }
 
 proc app::warn message {
@@ -203,11 +173,6 @@ proc esc_codes {} {
         set italic ""
     }
     return [list $reset $bold $italic]
-}
-
-proc app::version {} {
-    puts "store v$::VERSION"
-    exit 2
 }
 
 proc filtered_reporter message {

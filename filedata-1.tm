@@ -44,7 +44,7 @@ oo::define FileData method is_valid {} {
 }
 
 oo::define FileData method gid {{gid 0}} {
-    if {$gid != 0} { set Gid $gid }
+    if {$gid} { set Gid $gid }
     return $Gid
 }
 
@@ -59,17 +59,17 @@ oo::define FileData method kind {{kind ""}} {
 }
 
 oo::define FileData method usize {{usize 0}} {
-    if {$usize != 0} { set Usize $usize }
+    if {$usize} { set Usize $usize }
     return $Usize
 }
 
 oo::define FileData method zsize {{zsize 0}} {
-    if {$zsize != 0} { set Zsize $zsize }
+    if {$zsize} { set Zsize $zsize }
     return $Zsize
 }
 
 oo::define FileData method pgid {{pgid 0}} {
-    if {$pgid != 0} { set Pgid $pgid }
+    if {$pgid} { set Pgid $pgid }
     return $Pgid
 }
 

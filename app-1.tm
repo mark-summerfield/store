@@ -1,12 +1,13 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require actions
+package require globals
 package require gui
 
 namespace eval app {}
 
 proc app::main {} {
-    if {$::argc == 0} usage
+    if {!$::argc} usage
     set filename .[file tail [pwd]].str
     set command [lindex $::argv 0]
     lassign [get_reporter [lrange $::argv 1 end]] argv reporter
@@ -51,6 +52,7 @@ proc app::version {} {
     exit 2
 }
 
+# can't use globals since they are for stdout and here we need stderr
 proc app::warn message {
     if {[dict exists [chan configure stderr] -mode]} { ;# tty
         set reset "\033\[0m"
@@ -64,84 +66,73 @@ proc app::warn message {
 }
 
 proc app::usage {} {
-    lassign [esc_codes] reset bold italic
-    puts "${italic}usage: ${reset}${bold}store${reset} <command> …
+    puts "${::ITALIC}usage: ${::RESET}${::BOLD}store${::RESET} <command> …
 
 Stores generational copies of specified files (excluding those
-explicitly ignored) in .${italic}dirname${reset}.str.
+explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.
 
-${bold}a${reset} ${italic}or${reset} ${bold}add${reset} \[verbose]\
-    <filename1|dirname1 \[… filenameN|dirnameN]>
+${::BOLD}a${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}add${::RESET}\
+    \[verbose] <filename1|dirname1 \[… filenameN|dirnameN]>
   Adds the given files or the files in the given folders to the store,
   excluding any that are ignored, creating the store if necessary.
-${bold}u${reset} ${italic}or${reset} ${bold}update${reset} \[verbose]\
-\[optional message text]
+${::BOLD}u${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}update${::RESET}\
+    \[verbose] \[optional message text]
   Updates all the files in the store by creating a new generation and
   storing all those that have changed.
-${bold}e${reset} ${italic}or${reset} ${bold}extract${reset} \[verbose]\
-    \[#gid] <filename1 \[… filenameN]>
+${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
+    \[verbose] \[#gid] <filename1 \[… filenameN]>
   Extracts the given filenames at the generation,
   e.g., filename.ext will be extracted as filename#gid.ext, etc.
-${bold}c${reset} ${italic}or${reset} ${bold}copy${reset} \[verbose]\
-\[#gid] <dirname>
+${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
+    \[verbose] \[#gid] <dirname>
   Copies all the files at the generation into the given dirname
   (which must not exist).
-${bold}p${reset} ${italic}or${reset} ${bold}print${reset} \[#gid]\
-    <filename>
+${::BOLD}p${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}print${::RESET}\
+    \[#gid] <filename>
   Prints the given filename from the store at the generation,
   to stdout.
-${bold}d${reset} ${italic}or${reset} ${bold}diff${reset}\
+${::BOLD}d${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}diff${::RESET}\
     <#gid1> \[#gid2] <filename>
   Diffs the filename at #gid1 against the one in the current folder,
   or against the one stored at #gid2 if given.
-${bold}f${reset} ${italic}or${reset} ${bold}filenames${reset} \[#gid]
+${::BOLD}f${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}filenames${::RESET}\
+    \[#gid]
   Prints the generation’s filenames to stdout.
-${bold}g${reset} ${italic}or${reset} ${bold}generations${reset}
+${::BOLD}g${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}generations${::RESET}
   Prints the generation’s (number, created, message) to stdout.
-${bold}i${reset} ${italic}or${reset} ${bold}ignore${reset}\
+${::BOLD}i${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}ignore${::RESET}\
     <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
   Adds the given filenames, folders, and globs to the ignore list.
-${bold}I${reset} ${italic}or${reset} ${bold}ignores${reset}
+${::BOLD}I${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}ignores${::RESET}
   Lists the filenames, folders, and globs in the ignore list.
-${bold}U${reset} ${italic}or${reset} ${bold}unignore${reset}\
+${::BOLD}U${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}unignore${::RESET}\
     <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
   Unignores the given filenames, folders, and globs by removing them
   from the ignore list.
-${bold}P${reset} ${italic}or${reset} ${bold}purge${reset} <filename>
+${::BOLD}P${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}purge${::RESET}\
+    <filename>
   Purges the given filename from the store by deleting every copy
   of it at every generation.
-${bold}G${reset} ${italic}or${reset} ${bold}gui${reset}
+${::BOLD}G${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}gui${::RESET}
   Launch graphical user interface.
-${bold}h${reset} ${italic}or${reset} ${bold}help${reset}\
-    ${italic}or${reset} ${bold}-h${reset} ${italic}or${reset}\
-    ${bold}--help${reset}
+${::BOLD}h${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}help${::RESET}\
+    ${::ITALIC}or${::RESET} ${::BOLD}-h${::RESET} ${::ITALIC}or${::RESET}\
+    ${::BOLD}--help${::RESET}
   Show this usage message and exit.
-${bold}v${reset} ${italic}or${reset} ${bold}version${reset}\
-    ${italic}or${reset} ${bold}-v${reset} ${italic}or${reset}\
-    ${bold}--version${reset}
+${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
+    ${::ITALIC}or${::RESET} ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
+    ${::BOLD}--version${::RESET}
   Show store’s version and exit.
 
 • #gid — #-prefixed generation number, e.g., #5;
   if unspecified, the last generation is assumed
 • glob — when using globs for ignore or unignore use quotes
   to avoid shell expansion of glob characters (e.g., '*.o').
-• verbose — specified as ${bold}-v${reset} ${italic}or${reset}\
-   ${bold}--verbose${reset} ${italic}or${reset} ${bold}-V${reset} ${italic}or${reset} ${bold}-veryverbose${reset}"
+• verbose — specified as ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
+   ${::BOLD}--verbose${::RESET} ${::ITALIC}or${::RESET}\
+   ${::BOLD}-V${::RESET} ${::ITALIC}or${::RESET}\
+   ${::BOLD}-veryverbose${::RESET}"
     exit 2
-}
-
-# See: https://en.wikipedia.org/wiki/ANSI_escape_code
-proc esc_codes {} {
-    if {[dict exists [chan configure stdout] -mode]} { ;# tty
-        set reset "\033\[0m"
-        set bold "\x1B\[1m"
-        set italic "\x1B\[3m"
-    } else { ;# redirected
-        set reset ""
-        set bold ""
-        set italic ""
-    }
-    return [list $reset $bold $italic]
 }
 
 proc filtered_reporter message {

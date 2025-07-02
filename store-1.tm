@@ -70,7 +70,7 @@ oo::define Store method add {args} {
 # must only be used after at least one call to add
 oo::define Store method update {message} {
     set gid [my last_generation]
-    if {$gid == 0} { error "can only update an existing non-empty store" }
+    if {!$gid} { error "can only update an existing non-empty store" }
     {*}$Reporter "updating \"$message\""
     return [my Update $message false {*}[my filenames $gid]]
 }
@@ -86,7 +86,7 @@ oo::define Store method Update {message adding args} {
             {*}$Reporter "skipped missing or non-file \"$filename\""
         }
     }
-    if {[llength $filenames] == 0} {
+    if {![llength $filenames]} {
         {*}$Reporter "no files to update"
         return 0
     }
@@ -107,7 +107,7 @@ oo::define Store method UpdateOne {adding gid filename} {
     set fileData [FileData load $gid $filename]
     set data [$fileData data]
     set oldGid [my FindMatch $gid $filename $data]
-    if {$oldGid != 0} {
+    if {$oldGid} {
         set kind S
         set pgid $oldGid
         set data ""
@@ -172,7 +172,7 @@ oo::define Store method generations {} {
 
 # returns a list of the last or given gid's filenames
 oo::define Store method filenames {{gid 0}} {
-    if {$gid == 0} { set gid [my last_generation] }
+    if {!$gid} { set gid [my last_generation] }
     return [$Db eval {SELECT filename FROM Files WHERE gid = :gid \
                       ORDER BY LOWER(filename)}]
 }
@@ -189,7 +189,7 @@ oo::define Store method purge {filename} {
 # path/filename1.ext → path/filename1#gid.ext,
 # path/filename2 → path/filename2#gid, etc
 oo::define Store method extract {{gid 0} args} {
-    if {$gid == 0} { set gid [my last_generation] }
+    if {!$gid} { set gid [my last_generation] }
     set filenames [expr {[llength $args] ? $args : [my filenames $gid]}]
     foreach filename $filenames {
         my ExtractOne extracted $gid $filename $filename

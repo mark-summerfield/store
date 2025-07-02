@@ -197,14 +197,13 @@ proc test5 {} {
 }
 
 const MESSAGES1 {created /tmp/test3.db
-adding 4 new files
+adding/updating 4 files
 created generation @1
 added "app-1.tm" (deflated)
 added "sql/create.sql" (deflated)
 added "sql/prepare.sql" (deflated)
 added "store-1.tm" (deflated)
-adding one new file
-updating 4 files
+adding/updating 5 files
 created generation @2
 same as generation @1 "app-1.tm"
 added "README.md" (deflated)
@@ -259,21 +258,21 @@ test3: gid=6 message="should restore old README.md @5"
 test3: gid=5 message="should change to new README.md @4"
 test3: gid=4 message="should change nothing @3"
 test3: gid=3 message="should change nothing @2"
-test3: gid=2 message="added one new file"
-test3: gid=1 message="added 4 new files"
+test3: gid=2 message="adding/updating 5 files"
+test3: gid=1 message="adding/updating 4 files"
 extracted "sql/prepare.sql" → "sql/prepare@1.sql"
 extracted "README.md" → "README@5.md"
 copied "README.md" → "/tmp/test3/README.md"
 copied "sql/create.sql" → "/tmp/test3/sql/create.sql"
 copied "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
 copied "store-1.tm" → "/tmp/test3/store-1.tm"
+closed /tmp/test3.db
 }
 
 const MESSAGES2 {created /tmp/test3.db
-adding 4 new files
+adding/updating 4 files
 created generation @1
-adding one new file
-updating 4 files
+adding/updating 5 files
 created generation @2
 updating "should change nothing @2"
 created generation @3
@@ -294,14 +293,15 @@ test3: gid=6 message="should restore old README.md @5"
 test3: gid=5 message="should change to new README.md @4"
 test3: gid=4 message="should change nothing @3"
 test3: gid=3 message="should change nothing @2"
-test3: gid=2 message="added one new file"
-test3: gid=1 message="added 4 new files"
+test3: gid=2 message="adding/updating 5 files"
+test3: gid=1 message="adding/updating 4 files"
 extracted "sql/prepare.sql" → "sql/prepare@1.sql"
 extracted "README.md" → "README@5.md"
 copied "README.md" → "/tmp/test3/README.md"
 copied "sql/create.sql" → "/tmp/test3/sql/create.sql"
 copied "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
 copied "store-1.tm" → "/tmp/test3/store-1.tm"
+closed /tmp/test3.db
 }
 
 proc full_reporter message { lappend ::messages "$message\n" }

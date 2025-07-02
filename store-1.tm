@@ -38,6 +38,7 @@ oo::define Store method close {} {
     if {![my is_closed]} {
         $Db close
         set Db {}
+        {*}$Reporter "closed $Filename"
     }
 }
 
@@ -53,17 +54,11 @@ oo::define Store method last_generation {} {
 # returns the number of files added.
 # Note that ignores should be handled by the application itself.
 oo::define Store method add {args} {
-    set size [llength $args]
-    lassign [misc::n_s $size] n s
-    {*}$Reporter "adding $n new file$s"
-    set filenames [my filenames]
-    set size [llength $filenames]
-    if {$size > 0 } {
-        lassign [misc::n_s $size] n2 s2
-        {*}$Reporter "updating $n2 file$s2"
-    }
-    set filenames [lsort -nocase [list {*}$filenames {*}$args]]
-    return [my Update "added $n new file$s" true {*}$filenames]
+    set filenames [lsort -nocase \
+        [lsort -unique [list {*}[my filenames] {*}$args]]]
+    lassign [misc::n_s [llength $filenames]] n s
+    {*}$Reporter "adding/updating $n file$s"
+    return [my Update "adding/updating $n file$s" true {*}$filenames]
 }
 
 # if at least one prev generation exists, creates new generation with

@@ -5,7 +5,7 @@ package require store
 
 namespace eval actions {}
 
-# we deliberately only go at most one level of depth for folders
+# we deliberately only go at most one level deep for folders
 proc actions::add {reporter filename rest} {
     set str [Store new $filename $reporter]
     try {
@@ -26,8 +26,6 @@ proc actions::add {reporter filename rest} {
         }
         if {[llength $names]} {
             $str add {*}$names
-        } else {
-            warn "empty store created; no filenames to add"
         }
     } finally {
         $str close
@@ -36,8 +34,8 @@ proc actions::add {reporter filename rest} {
 
 proc actions::update {reporter filename rest} {
     set message [join $rest " "]
+    set str [Store new $filename $reporter]
     try {
-        set str [Store new $filename $reporter]
         $str update $message
     } finally {
         $str close
@@ -45,8 +43,8 @@ proc actions::update {reporter filename rest} {
 }
 
 proc actions::extract {reporter filename rest} {
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
     try {
-        lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
         $str extract $gid {*}$rest
     } finally {
         $str close
@@ -54,8 +52,8 @@ proc actions::extract {reporter filename rest} {
 }
 
 proc actions::copy {reporter filename rest} {
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
     try {
-        lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
         $str copy $gid $rest
     } finally {
         $str close
@@ -63,8 +61,8 @@ proc actions::copy {reporter filename rest} {
 }
 
 proc actions::print {reporter filename rest} {
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
     try {
-        lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
         lassign [$str get $gid $rest] gid data
         puts -nonewline [encoding convertfrom utf-8 $data]
     } finally {
@@ -77,27 +75,71 @@ proc actions::diff {reporter filename rest} {
 }
 
 proc actions::filenames {reporter filename rest} {
-    puts "TODO filenames store=$filename rest=$rest" ;# TODO
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+    try {
+        foreach filename [$str filenames $gid] {
+            puts $filename
+        }
+    } finally {
+        $str close
+    }
 }
 
 proc actions::generations {reporter filename rest} {
-    puts "TODO generations store=$filename rest=$rest" ;# TODO
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+    try {
+        foreach {gid created message} [$str generations] {
+            puts "@$gid $created $message"
+        }
+    } finally {
+        $str close
+    }
 }
 
 proc actions::ignore {reporter filename rest} {
-    puts "TODO ignore store=$filename rest=$rest" ;# TODO
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+    try {
+        $str ignore {*}$rest
+    } finally {
+        $str close
+    }
 }
 
 proc actions::ignores {reporter filename} {
-    puts "TODO ignores store=$filename" ;# TODO
+    lassign [GidStoreAndRest $reporter $filename {}] gid str rest
+    try {
+        foreach pattern [$str ignores] {
+            puts $pattern
+        }
+    } finally {
+        $str close
+    }
 }
 
 proc actions::unignore {reporter filename rest} {
-    puts "TODO unignore store=$filename rest=$rest" ;# TODO
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+    try {
+        $str unignore {*}$rest
+    } finally {
+        $str close
+    }
 }
 
 proc actions::purge {reporter filename rest} {
-    puts "TODO purge store=$filename rest=$rest" ;# TODO
+    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+    try {
+        puts -nonewline \
+            "permanently purge \"$rest\" from the store \[yN]? "
+        flush stdout
+        set reply [read stdin 1]
+        if {$reply eq "y"} {
+            set n [$str purge $rest]
+            lassign [misc::n_s $n] n s
+            puts "purged $n version$s"
+        }
+    } finally {
+        $str close
+    }
 }
 
 proc actions::GidStoreAndRest {reporter filename rest} {

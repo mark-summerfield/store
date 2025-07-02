@@ -23,7 +23,7 @@ proc app::main {} {
         i - ignore { actions::ignore $reporter $filename $rest }
         I - ignores { actions::ignores $reporter $filename }
         p - print { actions::print $reporter $filename $rest }
-        P - purge { actions::purge $reporter $filename $rest }
+        purge { actions::purge $reporter $filename $rest }
         u - update { actions::update $reporter $filename $rest }
         U - unignore { actions::unignore $reporter $filename $rest }
         v - version - -v - --version { version }
@@ -96,8 +96,7 @@ ${::BOLD}U${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}unignore${::RESET}\
     <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
   Unignores the given filenames, folders, and globs by removing them
   from the ignore list.
-${::BOLD}P${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}purge${::RESET}\
-    <filename>
+${::BOLD}purge${::RESET} <filename>
   Purges the given filename from the store by deleting every copy
   of it at every generation.
 ${::BOLD}G${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}gui${::RESET}

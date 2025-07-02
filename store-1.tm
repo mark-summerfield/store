@@ -22,8 +22,10 @@ oo::define Store constructor {filename {reporter ""}} {
     sqlite3 $Db $Filename
     $Db eval [readFile $::APPPATH/sql/prepare.sql] 
     if {!$exists} {
-        $Db eval [readFile $::APPPATH/sql/create.sql] 
-        $Db eval [readFile $::APPPATH/sql/insert.sql] 
+        $Db transaction {
+            $Db eval [readFile $::APPPATH/sql/create.sql] 
+            $Db eval [readFile $::APPPATH/sql/insert.sql] 
+        }
         {*}$Reporter "created $Filename"
     } else {
         {*}$Reporter "opened $Filename"
@@ -71,7 +73,7 @@ oo::define Store method add {args} {
 oo::define Store method update {message} {
     set gid [my last_generation]
     if {!$gid} { error "can only update an existing non-empty store" }
-    {*}$Reporter "updating \"$message\""
+    if {$message ne ""} { {*}$Reporter "updating \"$message\"" }
     return [my Update $message false {*}[my filenames $gid]]
 }
 
@@ -90,12 +92,14 @@ oo::define Store method Update {message adding args} {
         {*}$Reporter "no files to update"
         return 0
     }
-    $Db eval {INSERT INTO Generations (message) VALUES (:message)}
-    set gid [$Db last_insert_rowid]
-    {*}$Reporter "created generation @$gid"
-    set n 0
-    foreach filename [lsort -nocase $filenames] {
-        incr n [my UpdateOne $adding $gid $filename]
+    $Db transaction {
+        $Db eval {INSERT INTO Generations (message) VALUES (:message)}
+        set gid [$Db last_insert_rowid]
+        {*}$Reporter "created generation @$gid"
+        set n 0
+        foreach filename [lsort -nocase $filenames] {
+            incr n [my UpdateOne $adding $gid $filename]
+        }
     }
     return $n
 }
@@ -219,15 +223,17 @@ oo::define Store method ExtractOne {action gid filename target} {
 # returned gid will equal the given gid if the data is U or Z or will be the
 # pgid where the data is U or Z if the data at the given gid is S
 oo::define Store method get {gid filename} {
-    lassign [$Db eval {SELECT kind, pgid FROM Files WHERE gid = :gid \
-                       AND filename = :filename}] kind pgid
-    if {$kind eq "S"} {
-        lassign [$Db eval {SELECT kind, data FROM Files WHERE gid = :pgid \
-                           AND filename = :filename}] kind data
-        set gid $pgid
-    } else {
-        lassign [$Db eval {SELECT kind, data FROM Files WHERE gid = :gid \
-                           AND filename = :filename}] kind data
+    $Db transaction {
+        lassign [$Db eval {SELECT kind, pgid FROM Files \
+                    WHERE gid = :gid AND filename = :filename}] kind pgid
+        if {$kind eq "S"} {
+            lassign [$Db eval {SELECT kind, data FROM Files \
+                    WHERE gid = :pgid AND filename = :filename}] kind data
+            set gid $pgid
+        } else {
+            lassign [$Db eval {SELECT kind, data FROM Files \
+                    WHERE gid = :gid AND filename = :filename}] kind data
+        }
     }
     if {$kind eq "Z"} { set data [zlib inflate $data] }
     return [list $gid $data]

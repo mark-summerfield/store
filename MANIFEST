@@ -4,7 +4,7 @@ actions-1.tm # TODO
 gui-1.tm
 store-1.tm
 filedata-1.tm
-globals-1.tm
+globals-1.tm # VERSION
 misc-1.tm
 
 test_store.tcl

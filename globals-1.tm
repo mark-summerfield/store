@@ -1,5 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+const VERSION 0.1.0
+
 # See: https://en.wikipedia.org/wiki/ANSI_escape_code
 if {[dict exists [chan configure stdout] -mode]} { ;# tty
     set RESET "\033\[0m"

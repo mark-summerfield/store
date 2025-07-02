@@ -5,6 +5,7 @@ package require store
 
 namespace eval actions {}
 
+# we deliberately only go at most one level of depth for folders
 proc actions::add {reporter filename rest} {
     set str [Store new $filename $reporter]
     try {

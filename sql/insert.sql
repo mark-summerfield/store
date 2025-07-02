@@ -23,6 +23,6 @@ INSERT INTO Ignores (pattern) VALUES ('__pycache__');
 INSERT INTO Ignores (pattern) VALUES ('louti[0-9]*');
 INSERT INTO Ignores (pattern) VALUES ('moc_*.cpp');
 INSERT INTO Ignores (pattern) VALUES ('qrc_*.cpp');
-INSERT INTO Ignores (pattern) VALUES ('test.*');
+INSERT INTO Ignores (pattern) VALUES ('test*');
 INSERT INTO Ignores (pattern) VALUES ('ui_*.h');
 INSERT INTO Ignores (pattern) VALUES ('zOld');

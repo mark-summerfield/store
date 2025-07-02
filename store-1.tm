@@ -92,7 +92,7 @@ oo::define Store method Update {message adding args} {
     }
     $Db eval {INSERT INTO Generations (message) VALUES (:message)}
     set gid [$Db last_insert_rowid]
-    {*}$Reporter "created generation #$gid"
+    {*}$Reporter "created generation @$gid"
     set n 0
     foreach filename [lsort -nocase $filenames] {
         incr n [my UpdateOne $adding $gid $filename]
@@ -123,7 +123,7 @@ oo::define Store method UpdateOne {adding gid filename} {
               (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     set action [expr {$adding ? "added" : "updated"}]
     switch $kind {
-        S { {*}$Reporter "same as generation #$pgid \"$filename\"" }
+        S { {*}$Reporter "same as generation @$pgid \"$filename\"" }
         U { {*}$Reporter "$action \"$filename\"" }
         Z { {*}$Reporter "$action \"$filename\" (deflated)" }
     }
@@ -186,8 +186,8 @@ oo::define Store method purge {filename} {
 
 # extracts all files at last or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
-# path/filename1.ext → path/filename1#gid.ext,
-# path/filename2 → path/filename2#gid, etc
+# path/filename1.ext → path/filename1@gid.ext,
+# path/filename2 → path/filename2@gid, etc
 oo::define Store method extract {{gid 0} args} {
     if {!$gid} { set gid [my last_generation] }
     set filenames [expr {[llength $args] ? $args : [my filenames $gid]}]
@@ -236,7 +236,7 @@ oo::define Store method get {gid filename} {
 proc PrepareTarget {action gid filename} {
     if {$action eq "extracted"} {
         set ext [file extension $filename]
-        set target "[file rootname $filename]#$gid$ext"
+        set target "[file rootname $filename]@$gid$ext"
     } else {
         set target $filename
     }

@@ -28,7 +28,7 @@ proc app::main {} {
         u - update { actions::update $reporter $filename $rest }
         U - unignore { actions::unignore $reporter $filename $rest }
         v - version - -v - --version { version }
-        default { warn "unrecognized command: \"$command\"" }
+        default { misc::warn "unrecognized command: \"$command\"" }
     }
 }
 

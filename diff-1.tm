@@ -44,7 +44,7 @@ proc diff::diff {old_lines new_lines} {
 # bold: "\x1B\[1m"
 # italic: "\x1B\[3m"
 # underline: "\x1B\[4m"
-proc esc_codes {} {
+proc diff::esc_codes {} {
     if {[dict exists [chan configure stdout] -mode]} { ;# tty
         set reset "\033\[0m"
         set add "\x1B\[34m+ " ;# blue

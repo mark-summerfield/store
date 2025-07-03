@@ -206,7 +206,7 @@ oo::define Store method extract {{gid 0} args} {
 
 # copy all files at last or given gid into the given folder (which
 # must not already exist)
-oo::define Store method copy {{gid 0} folder} {
+oo::define Store method copy {{gid 0} {folder ""}} {
     if {[file isdirectory $folder]} {
         error "can only copy into a new nonexistent folder"
     }
@@ -218,7 +218,7 @@ oo::define Store method copy {{gid 0} folder} {
 
 oo::define Store method ExtractOne {action gid filename target} {
     lassign [my get $gid $filename] gid data
-    set target [PrepareTarget $action $gid $target]
+    set target [my PrepareTarget $action $gid $target]
     writeFile $target binary $data
     {*}$Reporter "$action \"$filename\" → \"$target\""
 }
@@ -258,7 +258,7 @@ oo::define Store method history {{filename ""}} {
     }
 }
 
-proc PrepareTarget {action gid filename} {
+oo::define Store method PrepareTarget {action gid filename} {
     if {$action eq "extracted"} {
         set ext [file extension $filename]
         set target "[file rootname $filename]@$gid$ext"

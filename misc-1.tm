@@ -3,7 +3,7 @@
 namespace eval misc {}
 
 # can't use globals since they are for stdout and here we need stderr
-proc warn message {
+proc misc::warn message {
     if {[dict exists [chan configure stderr] -mode]} { ;# tty
         set reset "\033\[0m"
         set red "\x1B\[31m"

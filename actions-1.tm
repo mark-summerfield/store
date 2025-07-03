@@ -15,13 +15,13 @@ proc actions::add {reporter filename rest} {
         foreach name $rest {
             if {![misc::ignore $name $ignores]} {
                 if {[file isdirectory $name]} {
-                    foreach subname [glob -directory $name -type f *] {
+                    foreach subname [glob -directory $name -types f *] {
                         if {![misc::ignore $subname $ignores] &&
-                                ![file attributes $subname -hidden]} {
+                                ![string match {.*} [file tail $name]]} {
                             lappend names $subname   
                         }
                     }
-                } elseif {![file attributes $subname -hidden]} {
+                } elseif {![string match {.*} [file tail $name]]} {
                     lappend names $name
                 }
             }
@@ -88,7 +88,7 @@ proc actions::diff {reporter filename rest} {
         if {$gid1 == $gid2} { ;# compare with file
             lassign [$str get $gid1 $rest] gid1 old_data
             if {$old_data eq ""} {
-                warn "\"$rest\" @$gid1 not found in store"
+                misc::warn "\"$rest\" @$gid1 not found in store"
             }
             set new_data [readFile $rest binary]
             set message "\"$rest\" @$gid1 with file on disk"
@@ -98,11 +98,11 @@ proc actions::diff {reporter filename rest} {
             }
             lassign [$str get $gid1 $rest] gid1 old_data
             if {$old_data eq ""} {
-                warn "\"$rest\" @$gid1 not found in store"
+                misc::warn "\"$rest\" @$gid1 not found in store"
             }
             lassign [$str get $gid2 $rest] gid2 new_data
             if {$new_data eq ""} {
-                warn "\"$rest\" @$gid2 not found in store"
+                misc::warn "\"$rest\" @$gid2 not found in store"
             }
             set message "\"$rest\" @$gid1 with @$gid2"
         }

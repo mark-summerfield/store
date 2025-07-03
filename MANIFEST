@@ -1,5 +1,14 @@
-# TODO allow user to remove unwanted generations
-# purge <filename|@gid>
+# TODO purge VACUUM
+# TODO allow user to remove generations that only contain S files
+# clean Remove redundant generations
+#   -- something like...
+#   DELETE FROM Files
+#   WHERE gid = :gid
+#   AND kind = 'S'
+#   AND NOT EXISTS (SELECT gid FROM Files WHERE gid = :gid AND kind != 'S')
+#
+#   DELETE FROM Generations WHERE gid = :gid
+#   VACUUM
 
 store
 app-1.tm

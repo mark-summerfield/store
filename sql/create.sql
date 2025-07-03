@@ -40,7 +40,7 @@ CREATE TABLE Files (
 );
 
 CREATE VIEW ViewHistory AS
-    SELECT filename, gid FROM Files
-    WHERE kind in ('U', 'Z') ORDER BY LOWER(filename), gid DESC;
+    SELECT filename, gid FROM Files WHERE kind in ('U', 'Z')
+        ORDER BY LOWER(filename), gid DESC;
 
 CREATE TABLE Ignores (pattern TEXT PRIMARY KEY NOT NULL) WITHOUT ROWID;

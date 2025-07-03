@@ -1,3 +1,6 @@
+# TODO allow user to remove unwanted generations
+# purge <filename|@gid>
+
 store
 app-1.tm
 actions-1.tm

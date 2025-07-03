@@ -7,8 +7,8 @@ package require store
 namespace eval actions {}
 
 # we deliberately only go at most one level deep for folders
-proc actions::add {reporter filename rest} {
-    set str [Store new $filename $reporter]
+proc actions::add {reporter storefile rest} {
+    set str [Store new $storefile $reporter]
     try {
         set ignores [$str ignores]
         set names [list]
@@ -34,9 +34,9 @@ proc actions::add {reporter filename rest} {
     }
 }
 
-proc actions::update {reporter filename rest} {
+proc actions::update {reporter storefile rest} {
     set message [join $rest " "]
-    set str [Store new $filename $reporter]
+    set str [Store new $storefile $reporter]
     try {
         $str update $message
     } finally {
@@ -44,8 +44,8 @@ proc actions::update {reporter filename rest} {
     }
 }
 
-proc actions::extract {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::extract {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         $str extract $gid {*}$rest
     } finally {
@@ -53,27 +53,27 @@ proc actions::extract {reporter filename rest} {
     }
 }
 
-proc actions::copy {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::copy {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str dirname
     try {
-        $str copy $gid $rest
+        $str copy $gid $dirname
     } finally {
         $str close
     }
 }
 
-proc actions::print {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::print {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {
-        lassign [$str get $gid $rest] gid data
+        lassign [$str get $gid $filename] gid data
         if {$data ne ""} {
             puts -nonewline [encoding convertfrom utf-8 $data]
         } else {
-            set gid [$str find_first_gid $rest]
+            set gid [$str find_first_gid $filename]
             if {$gid} {
-                puts "\"$rest\" was added to the store in generation @$gid"
+                puts "\"$filename\" was added to the store in @$gid"
             } else {
-                puts "\"$rest\" is not in the store"
+                puts "\"$filename\" is not in the store"
             }
         }
     } finally {
@@ -81,30 +81,30 @@ proc actions::print {reporter filename rest} {
     }
 }
 
-proc actions::diff {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid1 str rest
+proc actions::diff {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid1 str rest
     try {
-        lassign [GidAndRest $str $rest] gid2 rest
+        lassign [GidAndRest $str $rest] gid2 filename
         if {$gid1 == $gid2} { ;# compare with file
-            lassign [$str get $gid1 $rest] gid1 old_data
+            lassign [$str get $gid1 $filename] gid1 old_data
             if {$old_data eq ""} {
-                misc::warn "\"$rest\" @$gid1 not found in store"
+                misc::warn "\"$filename\" @$gid1 not found in store"
             }
-            set new_data [readFile $rest binary]
-            set message "\"$rest\" @$gid1 with file on disk"
+            set new_data [readFile $filename binary]
+            set message "\"$filename\" @$gid1 with file on disk"
         } else { ;# compare in store
             if {$gid1 > $gid2} {
                 lassign "$gid1 $gid2" gid2 gid1
             }
-            lassign [$str get $gid1 $rest] gid1 old_data
+            lassign [$str get $gid1 $filename] gid1 old_data
             if {$old_data eq ""} {
-                misc::warn "\"$rest\" @$gid1 not found in store"
+                misc::warn "\"$filename\" @$gid1 not found in store"
             }
-            lassign [$str get $gid2 $rest] gid2 new_data
+            lassign [$str get $gid2 $filename] gid2 new_data
             if {$new_data eq ""} {
-                misc::warn "\"$rest\" @$gid2 not found in store"
+                misc::warn "\"$filename\" @$gid2 not found in store"
             }
-            set message "\"$rest\" @$gid1 with @$gid2"
+            set message "\"$filename\" @$gid1 with @$gid2"
         }
         if {$old_data eq $new_data} {
             puts "no differences $message"
@@ -120,8 +120,8 @@ proc actions::diff {reporter filename rest} {
     }
 }
 
-proc actions::filenames {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::filenames {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         foreach filename [$str filenames $gid] {
             puts $filename
@@ -131,8 +131,8 @@ proc actions::filenames {reporter filename rest} {
     }
 }
 
-proc actions::generations {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::generations {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         foreach {gid created message} [$str generations] {
             puts "@$gid $created $message"
@@ -142,8 +142,8 @@ proc actions::generations {reporter filename rest} {
     }
 }
 
-proc actions::history {reporter filename rest} {
-    set str [Store new $filename $reporter]
+proc actions::history {reporter storefile rest} {
+    set str [Store new $storefile $reporter]
     try {
         set prev_name ""
         set prefix ""
@@ -162,17 +162,17 @@ proc actions::history {reporter filename rest} {
     }
 }
 
-proc actions::ignore {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::ignore {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str patterns
     try {
-        $str ignore {*}$rest
+        $str ignore {*}$patterns
     } finally {
         $str close
     }
 }
 
-proc actions::ignores {reporter filename} {
-    lassign [GidStoreAndRest $reporter $filename {}] gid str rest
+proc actions::ignores {reporter storefile} {
+    lassign [GidStoreAndRest $reporter $storefile {}] gid str rest
     try {
         foreach pattern [$str ignores] {
             puts $pattern
@@ -182,24 +182,24 @@ proc actions::ignores {reporter filename} {
     }
 }
 
-proc actions::unignore {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::unignore {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str patterns
     try {
-        $str unignore {*}$rest
+        $str unignore {*}$patterns
     } finally {
         $str close
     }
 }
 
-proc actions::purge {reporter filename rest} {
-    lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
+proc actions::purge {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {
         puts -nonewline \
-            "permanently purge \"$rest\" from the store \[yN]? "
+            "permanently purge \"$filename\" from the store \[yN]? "
         flush stdout
         set reply [read stdin 1]
         if {$reply eq "y"} {
-            set n [$str purge $rest]
+            set n [$str purge $filename]
             lassign [misc::n_s $n] n s
             puts "purged $n version$s"
         }
@@ -208,8 +208,8 @@ proc actions::purge {reporter filename rest} {
     }
 }
 
-proc actions::GidStoreAndRest {reporter filename rest} {
-    set str [Store new $filename $reporter]
+proc actions::GidStoreAndRest {reporter storefile rest} {
+    set str [Store new $storefile $reporter]
     lassign [GidAndRest $str $rest] gid rest
     return [list $gid $str $rest]
 }

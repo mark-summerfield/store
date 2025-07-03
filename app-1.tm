@@ -8,25 +8,25 @@ namespace eval app {}
 
 proc app::main {} {
     if {!$::argc} usage
-    set filename .[file tail [pwd]].str
+    set storefile .[file tail [pwd]].str
     set command [lindex $::argv 0]
     lassign [get_reporter [lrange $::argv 1 end]] rest reporter
     switch $command {
-        a - add { actions::add $reporter $filename $rest }
-        c - copy { actions::copy $reporter $filename $rest }
-        d - diff { actions::diff $reporter $filename $rest }
-        e - extract { actions::extract $reporter $filename $rest }
-        f - filenames { actions::filenames $reporter $filename $rest }
-        g - generations { actions::generations $reporter $filename $rest }
-        G - gui { gui::run $filename }
+        a - add { actions::add $reporter $storefile $rest }
+        c - copy { actions::copy $reporter $storefile $rest }
+        d - diff { actions::diff $reporter $storefile $rest }
+        e - extract { actions::extract $reporter $storefile $rest }
+        f - filenames { actions::filenames $reporter $storefile $rest }
+        g - generations { actions::generations $reporter $storefile $rest }
+        G - gui { gui::run $storefile }
         h - help - -h - --help { usage } 
-        H - history { actions::history $reporter $filename $rest}
-        i - ignore { actions::ignore $reporter $filename $rest }
-        I - ignores { actions::ignores $reporter $filename }
-        p - print { actions::print $reporter $filename $rest }
-        purge { actions::purge $reporter $filename $rest }
-        u - update { actions::update $reporter $filename $rest }
-        U - unignore { actions::unignore $reporter $filename $rest }
+        H - history { actions::history $reporter $storefile $rest}
+        i - ignore { actions::ignore $reporter $storefile $rest }
+        I - ignores { actions::ignores $reporter $storefile }
+        p - print { actions::print $reporter $storefile $rest }
+        purge { actions::purge $reporter $storefile $rest }
+        u - update { actions::update $reporter $storefile $rest }
+        U - unignore { actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
         default { misc::warn "unrecognized command: \"$command\"" }
     }

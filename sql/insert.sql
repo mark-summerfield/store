@@ -1,5 +1,6 @@
 -- Copyright © 2025 Mark Summerfield. All Rights Reserved.
 
+-- we don't need '.*' since hidden files are always ignored
 INSERT INTO Ignores (pattern) VALUES ('*.a');
 INSERT INTO Ignores (pattern) VALUES ('*.bak');
 INSERT INTO Ignores (pattern) VALUES ('*.class');

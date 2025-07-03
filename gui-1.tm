@@ -4,5 +4,5 @@ namespace eval gui {}
 
 proc gui::run filename {
     package require tk
-    puts "TODO gui::run store=$filename"
+    puts "TODO gui::run store=$filename" ;# — € • …
 }

@@ -139,6 +139,15 @@ oo::define Store method FindMatch {gid filename data} {
     return [expr {$gid eq "" ? 0 : $gid}]
 }
 
+oo::define Store method find_first_gid {filename} {
+    set gid [$Db eval {
+        SELECT gid FROM Files \
+        WHERE filename = :filename AND kind IN ('U', 'Z')
+        ORDER BY gid LIMIT 1
+    }]
+    return [expr {$gid eq "" ? 0 : $gid}]
+}
+
 # returns the filenames, dirnames, and globs to ignore
 oo::define Store method ignores {} {
     return [$Db eval {SELECT pattern FROM Ignores ORDER BY LOWER(pattern)}]

@@ -252,9 +252,7 @@ oo::define Store method history {{filename ""}} {
             WHERE filename = :filename AND kind in ('U', 'Z')
             ORDER BY gid DESC}]
     } else {
-        return [$Db eval {
-            SELECT filename, gid FROM Files
-            WHERE kind in ('U', 'Z') ORDER BY LOWER(filename), gid DESC}]
+        return [$Db eval { SELECT filename, gid FROM ViewHistory }]
     }
 }
 

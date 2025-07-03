@@ -6,8 +6,8 @@
 #   -- something like...
 #
 #   CREATE VIEW EmptyGenerations AS
-#	SELECT UNIQUE gid FROM Files WHERE kind = 'S' AND gid NOT IN (
-#	    SELECT gid FROM Files WHERE kind in ('U', 'Z');
+#	SELECT DISTINCT gid FROM Files WHERE kind = 'S' AND gid NOT IN (
+#	    SELECT gid FROM Files WHERE kind in ('U', 'Z'));
 #
 #   DELETE FROM Files, Generations WHERE gid in EmptyGenerations;
 #   VACUUM

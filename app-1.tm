@@ -20,6 +20,7 @@ proc app::main {} {
         g - generations { actions::generations $reporter $filename $rest }
         G - gui { gui::run $filename }
         h - help - -h - --help { usage } 
+        H - history { actions::history $reporter $filename $rest}
         i - ignore { actions::ignore $reporter $filename $rest }
         I - ignores { actions::ignores $reporter $filename }
         p - print { actions::print $reporter $filename $rest }
@@ -85,6 +86,10 @@ ${::BOLD}d${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}diff${::RESET}\
 ${::BOLD}f${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}filenames${::RESET}\
     \[@gid]
   Prints the generation’s filenames to stdout.
+${::BOLD}H${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}history${::RESET}\
+    \[filename]
+  Prints the given file’s generations, or all the files’ generations
+  if no file specified, where a change has occurred to stdout.
 ${::BOLD}g${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}generations${::RESET}
   Prints the generation’s (number, created, message) to stdout.
 ${::BOLD}i${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}ignore${::RESET}\

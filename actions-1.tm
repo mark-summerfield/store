@@ -142,6 +142,26 @@ proc actions::generations {reporter filename rest} {
     }
 }
 
+proc actions::history {reporter filename rest} {
+    set str [Store new $filename $reporter]
+    try {
+        set prev_name ""
+        set prefix ""
+        foreach {name gid} [$str history $rest] {
+            if {$prev_name eq $name} {
+                puts -nonewline " @$gid"
+            } else {
+                set prev_name $name
+                puts -nonewline "$prefix$name @$gid"
+                set prefix "\n"
+            }
+        }
+        puts ""
+    } finally {
+        $str close
+    }
+}
+
 proc actions::ignore {reporter filename rest} {
     lassign [GidStoreAndRest $reporter $filename $rest] gid str rest
     try {

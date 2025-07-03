@@ -1,6 +1,6 @@
 store
 app-1.tm
-actions-1.tm # TODO diff
+actions-1.tm
 gui-1.tm
 store-1.tm
 filedata-1.tm

@@ -243,6 +243,21 @@ oo::define Store method get {gid filename} {
     return [list $gid $data]
 }
 
+# returns a list of lines each with a filename and its generations
+# of records deleted (which could be 0)
+oo::define Store method history {{filename ""}} {
+    if {$filename ne ""} {
+        return [$Db eval {
+            SELECT filename, gid FROM Files
+            WHERE filename = :filename AND kind in ('U', 'Z')
+            ORDER BY gid DESC}]
+    } else {
+        return [$Db eval {
+            SELECT filename, gid FROM Files
+            WHERE kind in ('U', 'Z') ORDER BY LOWER(filename), gid DESC}]
+    }
+}
+
 proc PrepareTarget {action gid filename} {
     if {$action eq "extracted"} {
         set ext [file extension $filename]

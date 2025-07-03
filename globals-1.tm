@@ -1,6 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-const VERSION 0.1.0
+const VERSION 0.5.0
 
 # See: https://en.wikipedia.org/wiki/ANSI_escape_code
 if {[dict exists [chan configure stdout] -mode]} { ;# tty

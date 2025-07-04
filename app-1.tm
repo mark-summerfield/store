@@ -130,10 +130,7 @@ ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
 }
 
 proc filtered_reporter message {
-    if {[string match {added*} $message] || \
-            [string match {same as*} $message] } {
-        return
-    }
+    if {[regexp {^(:?added|same as|opened|closed)} $message]} { return }
     puts $message
 }
 

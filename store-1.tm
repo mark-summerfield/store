@@ -109,17 +109,19 @@ oo::define Store method UpdateOne {adding gid filename} {
     if {$oldGid} {
         set kind S
         set pgid $oldGid
-        set data ""
+        set sql {INSERT INTO Files (gid, filename, kind, pgid) VALUES
+                 (:gid, :filename, :kind, :pgid)}
         set added 0
     } else {
         set kind [$fileData kind]
         set pgid [$fileData pgid]
+        set usize [$fileData usize]
+        set zsize [$fileData zsize]
+        set sql {INSERT INTO Files 
+                 (gid, filename, kind, usize, zsize, pgid, data) VALUES
+                 (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     }
-    set usize [$fileData usize]
-    set zsize [$fileData zsize]
-    $Db eval {INSERT INTO Files \
-              (gid, filename, kind, usize, zsize, pgid, data) VALUES \
-              (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
+    $Db eval $sql
     set action [expr {$adding ? "added" : "updated"}]
     switch $kind {
         S { {*}$Reporter "same as @$pgid \"$filename\"" }
@@ -131,7 +133,7 @@ oo::define Store method UpdateOne {adding gid filename} {
 
 oo::define Store method FindMatch {gid filename data} {
     set gid [$Db eval {
-        SELECT gid FROM Files \
+        SELECT gid FROM Files
         WHERE filename = :filename AND kind IN ('U', 'Z') AND data = :data
               AND gid != :gid
         ORDER BY gid DESC LIMIT 1
@@ -242,14 +244,14 @@ oo::define Store method ExtractOne {action gid filename target} {
 # pgid where the data is U or Z if the data at the given gid is S
 oo::define Store method get {gid filename} {
     $Db transaction {
-        lassign [$Db eval {SELECT kind, pgid FROM Files \
+        lassign [$Db eval {SELECT kind, pgid FROM Files
                     WHERE gid = :gid AND filename = :filename}] kind pgid
         if {$kind eq "S"} {
-            lassign [$Db eval {SELECT kind, data FROM Files \
+            lassign [$Db eval {SELECT kind, data FROM Files
                     WHERE gid = :pgid AND filename = :filename}] kind data
             set gid $pgid
         } else {
-            lassign [$Db eval {SELECT kind, data FROM Files \
+            lassign [$Db eval {SELECT kind, data FROM Files
                     WHERE gid = :gid AND filename = :filename}] kind data
         }
     }

@@ -33,9 +33,7 @@ proc misc::n_s size {
 
 proc misc::ignore {filename ignores} {
     foreach pattern $ignores {
-        if {[string match $pattern $filename]} {
-            return true
-        }
+        if {[string match $pattern $filename]} { return true }
     }
     return false
 }

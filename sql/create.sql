@@ -20,20 +20,19 @@ CREATE VIEW LastGeneration AS SELECT COALESCE(MAX(gid), 0) AS gid
 -- kind
 --  U uncompressed raw bytes (the actual file); usize set; zsize NULL
 --  Z zlib deflated raw bytes (the actual file); usize & zsize set
---  S same as record whose gid is pgid; usize & zsize as pgid record & data
---    NULL
+--  S same as record whose gid is pgid; usize & zsize & data NULL
 CREATE TABLE Files (
     gid INTEGER NOT NULL, -- generation ID
     filename TEXT NOT NULL, -- contains full (relative) path
     kind TEXT NOT NULL,
-    usize INTEGER NOT NULL, -- uncompressed size
-    zsize INTEGER NOT NULL, -- zlib-deflated size; 0 means not compressed
+    usize INTEGER, -- uncompressed size
+    zsize INTEGER, -- zlib-deflated size; 0 means not compressed
     pgid INTEGER NOT NULL, -- set to gid if 'U' or 'Z' or to parent if 'S'
     data BLOB,
 
     CHECK(kind IN ('U', 'Z', 'S')),
-    CHECK(usize > 0),
-    CHECK(zsize >= 0),
+    CHECK((kind = 'S' AND usize IS NULL) OR (kind != 'S' AND usize > 0)),
+    CHECK((kind = 'S' AND zsize IS NULL) OR (kind != 'S' AND zsize >= 0)),
     FOREIGN KEY(pgid) REFERENCES Generations(gid),
     FOREIGN KEY(gid) REFERENCES Generations(gid),
     PRIMARY KEY(gid, filename)

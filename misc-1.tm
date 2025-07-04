@@ -1,5 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require globals
+
 namespace eval misc {}
 
 # can't use globals since they are for stdout and here we need stderr
@@ -14,6 +16,8 @@ proc misc::warn message {
     puts stderr "${red}$message${reset}"
     exit 1
 }
+
+proc misc::info message { puts "${::BLUE}$message${::RESET}" }
 
 proc misc::sqlite_version {} {
     set db ::DB#[string range [clock clicks] end-8 end]

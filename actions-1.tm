@@ -44,10 +44,10 @@ proc actions::status {reporter storefile rest} {
         set names [lmap name $candidates { ;# drop already stored files
             expr {[$str find_first_gid $name] ? [continue] : $name} }]
         if {[llength $names]} {
-            puts "unstored unignored nonempty files:\n \
-                 [join $names "\n  "]"
+            misc::info "unstored unignored nonempty files:\n \
+                       [join $names "\n  "]"
         } else {
-            puts "no unstored unignored nonempty files found"
+            misc::info "no unstored unignored nonempty files found"
         }
     } finally {
         $str close
@@ -75,9 +75,9 @@ proc actions::print {reporter storefile rest} {
         } else {
             set gid [$str find_first_gid $filename]
             if {$gid} {
-                puts "\"$filename\" was added to the store in @$gid"
+                misc::info "\"$filename\" was added to the store in @$gid"
             } else {
-                puts "\"$filename\" is not in the store"
+                misc::info "\"$filename\" is not in the store"
             }
         }
     } finally {
@@ -111,12 +111,12 @@ proc actions::diff {reporter storefile rest} {
             set message "\"$filename\" @$gid1 with @$gid2"
         }
         if {$old_data eq $new_data} {
-            puts "no differences $message"
+            misc::info "no differences $message"
             return
         }
         set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
         set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
-        puts "diff of $message"
+        misc::info "diff of $message"
         set delta [diff::diff $old_data $new_data]
         puts -nonewline $delta
     } finally {
@@ -128,7 +128,7 @@ proc actions::filenames {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         foreach filename [$str filenames $gid] {
-            puts $filename
+            misc::info $filename
         }
     } finally {
         $str close
@@ -139,7 +139,7 @@ proc actions::generations {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         foreach {gid created message} [$str generations] {
-            puts "@$gid $created $message"
+            misc::info "@$gid $created $message"
         }
     } finally {
         $str close
@@ -156,7 +156,7 @@ proc actions::history {reporter storefile rest} {
                 puts -nonewline " @$gid"
             } else {
                 set prev_name $name
-                puts -nonewline "$prefix$name @$gid"
+                puts -nonewline "$prefix${::BLUE}$name${::RESET} @$gid"
                 set prefix "\n"
             }
         }
@@ -179,7 +179,7 @@ proc actions::ignores {reporter storefile} {
     lassign [GidStoreAndRest $reporter $storefile {}] gid str rest
     try {
         foreach pattern [$str ignores] {
-            puts $pattern
+            misc::info $pattern
         }
     } finally {
         $str close
@@ -207,14 +207,14 @@ proc actions::clean {reporter storefile rest} {
 proc actions::purge {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {
-        puts -nonewline \
-            "permanently purge \"$filename\" from the store \[yN]? "
+        puts -nonewline "${::RED}permanently purge \"$filename\"\
+                         from the store \[yN]?${::RESET} "
         flush stdout
         set reply [read stdin 1]
         if {$reply eq "y"} {
             set n [$str purge $filename]
             lassign [misc::n_s $n] n s
-            puts "purged $n version$s"
+            misc::info "purged $n version$s"
         }
     } finally {
         $str close

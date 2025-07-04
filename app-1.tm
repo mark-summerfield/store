@@ -50,7 +50,7 @@ proc app::get_reporter rest {
 }
 
 proc app::version {} {
-    puts "str v$::VERSION"
+    misc::info "str v$::VERSION"
     exit 2
 }
 
@@ -136,7 +136,7 @@ proc filtered_reporter message {
     if {[regexp {^(:?added|same as|opened|closed)} $message]} {
         return
     }
-    puts $message
+    misc::info $message
 }
 
-proc full_reporter message { puts $message }
+proc full_reporter message { misc::info $message }

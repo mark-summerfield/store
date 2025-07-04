@@ -25,6 +25,7 @@ proc app::main {} {
         I - ignores { actions::ignores $reporter $storefile }
         p - print { actions::print $reporter $storefile $rest }
         purge { actions::purge $reporter $storefile $rest }
+        s - status { actions::status $reporter $storefile $rest }
         u - update { actions::update $reporter $storefile $rest }
         U - unignore { actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
@@ -49,15 +50,16 @@ proc app::get_reporter rest {
 }
 
 proc app::version {} {
-    puts "store v$::VERSION"
+    puts "str v$::VERSION"
     exit 2
 }
 
 proc app::usage {} {
-    puts "${::ITALIC}usage: ${::RESET}${::BOLD}store${::RESET} <command> …
+    puts "${::ITALIC}usage: ${::RESET}${::BOLD}str${::RESET} <command> …
 
 Stores generational copies of specified files (excluding those
-explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.
+explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.\
+(For a GUI run ${::BOLD}store${::RESET}.)
 
 ${::BOLD}a${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}add${::RESET}\
     \[verbose] <filename1|dirname1 \[… filenameN|dirnameN]>
@@ -71,6 +73,10 @@ ${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
     \[verbose] \[@gid] <filename1 \[… filenameN]>
   Extracts the given filenames at the generation,
   e.g., filename.ext will be extracted as filename@gid.ext, etc.
+${::BOLD}s${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}status${::RESET}
+  Lists any files that are not in the store and not ignored,
+  i.e., candidates for ${::BOLD}a${::RESET} ${::ITALIC}or${::RESET}\
+  ${::BOLD}add${::RESET}.
 ${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
     \[verbose] \[@gid] <dirname>
   Copies all the files at the generation into the given dirname

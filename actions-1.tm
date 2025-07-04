@@ -6,26 +6,10 @@ package require store
 
 namespace eval actions {}
 
-# we deliberately only go at most one level deep for folders
 proc actions::add {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
-        set ignores [$str ignores]
-        set names [list]
-        foreach name $rest {
-            if {![misc::ignore $name $ignores]} {
-                if {[file isdirectory $name]} {
-                    foreach subname [glob -directory $name -types f *] {
-                        if {![misc::ignore $subname $ignores] &&
-                                ![string match {.*} [file tail $name]]} {
-                            lappend names $subname   
-                        }
-                    }
-                } elseif {![string match {.*} [file tail $name]]} {
-                    lappend names $name
-                }
-            }
-        }
+        set names [CandidatesForAdd $str $rest]
         if {[llength $names]} {
             $str add {*}$names
         }
@@ -48,6 +32,23 @@ proc actions::extract {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         $str extract $gid {*}$rest
+    } finally {
+        $str close
+    }
+}
+
+proc actions::status {reporter storefile rest} {
+    set str [Store new $storefile $reporter]
+    try {
+        set candidates [CandidatesForAdd $str [glob * */*]]
+        set names [lmap name $candidates { ;# drop already stored files
+            expr {[$str find_first_gid $name] ? [continue] : $name} }]
+        if {[llength $names]} {
+            puts "unstored unignored nonempty files:\n \
+                 [join $names "\n  "]"
+        } else {
+            puts "no unstored unignored nonempty files found"
+        }
     } finally {
         $str close
     }
@@ -218,6 +219,31 @@ proc actions::purge {reporter storefile rest} {
     } finally {
         $str close
     }
+}
+
+# we deliberately only go at most one level deep for folders
+proc actions::CandidatesForAdd {str candidates} {
+    set ignores [$str ignores]
+    set names [list]
+    foreach name $candidates {
+        if {![misc::ignore $name $ignores]} {
+            if {[file isdirectory $name]} {
+                foreach subname [glob -directory $name -types f *] {
+                    if {![misc::ignore $subname $ignores] &&
+                            [ValidFile $subname]} {
+                        lappend names $subname   
+                    }
+                }
+            } elseif {[ValidFile $name]} {
+                lappend names $name
+            }
+        }
+    }
+    return $names
+}
+
+proc actions::ValidFile name {
+    return ![string match {.*} [file tail $name]] && [file size $name]
 }
 
 proc actions::GidStoreAndRest {reporter storefile rest} {

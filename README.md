@@ -2,13 +2,13 @@
 
 An easy-to-use simple alternative to a version control system.
 
-Add files to store:
+Add files to str:
 
-    store a *
+    str a *
 
 or
 
-    store add *
+    str add *
 
 This will add all the globbed files apart from those that match the default
 ignore globs (e.g., `*.bak`, `*.o`, `*.obj`, etc.). You can add, remove, or
@@ -16,24 +16,28 @@ list the ignores (filenames, folder names, or globs).
 
 The most common operation is to update the store after changes:
 
-    store u
+    str u
 
 or
 
-    store update
+    str update
 
 or, say,
 
-    store u This is an optional comment.
+    str u This is an optional comment.
 
 You can print or extract any previous version of any stored file.
 You can diff a previous version against the version on disk or against a
 different previous version.
 
+To see if there are any files not in the store that are not ignored (e.g.,
+new candidates for adding), run `str s` or `str status`.
+
 You can also extract all the files in a previous “generation” into a new
 folder (using the `copy` command).
 
-For command line run `store help` for commands; for GUI run `store gui`.
+The command line application is `str`; run `str help` for commands.
+The GUI app is `store`.
 
 The generational copies of the added files are stored in _.dirname_.str.
 

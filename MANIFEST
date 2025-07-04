@@ -14,6 +14,7 @@ sql/prepare.sql
 sql/create.sql
 sql/insert.sql
 
+# TODO add installation instructions once I can built a stand-alone binary
 README.md
 
 st.sh

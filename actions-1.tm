@@ -57,6 +57,9 @@ proc actions::copy {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str dirname
     try {
         $str copy $gid $dirname
+    } trap {} {message} {
+        $str close
+        misc::warn $message
     } finally {
         $str close
     }

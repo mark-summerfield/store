@@ -26,10 +26,8 @@ oo::define Store constructor {filename {reporter ""}} {
             $Db eval [readFile $::APPPATH/sql/create.sql] 
             $Db eval [readFile $::APPPATH/sql/insert.sql] 
         }
-        {*}$Reporter "created $Filename"
-    } else {
-        {*}$Reporter "opened $Filename"
     }
+    {*}$Reporter "[expr {$exists ? "opened" : "created"}] $Filename"
 }
 
 oo::define Store destructor { my close }

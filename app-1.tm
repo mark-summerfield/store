@@ -14,6 +14,7 @@ proc app::main {} {
     switch $command {
         a - add { actions::add $reporter $storefile $rest }
         c - copy { actions::copy $reporter $storefile $rest }
+        C - clean { actions::clean $reporter $storefile $rest }
         d - diff { actions::diff $reporter $storefile $rest }
         e - extract { actions::extract $reporter $storefile $rest }
         f - filenames { actions::filenames $reporter $storefile $rest }
@@ -101,6 +102,8 @@ ${::BOLD}U${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}unignore${::RESET}\
     <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
   Unignores the given filenames, folders, and globs by removing them
   from the ignore list.
+${::BOLD}C${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}clean${::RESET}
+  Cleans, i.e., deletes, every “empty” generation that has no changes.
 ${::BOLD}purge${::RESET} <filename>
   Purges the given filename from the store by deleting every copy
   of it at every generation.

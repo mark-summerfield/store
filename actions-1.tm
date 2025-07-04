@@ -191,6 +191,15 @@ proc actions::unignore {reporter storefile rest} {
     }
 }
 
+proc actions::clean {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+    try {
+        $str clean
+    } finally {
+        $str close
+    }
+}
+
 proc actions::purge {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {

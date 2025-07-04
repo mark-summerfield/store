@@ -1,17 +1,3 @@
-# TODO purge VACUUM
-# TODO if no changes needed & no comments don't add a new generation &
-# print "no updates needed"
-# TODO allow user to remove generations that only contain S files
-# clean Remove redundant generations
-#   -- something like...
-#
-#   CREATE VIEW EmptyGenerations AS
-#	SELECT DISTINCT gid FROM Files WHERE kind = 'S' AND gid NOT IN (
-#	    SELECT gid FROM Files WHERE kind in ('U', 'Z'));
-#
-#   DELETE FROM Files, Generations WHERE gid in EmptyGenerations;
-#   VACUUM
-
 store
 app-1.tm
 actions-1.tm

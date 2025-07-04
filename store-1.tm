@@ -90,7 +90,7 @@ oo::define Store method Update {message adding args} {
     $Db transaction {
         $Db eval {INSERT INTO Generations (message) VALUES (:message)}
         set gid [$Db last_insert_rowid]
-        {*}$Reporter "created generation @$gid"
+        {*}$Reporter "created @$gid"
         set n 0
         foreach filename [lsort -nocase $filenames] {
             incr n [my UpdateOne $adding $gid $filename]
@@ -122,7 +122,7 @@ oo::define Store method UpdateOne {adding gid filename} {
               (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     set action [expr {$adding ? "added" : "updated"}]
     switch $kind {
-        S { {*}$Reporter "same as generation @$pgid \"$filename\"" }
+        S { {*}$Reporter "same as @$pgid \"$filename\"" }
         U { {*}$Reporter "$action \"$filename\"" }
         Z { {*}$Reporter "$action \"$filename\" (deflated)" }
     }
@@ -141,7 +141,7 @@ oo::define Store method FindMatch {gid filename data} {
 
 oo::define Store method find_first_gid {filename} {
     set gid [$Db eval {
-        SELECT gid FROM Files \
+        SELECT gid FROM Files
         WHERE filename = :filename AND kind IN ('U', 'Z')
         ORDER BY gid LIMIT 1
     }]
@@ -171,6 +171,7 @@ oo::define Store method unignore {args} {
             $Db eval {DELETE FROM Ignores WHERE pattern = :pattern}
         }
     }
+    $Db eval {VACUUM;}
 }
 
 # lists all generations (gid, created, message)
@@ -185,11 +186,24 @@ oo::define Store method filenames {{gid 0}} {
                       ORDER BY LOWER(filename)}]
 }
 
+# cleans, i.e., deletes, every “empty” generation that has no changes
+oo::define Store method clean {} {
+    $Db transaction {
+        $Db eval {DELETE FROM Files WHERE gid IN (
+                    SELECT gid FROM EmptyGenerations);}
+        $Db eval {DELETE FROM Generations WHERE gid NOT IN (
+                    SELECT gid FROM Files);}
+    }
+    $Db eval {VACUUM;}
+}
+
 # deletes the given filename in every generation and returns the number
 # of records deleted (which could be 0)
 oo::define Store method purge {filename} {
     $Db eval {DELETE FROM Files WHERE filename = :filename}
-    return [$Db changes]
+    set n [$Db changes]
+    $Db eval {VACUUM;}
+    return $n
 }
 
 # extracts all files at last or given gid into the current dir or only

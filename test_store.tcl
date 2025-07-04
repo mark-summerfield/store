@@ -198,60 +198,60 @@ proc test5 {} {
 
 const MESSAGES1 {created /tmp/test3.db
 adding/updating 4 files
-created generation @1
+created @1
 added "app-1.tm" (deflated)
 added "sql/create.sql" (deflated)
 added "sql/prepare.sql" (deflated)
 added "store-1.tm" (deflated)
 adding/updating 5 files
-created generation @2
-same as generation @1 "app-1.tm"
+created @2
+same as @1 "app-1.tm"
 added "README.md" (deflated)
-same as generation @1 "sql/create.sql"
-same as generation @1 "sql/prepare.sql"
-same as generation @1 "store-1.tm"
+same as @1 "sql/create.sql"
+same as @1 "sql/prepare.sql"
+same as @1 "store-1.tm"
 updating "should change nothing @2"
-created generation @3
-same as generation @1 "app-1.tm"
-same as generation @2 "README.md"
-same as generation @1 "sql/create.sql"
-same as generation @1 "sql/prepare.sql"
-same as generation @1 "store-1.tm"
+created @3
+same as @1 "app-1.tm"
+same as @2 "README.md"
+same as @1 "sql/create.sql"
+same as @1 "sql/prepare.sql"
+same as @1 "store-1.tm"
 updating "should change nothing @3"
-created generation @4
-same as generation @1 "app-1.tm"
-same as generation @2 "README.md"
-same as generation @1 "sql/create.sql"
-same as generation @1 "sql/prepare.sql"
-same as generation @1 "store-1.tm"
+created @4
+same as @1 "app-1.tm"
+same as @2 "README.md"
+same as @1 "sql/create.sql"
+same as @1 "sql/prepare.sql"
+same as @1 "store-1.tm"
 updating "should change to new README.md @4"
-created generation @5
-same as generation @1 "app-1.tm"
+created @5
+same as @1 "app-1.tm"
 updated "README.md" (deflated)
-same as generation @1 "sql/create.sql"
-same as generation @1 "sql/prepare.sql"
-same as generation @1 "store-1.tm"
+same as @1 "sql/create.sql"
+same as @1 "sql/prepare.sql"
+same as @1 "store-1.tm"
 updating "should restore old README.md @5"
-created generation @6
-same as generation @1 "app-1.tm"
-same as generation @2 "README.md"
-same as generation @1 "sql/create.sql"
-same as generation @1 "sql/prepare.sql"
-same as generation @1 "store-1.tm"
+created @6
+same as @1 "app-1.tm"
+same as @2 "README.md"
+same as @1 "sql/create.sql"
+same as @1 "sql/prepare.sql"
+same as @1 "store-1.tm"
 updating "should change nothing @6"
-created generation @7
-same as generation @1 "app-1.tm"
-same as generation @2 "README.md"
-same as generation @1 "sql/create.sql"
-same as generation @1 "sql/prepare.sql"
-same as generation @1 "store-1.tm"
+created @7
+same as @1 "app-1.tm"
+same as @2 "README.md"
+same as @1 "sql/create.sql"
+same as @1 "sql/prepare.sql"
+same as @1 "store-1.tm"
 updating "should change nothing @7"
-created generation @8
-same as generation @1 "app-1.tm"
-same as generation @2 "README.md"
-same as generation @1 "sql/create.sql"
-same as generation @1 "sql/prepare.sql"
-same as generation @1 "store-1.tm"
+created @8
+same as @1 "app-1.tm"
+same as @2 "README.md"
+same as @1 "sql/create.sql"
+same as @1 "sql/prepare.sql"
+same as @1 "store-1.tm"
 test3: gid=8 message="should change nothing @7"
 test3: gid=7 message="should change nothing @6"
 test3: gid=6 message="should restore old README.md @5"
@@ -271,22 +271,22 @@ closed /tmp/test3.db
 
 const MESSAGES2 {created /tmp/test3.db
 adding/updating 4 files
-created generation @1
+created @1
 adding/updating 5 files
-created generation @2
+created @2
 updating "should change nothing @2"
-created generation @3
+created @3
 updating "should change nothing @3"
-created generation @4
+created @4
 updating "should change to new README.md @4"
-created generation @5
+created @5
 updated "README.md" (deflated)
 updating "should restore old README.md @5"
-created generation @6
+created @6
 updating "should change nothing @6"
-created generation @7
+created @7
 updating "should change nothing @7"
-created generation @8
+created @8
 test3: gid=8 message="should change nothing @7"
 test3: gid=7 message="should change nothing @6"
 test3: gid=6 message="should restore old README.md @5"

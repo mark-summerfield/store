@@ -19,7 +19,6 @@ proc app::main {} {
         e - extract { actions::extract $reporter $storefile $rest }
         f - filenames { actions::filenames $reporter $storefile $rest }
         g - generations { actions::generations $reporter $storefile $rest }
-        G - gui { gui::run $storefile }
         h - help - -h - --help { usage } 
         H - history { actions::history $reporter $storefile $rest}
         i - ignore { actions::ignore $reporter $storefile $rest }
@@ -107,8 +106,6 @@ ${::BOLD}C${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}clean${::RESET}
 ${::BOLD}purge${::RESET} <filename>
   Purges the given filename from the store by deleting every copy
   of it at every generation.
-${::BOLD}G${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}gui${::RESET}
-  Launch graphical user interface.
 ${::BOLD}h${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}help${::RESET}\
     ${::ITALIC}or${::RESET} ${::BOLD}-h${::RESET} ${::ITALIC}or${::RESET}\
     ${::BOLD}--help${::RESET}

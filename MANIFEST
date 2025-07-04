@@ -1,7 +1,9 @@
-store
+store # GUI TODO
+gui-1.tm
+
+str # CLI
 app-1.tm
 actions-1.tm
-gui-1.tm # TODO
 store-1.tm
 filedata-1.tm
 diff-1.tm

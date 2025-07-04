@@ -1,4 +1,4 @@
-#!/usr/bin/env wish9
+#!/usr/bin/env tclsh9
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 if {![catch {file readlink [info script]} name]} {
@@ -8,6 +8,6 @@ if {![catch {file readlink [info script]} name]} {
 }
 tcl::tm::path add $APPPATH
 
-package require gui
+package require app
 
-gui::main
+app::main

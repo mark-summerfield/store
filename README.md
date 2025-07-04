@@ -39,7 +39,7 @@ The generational copies of the added files are stored in _.dirname_.str.
 
 Store does not support branching, staging, or anything else that’s
 complicated, making it ideal for small personal projects where you just want
-to save regular “checkpoints” of your changes and be able to look back in
+to save regular “generations” of your changes and be able to look back in
 time.
 
 ## License

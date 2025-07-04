@@ -193,10 +193,15 @@ oo::define Store method clean {} {
     $Db transaction {
         $Db eval {DELETE FROM Files WHERE gid IN (
                     SELECT gid FROM EmptyGenerations);}
+        set nfiles [$Db changes]
         $Db eval {DELETE FROM Generations WHERE gid NOT IN (
                     SELECT gid FROM Files);}
+        set ngens [$Db changes]
     }
     $Db eval {VACUUM;}
+    lassign [misc::n_s $nfiles] nf ns
+    lassign [misc::n_s $ngens] gf gs
+    {*}$Reporter "cleaned $nf file$ns in $gf generation$gs"
 }
 
 # deletes the given filename in every generation and returns the number

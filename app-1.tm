@@ -125,12 +125,14 @@ ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
 • verbose — specified as ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
    ${::BOLD}--verbose${::RESET} ${::ITALIC}or${::RESET}\
    ${::BOLD}-V${::RESET} ${::ITALIC}or${::RESET}\
-   ${::BOLD}-veryverbose${::RESET}"
+   ${::BOLD}--veryverbose${::RESET}"
     exit 2
 }
 
 proc filtered_reporter message {
-    if {[regexp {^(:?added|same as|opened|closed)} $message]} { return }
+    if {[regexp {^(:?added|same as|opened|closed)} $message]} {
+        return
+    }
     puts $message
 }
 

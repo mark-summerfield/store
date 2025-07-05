@@ -1,6 +1,7 @@
 store
-gui-1.tm # GUI TODO
+gui-1.tm # GUI (2) TODO
 
+# TODO (1) status should also say if updates needed
 str # CLI
 app-1.tm
 actions-1.tm

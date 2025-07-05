@@ -73,10 +73,11 @@ ${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
     \[verbose] \[@gid] <filename1 \[… filenameN]>
   Extracts the given filenames at the generation,
   e.g., filename.ext will be extracted as filename@gid.ext, etc.
-${::BOLD}s${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}status${::RESET}
-  Lists any files that are not in the store and not ignored,
-  i.e., candidates for ${::BOLD}a${::RESET} ${::ITALIC}or${::RESET}\
-  ${::BOLD}add${::RESET}.
+${::BOLD}s${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}status${::RESET}\
+    \[verbose] \[interactive]
+  Lists any unstored unignored nonempty files; if interactive
+  specified as ${::BOLD}-i${::RESET} ${::ITALIC}or${::RESET}\
+  ${::BOLD}--interactive${::RESET} prompts to add those listed.
 ${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
     \[verbose] \[@gid] <dirname>
   Copies all the files at the generation into the given dirname

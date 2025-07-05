@@ -2,7 +2,7 @@
 
 An easy-to-use simple alternative to a version control system.
 
-Add files to str:
+Add files to store:
 
     str a *
 
@@ -13,6 +13,18 @@ or
 This will add all the globbed files apart from those that match the default
 ignore globs (e.g., `*.bak`, `*.o`, `*.obj`, etc.). You can add, remove, or
 list the ignores (filenames, folder names, or globs).
+
+Alternatively, specify actual files instead of using a glob, or have store
+find the files for you:
+
+    str s -i
+
+or
+
+    str status -i
+
+Store status lists the unstored unignored nonempty files; the `-i` (or
+`--interactive` says to prompt to add if there are any listed).
 
 The most common operation is to update the store after changes:
 

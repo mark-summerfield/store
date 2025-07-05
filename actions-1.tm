@@ -44,8 +44,17 @@ proc actions::status {reporter storefile rest} {
         set names [lmap name $candidates { ;# drop already stored files
             expr {[$str find_first_gid $name] ? [continue] : $name} }]
         if {[llength $names]} {
-            misc::info "unstored unignored nonempty files:\n \
-                       [join $names "\n  "]"
+            misc::info "unstored unignored nonempty\
+                files:\n${::GREEN}[join $names "\n"]${::RESET}"
+            if {$rest eq "-i" || $rest eq "--interactive"} {
+                puts -nonewline "${::MAGENTA}add these to the\
+                                 store \[yN]?${::RESET} "
+                flush stdout
+                set reply [read stdin 1]
+                if {$reply eq "y"} {
+                    $str add {*}$names
+                } 
+            }
         } else {
             misc::info "no unstored unignored nonempty files found"
         }

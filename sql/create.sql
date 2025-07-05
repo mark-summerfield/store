@@ -38,9 +38,13 @@ CREATE TABLE Files (
     PRIMARY KEY(gid, filename)
 );
 
-CREATE VIEW ViewHistory AS
+CREATE VIEW ViewHistoryByFilename AS
     SELECT filename, gid FROM Files WHERE kind in ('U', 'Z')
         ORDER BY LOWER(filename), gid DESC;
+
+CREATE VIEW ViewHistoryByGeneration AS
+    SELECT gid, filename FROM Files WHERE kind in ('U', 'Z')
+        ORDER BY gid DESC, LOWER(filename);
 
 CREATE VIEW EmptyGenerations AS
     SELECT DISTINCT gid FROM Files WHERE kind = 'S' AND gid NOT IN (

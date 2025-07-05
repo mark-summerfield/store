@@ -251,11 +251,11 @@ proc actions::CandidatesForAdd {str candidates} {
             if {[file isdirectory $name]} {
                 foreach subname [glob -directory $name -types f *] {
                     if {![misc::ignore $subname $ignores] &&
-                            [ValidFile $str $subname]} {
+                            [ValidFile $subname]} {
                         lappend names $subname   
                     }
                 }
-            } elseif {[ValidFile $str $name]} {
+            } elseif {[ValidFile $name]} {
                 lappend names $name
             }
         }
@@ -263,8 +263,8 @@ proc actions::CandidatesForAdd {str candidates} {
     return $names
 }
 
-proc actions::ValidFile {str name} {
-    return ![string match {.*} [file tail $name]] && [file size $name]
+proc actions::ValidFile name {
+    expr {![string match {.*} [file tail $name]] && [file size $name]}
 }
 
 proc actions::GidStoreAndRest {reporter storefile rest} {

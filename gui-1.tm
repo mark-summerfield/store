@@ -5,3 +5,13 @@ namespace eval gui {}
 proc gui::main {} {
     puts "TODO gui::main"
 }
+
+# /Files\/Generations\
+# Files tab has a tree view file x generation
+# Generations tab has a tree view generation x file
+#
+# Use two splitters:
+#
+# Buttons | Tabs | Text widget
+#
+# Status bar

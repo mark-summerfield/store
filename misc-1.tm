@@ -41,3 +41,11 @@ proc misc::ignore {filename ignores} {
     }
     return false
 }
+
+proc misc::yes_no {prompt {dangerous false}} {
+    set color [expr {$dangerous ? $::RED : $::MAGENTA}]
+    puts -nonewline "${color}$prompt \[yN]?${::RESET} "
+    flush stdout
+    set reply [read stdin 1]
+    expr {$reply eq "y"}
+}

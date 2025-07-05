@@ -22,9 +22,13 @@ proc actions::update {reporter storefile rest} {
     set message [join $rest " "]
     set str [Store new $storefile $reporter]
     try {
-        $str update $message
-        if {$::VERBOSE} {
-            Lst $str
+        if {[HaveUpdates $str]} {
+            $str update $message
+            if {$::VERBOSE} {
+                Lst $str
+            }
+        } elseif {$::VERBOSE} {
+            misc::info "no updates needed"
         }
     } finally {
         $str close
@@ -44,6 +48,14 @@ proc actions::lst {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
         Lst $str $rest
+        if {[HaveUpdates $str]} {
+            misc::info "updates needed"
+            if {!($rest eq "-n" || $rest eq "--no")} {
+                if {[misc::yes_no "update the store"]} {
+                    $str update ""
+                }
+            }
+        }
     } finally {
         $str close
     }
@@ -56,11 +68,7 @@ proc actions::Lst {str {rest ""}} {
             files:\n${::GREEN}[join $names "\n"]${::RESET}"
         if {!($rest eq "-n" || $rest eq "--no")} {
             set word [expr {[llength $names] == 1 ? "this" : "these"}]
-            puts -nonewline "${::MAGENTA}add $word to the\
-                                store \[yN]?${::RESET} "
-            flush stdout
-            set reply [read stdin 1]
-            if {$reply eq "y"} {
+            if {[misc::yes_no "add $word to the store"]} {
                 $str add {*}$names
             } 
         }
@@ -233,11 +241,8 @@ proc actions::clean {reporter storefile rest} {
 proc actions::purge {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {
-        puts -nonewline "${::RED}permanently purge \"$filename\"\
-                         from the store \[yN]?${::RESET} "
-        flush stdout
-        set reply [read stdin 1]
-        if {$reply eq "y"} {
+        if {[misc::yes_no "permanently permanently purge \"$filename\"\
+                          from the store" true]} {
             set n [$str purge $filename]
             lassign [misc::n_s $n] n s
             misc::info "purged $n version$s"
@@ -245,6 +250,13 @@ proc actions::purge {reporter storefile rest} {
     } finally {
         $str close
     }
+}
+
+proc actions::HaveUpdates str {
+    set files [$str filenames]
+    # TODO compare each file to its disk equivalent; if they are different
+    # sizes or the same size and different bytes then return true
+    return true ;# TODO false
 }
 
 proc actions::CandidatesForList str {

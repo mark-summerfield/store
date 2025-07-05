@@ -153,8 +153,19 @@ proc actions::filenames {reporter storefile rest} {
 proc actions::generations {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
-        foreach {gid created message} [$str generations] {
-            misc::info "@$gid $created $message"
+        if {$rest eq "-f" || $rest eq "--full"} {
+            set prev_gid 0
+            foreach {gid created message filename} [$str generations true] {
+                if {$gid != $prev_gid} {
+                    misc::info "@$gid $created $message"
+                    set prev_gid $gid
+                }
+                puts "  $filename"
+            }
+        } else {
+            foreach {gid created message} [$str generations] {
+                misc::info "@$gid $created $message"
+            }
         }
     } finally {
         $str close

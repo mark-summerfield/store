@@ -43,8 +43,10 @@ CREATE VIEW ViewHistoryByFilename AS
         ORDER BY LOWER(filename), gid DESC;
 
 CREATE VIEW ViewHistoryByGeneration AS
-    SELECT gid, filename FROM Files WHERE kind in ('U', 'Z')
-        ORDER BY gid DESC, LOWER(filename);
+    SELECT Generations.gid, DATETIME(created) AS created, message, filename
+        FROM Generations, Files
+        WHERE Generations.gid = Files.gid AND kind in ('U', 'Z')
+        ORDER BY Generations.gid DESC, LOWER(filename);
 
 CREATE VIEW EmptyGenerations AS
     SELECT DISTINCT gid FROM Files WHERE kind = 'S' AND gid NOT IN (

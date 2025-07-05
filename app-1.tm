@@ -103,8 +103,11 @@ ${::BOLD}H${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}history${::RESET}\
     \[filename]
   Prints the given file’s generations, or all the files’ generations
   if no file specified, where a change has occurred, to stdout.
-${::BOLD}g${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}generations${::RESET}
-  Prints all the generations (number, created, message) to stdout.
+${::BOLD}g${::RESET} ${::ITALIC}or${::RESET}\
+  ${::BOLD}generations${::RESET} \[full]
+  Prints all the generations (number, created, message), and if
+  \[full] specified as ${::BOLD}-f${::RESET} ${::ITALIC}or${::RESET}\
+  ${::BOLD}--full${::RESET}, all their filenames, to stdout.
 ${::BOLD}i${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}ignore${::RESET}\
     <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
   Adds the given filenames, folders, and globs to the ignore list.

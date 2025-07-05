@@ -175,7 +175,11 @@ oo::define Store method unignore {args} {
 }
 
 # lists all generations (gid, created, message)
-oo::define Store method generations {} {
+oo::define Store method generations {{full false}} {
+    if {$full} {
+        return [$Db eval {SELECT gid, created, message, filename
+                          FROM ViewHistoryByGeneration}]
+    }
     return [$Db eval {SELECT gid, created, message FROM ViewGenerations}]
 }
 
@@ -271,7 +275,7 @@ oo::define Store method history {{filename ""}} {
             WHERE filename = :filename AND kind in ('U', 'Z')
             ORDER BY gid DESC}]
     } else {
-        return [$Db eval { SELECT filename, gid FROM ViewHistory }]
+        return [$Db eval {SELECT filename, gid FROM ViewHistoryByFilename}]
     }
 }
 

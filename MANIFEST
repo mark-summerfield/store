@@ -1,10 +1,9 @@
 store
 gui-1.tm # GUI (2) TODO
 
-# TODO (1) implement HaveUpdates
 str # CLI
 app-1.tm
-actions-1.tm
+actions-1.tm # TODO (1) implement HaveUpdates
 store-1.tm
 filedata-1.tm
 diff-1.tm

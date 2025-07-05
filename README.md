@@ -4,27 +4,34 @@ An easy-to-use simple alternative to a version control system.
 
 Add files to store:
 
+    str l
+
+or
+
+    str list
+
+This will glob the files in the current folder and its immediate subfolders
+and filter out ignored and empty files to present a list of unstored files.
+It will then prompt for whether to add the files to the store (creating the
+store if necessary).
+
+(Use `str list --no` in a shell script to provide a list of unstored
+unignored nonempty files that are candidates to be added; the `--no`
+prevents the interactive prompting to add.)
+
+Alternatively, add specified or globbed files like this:
+
     str a *
 
 or
 
     str add *
 
-This will add all the globbed files apart from those that match the default
-ignore globs (e.g., `*.bak`, `*.o`, `*.obj`, etc.). You can add, remove, or
-list the ignores (filenames, folder names, or globs).
+This will add all the specified files apart from those that match the
+default ignore globs (e.g., `*.bak`, `*.o`, `*.obj`, etc.).
 
-Alternatively, specify actual files instead of using a glob, or have store
-find the files for you:
-
-    str s -i
-
-or
-
-    str status -i
-
-Store status lists the unstored unignored nonempty files; the `-i` (or
-`--interactive` says to prompt to add if there are any listed).
+You can also add, remove, or list the ignores (filenames, folder names, or
+globs).
 
 The most common operation is to update the store after changes:
 

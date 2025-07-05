@@ -23,6 +23,9 @@ proc actions::update {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
         $str update $message
+        if {$::VERBOSE} {
+            Lst $str
+        }
     } finally {
         $str close
     }
@@ -37,29 +40,32 @@ proc actions::extract {reporter storefile rest} {
     }
 }
 
-proc actions::status {reporter storefile rest} {
+proc actions::lst {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
-        set candidates [CandidatesForAdd $str [glob * */*]]
-        set names [lmap name $candidates { ;# drop already stored files
-            expr {[$str find_first_gid $name] ? [continue] : $name} }]
-        if {[llength $names]} {
-            misc::info "unstored unignored nonempty\
-                files:\n${::GREEN}[join $names "\n"]${::RESET}"
-            if {$rest eq "-i" || $rest eq "--interactive"} {
-                puts -nonewline "${::MAGENTA}add these to the\
-                                 store \[yN]?${::RESET} "
-                flush stdout
-                set reply [read stdin 1]
-                if {$reply eq "y"} {
-                    $str add {*}$names
-                } 
-            }
-        } else {
-            misc::info "no unstored unignored nonempty files found"
-        }
+        Lst $str $rest
     } finally {
         $str close
+    }
+}
+
+proc actions::Lst {str {rest ""}} {
+    set names [CandidatesForList $str]
+    if {[llength $names]} {
+        misc::info "unstored unignored nonempty\
+            files:\n${::GREEN}[join $names "\n"]${::RESET}"
+        if {!($rest eq "-n" || $rest eq "--no")} {
+            set word [expr {[llength $names] == 1 ? "this" : "these"}]
+            puts -nonewline "${::MAGENTA}add $word to the\
+                                store \[yN]?${::RESET} "
+            flush stdout
+            set reply [read stdin 1]
+            if {$reply eq "y"} {
+                $str add {*}$names
+            } 
+        }
+    } else {
+        misc::info "no unstored unignored nonempty files found"
     }
 }
 
@@ -230,6 +236,12 @@ proc actions::purge {reporter storefile rest} {
     }
 }
 
+proc actions::CandidatesForList str {
+    set candidates [CandidatesForAdd $str [glob * */*]]
+    return [lmap name $candidates { ;# drop already stored files
+            expr {[$str find_first_gid $name] ? [continue] : $name} }]
+}
+
 # we deliberately only go at most one level deep for folders
 proc actions::CandidatesForAdd {str candidates} {
     set ignores [$str ignores]
@@ -239,11 +251,11 @@ proc actions::CandidatesForAdd {str candidates} {
             if {[file isdirectory $name]} {
                 foreach subname [glob -directory $name -types f *] {
                     if {![misc::ignore $subname $ignores] &&
-                            [ValidFile $subname]} {
+                            [ValidFile $str $subname]} {
                         lappend names $subname   
                     }
                 }
-            } elseif {[ValidFile $name]} {
+            } elseif {[ValidFile $str $name]} {
                 lappend names $name
             }
         }
@@ -251,7 +263,7 @@ proc actions::CandidatesForAdd {str candidates} {
     return $names
 }
 
-proc actions::ValidFile name {
+proc actions::ValidFile {str name} {
     return ![string match {.*} [file tail $name]] && [file size $name]
 }
 

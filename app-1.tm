@@ -23,9 +23,9 @@ proc app::main {} {
         H - history { actions::history $reporter $storefile $rest}
         i - ignore { actions::ignore $reporter $storefile $rest }
         I - ignores { actions::ignores $reporter $storefile }
+        l - list { actions::lst $reporter $storefile $rest }
         p - print { actions::print $reporter $storefile $rest }
         purge { actions::purge $reporter $storefile $rest }
-        s - status { actions::status $reporter $storefile $rest }
         u - update { actions::update $reporter $storefile $rest }
         U - unignore { actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
@@ -40,10 +40,12 @@ proc app::get_reporter rest {
         -v - --verbose {
             set reporter filtered_reporter
             set rest [lrange $rest 1 end]
+            set ::VERBOSE 1
         }
         -V - --veryverbose {
             set reporter full_reporter
             set rest [lrange $rest 1 end]
+            set ::VERBOSE 2
         }
     }
     return [list $rest $reporter]
@@ -61,23 +63,27 @@ Stores generational copies of specified files (excluding those
 explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.\
 (For a GUI run ${::BOLD}store${::RESET}.)
 
-${::BOLD}a${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}add${::RESET}\
-    \[verbose] <filename1|dirname1 \[… filenameN|dirnameN]>
-  Adds the given files or the files in the given folders to the store,
-  excluding any that are ignored, creating the store if necessary.
+${::BOLD}l${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}list${::RESET}\
+    \[verbose] \[no]
+  Lists any unstored unignored nonempty files. Prompts to\
+  ${::BOLD}add${::RESET} those
+  listed, creating the store if neccessary, unless \[no] is specified
+  as ${::BOLD}-n${::RESET} ${::ITALIC}or${::RESET}\
+  ${::BOLD}--no${::RESET} (e.g., for shell scripts).
 ${::BOLD}u${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}update${::RESET}\
     \[verbose] \[optional message text]
   Updates all the files in the store by creating a new generation and
-  storing all those that have changed.
+  storing all those that have changed. If verbose, prompts to\
+  ${::BOLD}add${::RESET} any
+  unstored unignored nonempty files.
+${::BOLD}a${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}add${::RESET}\
+    \[verbose] <filename1|dirname1 \[… filenameN|dirnameN]>
+  Adds the given files or the files in the given folders to the store,
+  except for those ignored or empty, creating the store if necessary.
 ${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
     \[verbose] \[@gid] <filename1 \[… filenameN]>
   Extracts the given filenames at the generation,
   e.g., filename.ext will be extracted as filename@gid.ext, etc.
-${::BOLD}s${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}status${::RESET}\
-    \[verbose] \[interactive]
-  Lists any unstored unignored nonempty files; if interactive
-  specified as ${::BOLD}-i${::RESET} ${::ITALIC}or${::RESET}\
-  ${::BOLD}--interactive${::RESET} prompts to add those listed.
 ${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
     \[verbose] \[@gid] <dirname>
   Copies all the files at the generation into the given dirname
@@ -96,9 +102,9 @@ ${::BOLD}f${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}filenames${::RESET}\
 ${::BOLD}H${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}history${::RESET}\
     \[filename]
   Prints the given file’s generations, or all the files’ generations
-  if no file specified, where a change has occurred to stdout.
+  if no file specified, where a change has occurred, to stdout.
 ${::BOLD}g${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}generations${::RESET}
-  Prints the generation’s (number, created, message) to stdout.
+  Prints all the generations (number, created, message) to stdout.
 ${::BOLD}i${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}ignore${::RESET}\
     <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
   Adds the given filenames, folders, and globs to the ignore list.

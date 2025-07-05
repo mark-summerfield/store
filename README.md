@@ -1,6 +1,6 @@
 # Store
 
-An easy-to-use simple alternative to a version control system.
+An easy-to-use and simple alternative to a version control system.
 
 Add files to store:
 

@@ -1,5 +1,5 @@
-store # GUI TODO
-gui-1.tm
+store
+gui-1.tm # GUI TODO
 
 str # CLI
 app-1.tm

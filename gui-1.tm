@@ -15,3 +15,5 @@ proc gui::main {} {
 # Buttons | Tabs | Text widget
 #
 # Status bar
+#
+# For ignores pop up a modal dialog with list and Add Remove Close buttons

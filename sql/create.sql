@@ -10,13 +10,6 @@ CREATE TABLE Generations (
     CHECK(gid > 0)
 );
 
-CREATE VIEW ViewGenerations AS
-    SELECT gid, DATETIME(created) AS created, message FROM Generations
-        ORDER BY gid DESC;
-
-CREATE VIEW LastGeneration AS SELECT COALESCE(MAX(gid), 0) AS gid
-    FROM Generations;
-
 -- kind
 --  U uncompressed raw bytes (the actual file); usize set; zsize NULL
 --  Z zlib deflated raw bytes (the actual file); usize & zsize set
@@ -38,6 +31,19 @@ CREATE TABLE Files (
     PRIMARY KEY(gid, filename)
 );
 
+CREATE TABLE Ignores (pattern TEXT PRIMARY KEY NOT NULL) WITHOUT ROWID;
+
+CREATE VIEW ViewGenerations AS
+    SELECT gid, DATETIME(created) AS created, message FROM Generations
+        ORDER BY gid DESC;
+
+CREATE VIEW LastGeneration AS SELECT COALESCE(MAX(gid), 0) AS gid
+    FROM Generations;
+
+CREATE VIEW EmptyGenerations AS
+    SELECT DISTINCT gid FROM Files WHERE kind = 'S' AND gid NOT IN (
+        SELECT gid FROM Files WHERE kind != 'S');
+
 CREATE VIEW ViewHistoryByFilename AS
     SELECT filename, gid FROM Files WHERE kind in ('U', 'Z')
         ORDER BY LOWER(filename), gid DESC;
@@ -47,9 +53,3 @@ CREATE VIEW ViewHistoryByGeneration AS
         FROM Generations, Files
         WHERE Generations.gid = Files.gid AND kind in ('U', 'Z')
         ORDER BY Generations.gid DESC, LOWER(filename);
-
-CREATE VIEW EmptyGenerations AS
-    SELECT DISTINCT gid FROM Files WHERE kind = 'S' AND gid NOT IN (
-        SELECT gid FROM Files WHERE kind != 'S');
-
-CREATE TABLE Ignores (pattern TEXT PRIMARY KEY NOT NULL) WITHOUT ROWID;

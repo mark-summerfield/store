@@ -56,8 +56,9 @@ proc actions::status {reporter storefile rest} {
         } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
         }
-        if {$::VERBOSE && [$str needs_clean]} {
-            misc::info "clean needed (store contains empty generations)"
+        if {$::VERBOSE && [$str needs_clean] && \
+                [misc::yes_no "clean the store"]} {
+            $str clean
         }
     } finally {
         $str close

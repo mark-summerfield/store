@@ -49,22 +49,30 @@ proc actions::extract {reporter storefile rest} {
 }
 
 proc actions::status {reporter storefile rest} {
+    set yes_messages [list]
+    set no_messages [list]
     set str [Store new $storefile $reporter]
     try {
         if {[llength [CandidatesForAdd $str]]} {
-            misc::info "unstored unignored nonempty files present"
-        } elseif {$::VERBOSE > 1} {
-            misc::info "no files need adding"
+            lappend yes_messages "unstored unignored nonempty files present"
+        } elseif {$::VERBOSE} {
+            lappend no_messages "no files need adding"
         }
         if {[HaveUpdates $str]} {
-            misc::info "updates needed"
-        } elseif {$::VERBOSE > 1} {
-            misc::info "no updates needed"
+            lappend yes_messages "updates needed"
+        } elseif {$::VERBOSE} {
+            lappend no_messages "no updates needed"
         }
         if {$::VERBOSE && [$str needs_clean]} {
-            misc::info "clean needed"
-        } elseif {$::VERBOSE > 1} {
-            misc::info "no clean needed"
+            lappend yes_messages "clean needed"
+        } elseif {$::VERBOSE} {
+            lappend no_messages "no clean needed"
+        }
+        if {[llength $yes_messages]} {
+            misc::info [join $yes_messages "; "]
+        }
+        if {$::VERBOSE && [llength $no_messages]} {
+            misc::info [join $no_messages "; "]
         }
     } finally {
         $str close

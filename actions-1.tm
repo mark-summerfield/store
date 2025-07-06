@@ -9,7 +9,11 @@ namespace eval actions {}
 proc actions::add {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
-        set names [CandidatesForAdd $str $rest]
+        if {$rest eq ""} {
+            set names [CandidatesForAdd $str]
+        } else {
+            set names [CandidatesFromGiven $str $rest]
+        }
         if {[llength $names]} {
             $str add {*}$names
         }
@@ -24,11 +28,11 @@ proc actions::update {reporter storefile rest} {
     try {
         if {[HaveUpdates $str]} {
             $str update $message
-            if {$::VERBOSE} {
-                List $str
-            }
         } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
+        }
+        if {$::VERBOSE && [llength [CandidatesForAdd $str]]} {
+            misc::info "unstored unignored nonempty files present"
         }
     } finally {
         $str close
@@ -47,37 +51,23 @@ proc actions::extract {reporter storefile rest} {
 proc actions::status {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
-        List $str $rest
+        if {[llength [CandidatesForAdd $str]]} {
+            misc::info "unstored unignored nonempty files present"
+        } elseif {$::VERBOSE > 1} {
+            misc::info "no files need adding"
+        }
         if {[HaveUpdates $str]} {
             misc::info "updates needed"
-            if {$::VERBOSE && [misc::yes_no "update the store"]} {
-                $str update ""
-            }
         } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
         }
-        if {$::VERBOSE && [$str needs_clean] && \
-                [misc::yes_no "clean the store"]} {
-            $str clean
+        if {$::VERBOSE && [$str needs_clean]} {
+            misc::info "clean needed"
+        } elseif {$::VERBOSE > 1} {
+            misc::info "no clean needed"
         }
     } finally {
         $str close
-    }
-}
-
-proc actions::List {str {rest ""}} {
-    set names [CandidatesForList $str]
-    if {[llength $names]} {
-        misc::info "unstored unignored nonempty\
-            files:\n${::GREEN}[join $names "\n"]${::RESET}"
-        if {$::VERBOSE} {
-            set word [expr {[llength $names] == 1 ? "this" : "these"}]
-            if {[misc::yes_no "add $word to the store"]} {
-                $str add {*}$names
-            } 
-        }
-    } elseif {$::VERBOSE > 1} {
-        misc::info "no unstored unignored nonempty files found"
     }
 }
 
@@ -267,15 +257,15 @@ proc actions::HaveUpdates str {
     return false
 }
 
-proc actions::CandidatesForList str {
-    set candidates [CandidatesForAdd $str [glob * */*]]
+proc actions::CandidatesForAdd str {
+    set candidates [CandidatesFromGiven $str [glob * */*]]
     lmap name $candidates { ;# drop already stored files
         expr {[$str find_first_gid $name] ? [continue] : $name}
     }
 }
 
 # we deliberately only go at most one level deep for folders
-proc actions::CandidatesForAdd {str candidates} {
+proc actions::CandidatesFromGiven {str candidates} {
     set ignores [$str ignores]
     set names [list]
     foreach name $candidates {

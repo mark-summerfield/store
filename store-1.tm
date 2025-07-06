@@ -282,13 +282,24 @@ oo::define Store method history {{filename ""}} {
 }
 
 oo::define Store method file_sizes {} {
-    set seen [list]
     set file_sizes [list]
-    foreach {filename size} [$Db eval {SELECT filename, usize
-                                       FROM FileSizes}] {
-        if {[lsearch -sorted $seen $filename] == -1} {
-            lappend file_sizes [FileSize new $filename $size]
-            set seen [misc::insort $seen $filename]
+    $Db transaction {
+        set gid [$Db eval {SELECT gid FROM LastGeneration}]
+        foreach filename [$Db eval {SELECT filename FROM Files
+                                    WHERE gid = :gid}] {
+            lassign [$Db eval {SELECT kind, pgid FROM Files
+                               WHERE gid = :gid
+                               AND filename = :filename}] kind pgid
+            if {$kind eq "S"} {
+                set usize [$Db eval {SELECT usize FROM Files
+                                     WHERE gid = :pgid
+                                     AND filename = :filename}]
+            } else {
+                set usize [$Db eval {SELECT usize FROM Files
+                                     WHERE gid = :gid
+                                     AND filename = :filename}]
+            }
+            lappend file_sizes [FileSize new $filename $usize]
         }
     }
     return $file_sizes

@@ -7,8 +7,15 @@ package require gui
 namespace eval app {}
 
 proc app::main {} {
-    if {!$::argc} usage
     set storefile .[file tail [pwd]].str
+    if {!$::argc} {
+        if {[file exists $storefile]} {
+            actions::status "" $storefile {}
+            exit 0
+        } else {
+            usage
+        }
+    }
     set command [lindex $::argv 0]
     lassign [get_reporter [lrange $::argv 1 end]] rest reporter
     switch $command {
@@ -65,23 +72,18 @@ explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.\
 
 ${::BOLD}s${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}status${::RESET}\
     \[verbose]
-  Status lists any unstored unignored nonempty files. Prompts to\
-  ${::BOLD}add${::RESET}
-  those listed, creating the store if neccessary, prompts to\
-  ${::BOLD}update${::RESET}
-  if needed, and prompts to ${::BOLD}clean${::RESET} if needed,\
-  unless \[verbose]
-  is quiet (e.g., for shell scripts).
+  Status reports any unstored unignored nonempty files and whether
+  updates or cleaning are needed. (Default action for store.)
 ${::BOLD}u${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}update${::RESET}\
     \[verbose] \[optional message text]
   Updates all the files in the store by creating a new generation and
-  storing all those that have changed. If verbose, prompts to\
-  ${::BOLD}add${::RESET} any
-  unstored unignored nonempty files.
+  storing all those that have changed.
 ${::BOLD}a${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}add${::RESET}\
-    \[verbose] <filename1|dirname1 \[… filenameN|dirnameN]>
+    \[verbose] \[filename1|dirname1 … filenameN|dirnameN]
   Adds the given files or the files in the given folders to the store,
-  except for those ignored or empty, creating the store if necessary.
+  or if none given then the files in the current folder and its
+  immediate subfolders, except for those ignored or empty,
+  creating the store if necessary.
 ${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
     \[verbose] \[@gid] <filename1 \[… filenameN]>
   Extracts the given filenames at the generation,
@@ -127,7 +129,7 @@ ${::BOLD}purge${::RESET} <filename>
 ${::BOLD}h${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}help${::RESET}\
     ${::ITALIC}or${::RESET} ${::BOLD}-h${::RESET} ${::ITALIC}or${::RESET}\
     ${::BOLD}--help${::RESET}
-  Show this usage message and exit.
+  Show this usage message and exit. (Default action if no store.)
 ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
     ${::ITALIC}or${::RESET} ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
     ${::BOLD}--version${::RESET}

@@ -2,13 +2,13 @@
 
 An easy-to-use and simple alternative to a version control system.
 
-Add/update files:
+Add files:
 
-    str s
+    str a
 
 or
 
-    str status
+    str add
 
 This will glob the files in the current folder and its immediate subfolders
 and filter out ignored and empty files to present a list of unstored files.
@@ -44,6 +44,12 @@ or
 or, say,
 
     str u This is an optional comment.
+
+Use
+
+    str s
+
+or `str status` to see if any files need adding or updating.
 
 You can print or extract any previous version of any stored file.
 You can diff a previous version against the version on disk or against a

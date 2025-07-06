@@ -9,5 +9,5 @@ echo -------------
 du -sh .git
 ls -sh .store.str
 clc -s -l tcl
-str status --quiet
+str status
 git st

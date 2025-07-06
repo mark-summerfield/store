@@ -1,3 +1,9 @@
+# TODO add support for -D or --debug as "verbose" options
+# do _not_ show in usage message; if debug set VERBOSE to 3
+# then add; if {$::VERBOSE > 2} ... where needed
+# and add global proc dbg {message} function which outputs a unique color to
+# stderr (dark red?)
+
 store
 gui-1.tm # GUI TODO
 

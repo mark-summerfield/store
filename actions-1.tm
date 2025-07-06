@@ -50,10 +50,8 @@ proc actions::lst {reporter storefile rest} {
         Lst $str $rest
         if {[HaveUpdates $str]} {
             misc::info "updates needed"
-            if {!($rest eq "-n" || $rest eq "--no")} {
-                if {[misc::yes_no "update the store"]} {
-                    $str update ""
-                }
+            if {$::VERBOSE && [misc::yes_no "update the store"]} {
+                $str update ""
             }
         }
     } finally {
@@ -66,7 +64,7 @@ proc actions::Lst {str {rest ""}} {
     if {[llength $names]} {
         misc::info "unstored unignored nonempty\
             files:\n${::GREEN}[join $names "\n"]${::RESET}"
-        if {!($rest eq "-n" || $rest eq "--no")} {
+        if {$::VERBOSE} {
             set word [expr {[llength $names] == 1 ? "this" : "these"}]
             if {[misc::yes_no "add $word to the store"]} {
                 $str add {*}$names

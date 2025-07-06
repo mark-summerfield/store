@@ -27,7 +27,6 @@ oo::define Store constructor {filename {reporter ""}} {
             $Db eval [readFile $::APPPATH/sql/insert.sql] 
         }
     }
-    {*}$Reporter "[expr {$exists ? "opened" : "created"}] $Filename"
 }
 
 oo::define Store destructor { my close }
@@ -36,7 +35,6 @@ oo::define Store method close {} {
     if {![my is_closed]} {
         $Db close
         set Db {}
-        {*}$Reporter "closed $Filename"
     }
 }
 

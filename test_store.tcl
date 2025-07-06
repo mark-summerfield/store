@@ -196,8 +196,7 @@ proc test5 {} {
     if {$ok} { puts OK }
 }
 
-const MESSAGES1 {created /tmp/test3.db
-adding/updating 4 files
+const MESSAGES1 {adding/updating 4 files
 created @1
 added "app-1.tm" (deflated)
 added "sql/create.sql" (deflated)
@@ -266,11 +265,9 @@ copied "README.md" → "/tmp/test3/README.md"
 copied "sql/create.sql" → "/tmp/test3/sql/create.sql"
 copied "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
 copied "store-1.tm" → "/tmp/test3/store-1.tm"
-closed /tmp/test3.db
 }
 
-const MESSAGES2 {created /tmp/test3.db
-adding/updating 4 files
+const MESSAGES2 {adding/updating 4 files
 created @1
 adding/updating 5 files
 created @2
@@ -301,7 +298,6 @@ copied "README.md" → "/tmp/test3/README.md"
 copied "sql/create.sql" → "/tmp/test3/sql/create.sql"
 copied "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
 copied "store-1.tm" → "/tmp/test3/store-1.tm"
-closed /tmp/test3.db
 }
 
 proc full_reporter message { lappend ::messages "$message\n" }

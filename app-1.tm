@@ -34,18 +34,18 @@ proc app::main {} {
 }
 
 proc app::get_reporter rest {
-    set reporter ""
+    set reporter filtered_reporter ;# ::VERBOSE is default of 1
     set first [lindex $rest 0]
     switch $first {
         -v - --verbose {
-            set reporter filtered_reporter
-            set rest [lrange $rest 1 end]
-            set ::VERBOSE 1
-        }
-        -V - --veryverbose {
             set reporter full_reporter
             set rest [lrange $rest 1 end]
             set ::VERBOSE 2
+        }
+        -q - --quiet {
+            set reporter ""
+            set rest [lrange $rest 1 end]
+            set ::VERBOSE 0
         }
     }
     return [list $rest $reporter]
@@ -64,12 +64,12 @@ explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.\
 (For a GUI run ${::BOLD}store${::RESET}.)
 
 ${::BOLD}l${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}list${::RESET}\
-    \[verbose] \[no]
+    \[verbose]
   Lists any unstored unignored nonempty files. Prompts to\
   ${::BOLD}add${::RESET} those
-  listed, creating the store if neccessary, unless \[no] is specified
-  as ${::BOLD}-n${::RESET} ${::ITALIC}or${::RESET}\
-  ${::BOLD}--no${::RESET} (e.g., for shell scripts).
+  listed, creating the store if neccessary, and prompts to\
+  ${::BOLD}update${::RESET}
+  if needed, unless \[verbose] is quiet (e.g., for shell scripts).
 ${::BOLD}u${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}update${::RESET}\
     \[verbose] \[optional message text]
   Updates all the files in the store by creating a new generation and
@@ -135,10 +135,11 @@ ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
   if unspecified, the last generation is assumed
 • glob — when using globs for ignore or unignore use quotes
   to avoid shell expansion of glob characters (e.g., '*.o').
-• verbose — specified as ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
-   ${::BOLD}--verbose${::RESET} ${::ITALIC}or${::RESET}\
-   ${::BOLD}-V${::RESET} ${::ITALIC}or${::RESET}\
-   ${::BOLD}--veryverbose${::RESET}"
+• verbose — default is filtered; otherwise specified as
+  ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
+  ${::BOLD}--verbose${::RESET} full, ${::ITALIC}or${::RESET}\
+  ${::BOLD}-q${::RESET} ${::ITALIC}or${::RESET}\
+  ${::BOLD}--quiet${::RESET} silent."
     exit 2
 }
 

@@ -34,11 +34,11 @@ oo::define FileData classmethod load {gid filename} {
         set data $zdata
         set kind Z
     }
-    return [FileData new $gid $filename $kind $usize $zsize $gid $data]
+    FileData new $gid $filename $kind $usize $zsize $gid $data
 }
 
 oo::define FileData method is_valid {} {
-    return [string match {[UZS]} $Kind]
+    string match {[UZS]} $Kind
 }
 
 oo::define FileData method gid {{gid 0}} {

@@ -25,7 +25,7 @@ proc actions::update {reporter storefile rest} {
         if {[HaveUpdates $str]} {
             $str update $message
             if {$::VERBOSE} {
-                Lst $str
+                List $str
             }
         } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
@@ -47,7 +47,7 @@ proc actions::extract {reporter storefile rest} {
 proc actions::status {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
-        Lst $str $rest
+        List $str $rest
         if {[HaveUpdates $str]} {
             misc::info "updates needed"
             if {$::VERBOSE && [misc::yes_no "update the store"]} {
@@ -65,7 +65,7 @@ proc actions::status {reporter storefile rest} {
     }
 }
 
-proc actions::Lst {str {rest ""}} {
+proc actions::List {str {rest ""}} {
     set names [CandidatesForList $str]
     if {[llength $names]} {
         misc::info "unstored unignored nonempty\
@@ -269,8 +269,9 @@ proc actions::HaveUpdates str {
 
 proc actions::CandidatesForList str {
     set candidates [CandidatesForAdd $str [glob * */*]]
-    return [lmap name $candidates { ;# drop already stored files
-            expr {[$str find_first_gid $name] ? [continue] : $name} }]
+    lmap name $candidates { ;# drop already stored files
+        expr {[$str find_first_gid $name] ? [continue] : $name}
+    }
 }
 
 # we deliberately only go at most one level deep for folders
@@ -301,7 +302,7 @@ proc actions::ValidFile name {
 proc actions::GidStoreAndRest {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     lassign [GidAndRest $str $rest] gid rest
-    return [list $gid $str $rest]
+    list $gid $str $rest
 }
 
 proc actions::GidAndRest {str rest} {
@@ -311,5 +312,5 @@ proc actions::GidAndRest {str rest} {
         set gid [string range $first 1 end]
         set rest [lrange $rest 1 end]
     }
-    return [list $gid $rest]
+    list $gid $rest
 }

@@ -56,7 +56,7 @@ proc diff::esc_codes {} {
         set del "- "
         set same "  "
     }
-    return [list $reset $add $del $same]
+    list $reset $add $del $same
 }
 
 # txt must be a tk text widget

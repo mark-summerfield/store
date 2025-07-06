@@ -2,22 +2,22 @@
 
 An easy-to-use and simple alternative to a version control system.
 
-Add files to store:
+Add/update files:
 
-    str l
+    str s
 
 or
 
-    str list
+    str status
 
 This will glob the files in the current folder and its immediate subfolders
 and filter out ignored and empty files to present a list of unstored files.
 It will then prompt for whether to add the files to the store (creating the
-store if necessary).
+store if necessary). It will also prompt for updates.
 
-(Use `str list --no` in a shell script to provide a list of unstored
-unignored nonempty files that are candidates to be added; the `--no`
-prevents the interactive prompting to add.)
+(Use `str s -q` or `str status --quiet` in a shell script to provide a list
+of unstored unignored nonempty files that are candidates to be added; the
+`-q` or `--quiet` prevents the interactive prompting to add or update.)
 
 Alternatively, add specified or globbed files like this:
 

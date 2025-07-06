@@ -49,7 +49,7 @@ proc misc::sqlite_version {} {
 proc misc::n_s size {
     if {!$size} { return [list "no" "s"] }
     if {$size == 1} { return [list "one" ""] }
-    return [list $size "s"]
+    list $size "s"
 }
 
 proc misc::ignore {filename ignores} {

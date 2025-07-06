@@ -48,7 +48,7 @@ proc app::get_reporter rest {
             set ::VERBOSE 0
         }
     }
-    return [list $rest $reporter]
+    list $rest $reporter
 }
 
 proc app::version {} {
@@ -86,14 +86,14 @@ ${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
     \[verbose] \[@gid] <filename1 \[… filenameN]>
   Extracts the given filenames at the generation,
   e.g., filename.ext will be extracted as filename@gid.ext, etc.
-${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
-    \[verbose] \[@gid] <dirname>
-  Copies all the files at the generation into the given dirname
-  (which must not exist).
 ${::BOLD}p${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}print${::RESET}\
     \[@gid] <filename>
   Prints the given filename from the store at the generation,
   to stdout.
+${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
+    \[verbose] \[@gid] <dirname>
+  Copies all the files at the generation into the given dirname
+  (which must not exist).
 ${::BOLD}d${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}diff${::RESET}\
     <@gid1> \[@gid2] <filename>
   Diffs the filename at @gid1 against the one in the current folder,
@@ -133,7 +133,7 @@ ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
     ${::BOLD}--version${::RESET}
   Show store’s version and exit.
 
-• @gid — @-prefixed generation number, e.g., @5;
+• @gid — @-prefixed generation number, e.g., @28;
   if unspecified, the last generation is assumed
 • glob — when using globs for ignore or unignore use quotes
   to avoid shell expansion of glob characters (e.g., '*.o').

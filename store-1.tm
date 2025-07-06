@@ -44,7 +44,7 @@ oo::define Store method is_closed {} { catch {$Db version} }
 oo::define Store method filename {} { return $Filename }
 
 oo::define Store method last_generation {} {
-    return [$Db eval {SELECT gid FROM LastGeneration}]
+    $Db eval {SELECT gid FROM LastGeneration}
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file and
@@ -55,7 +55,7 @@ oo::define Store method add {args} {
         [lsort -unique [list {*}[my filenames] {*}$args]]]
     lassign [misc::n_s [llength $filenames]] n s
     {*}$Reporter "adding/updating $n file$s"
-    return [my Update "adding/updating $n file$s" true {*}$filenames]
+    my Update "adding/updating $n file$s" true {*}$filenames
 }
 
 # if at least one prev generation exists, creates new generation with
@@ -66,7 +66,7 @@ oo::define Store method update {message} {
     set gid [my last_generation]
     if {!$gid} { error "can only update an existing non-empty store" }
     if {$message ne ""} { {*}$Reporter "updating \"$message\"" }
-    return [my Update $message false {*}[my filenames $gid]]
+    my Update $message false {*}[my filenames $gid]
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file —
@@ -135,7 +135,7 @@ oo::define Store method FindMatch {gid filename data} {
               AND gid != :gid
         ORDER BY gid DESC LIMIT 1
     }]
-    return [expr {$gid eq "" ? 0 : $gid}]
+    expr {$gid eq "" ? 0 : $gid}
 }
 
 oo::define Store method find_first_gid {filename} {
@@ -144,12 +144,12 @@ oo::define Store method find_first_gid {filename} {
         WHERE filename = :filename AND kind IN ('U', 'Z')
         ORDER BY gid LIMIT 1
     }]
-    return [expr {$gid eq "" ? 0 : $gid}]
+    expr {$gid eq "" ? 0 : $gid}
 }
 
 # returns the filenames, dirnames, and globs to ignore
 oo::define Store method ignores {} {
-    return [$Db eval {SELECT pattern FROM Ignores ORDER BY LOWER(pattern)}]
+    $Db eval {SELECT pattern FROM Ignores ORDER BY LOWER(pattern)}
 }
 
 # add filenames or dirnames or globs to ignore;
@@ -179,14 +179,14 @@ oo::define Store method generations {{full false}} {
         return [$Db eval {SELECT gid, created, message, filename
                           FROM HistoryByGeneration}]
     }
-    return [$Db eval {SELECT gid, created, message FROM ViewGenerations}]
+    $Db eval {SELECT gid, created, message FROM ViewGenerations}
 }
 
 # returns a list of the last or given gid's filenames
 oo::define Store method filenames {{gid 0}} {
     if {!$gid} { set gid [my last_generation] }
-    return [$Db eval {SELECT filename FROM Files WHERE gid = :gid \
-                      ORDER BY LOWER(filename)}]
+    $Db eval {SELECT filename FROM Files WHERE gid = :gid
+              ORDER BY LOWER(filename)}
 }
 
 # cleans, i.e., deletes, every “empty” generation that has no changes
@@ -206,8 +206,7 @@ oo::define Store method clean {} {
 }
 
 oo::define Store method needs_clean {} {
-    set n [$Db eval {SELECT COUNT(*) FROM EmptyGenerations;}]
-    return $n
+    $Db eval {SELECT COUNT(*) FROM EmptyGenerations;}
 }
 
 # deletes the given filename in every generation and returns the number
@@ -267,7 +266,7 @@ oo::define Store method get {gid filename} {
         }
     }
     if {$kind eq "Z"} { set data [zlib inflate $data] }
-    return [list $gid $data]
+    list $gid $data
 }
 
 # returns a list of lines each with a filename and its generations
@@ -278,9 +277,8 @@ oo::define Store method history {{filename ""}} {
             SELECT filename, gid FROM Files
             WHERE filename = :filename AND kind in ('U', 'Z')
             ORDER BY gid DESC}]
-    } else {
-        return [$Db eval {SELECT filename, gid FROM HistoryByFilename}]
     }
+    $Db eval {SELECT filename, gid FROM HistoryByFilename}
 }
 
 oo::define Store method file_sizes {} {

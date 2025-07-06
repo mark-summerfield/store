@@ -44,7 +44,7 @@ proc actions::extract {reporter storefile rest} {
     }
 }
 
-proc actions::lst {reporter storefile rest} {
+proc actions::status {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
         Lst $str $rest
@@ -55,6 +55,9 @@ proc actions::lst {reporter storefile rest} {
             }
         } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
+        }
+        if {$::VERBOSE && [$str needs_clean]} {
+            misc::info "clean needed (store contains empty generations)"
         }
     } finally {
         $str close

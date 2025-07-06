@@ -23,9 +23,9 @@ proc app::main {} {
         H - history { actions::history $reporter $storefile $rest}
         i - ignore { actions::ignore $reporter $storefile $rest }
         I - ignores { actions::ignores $reporter $storefile }
-        l - list { actions::lst $reporter $storefile $rest }
         p - print { actions::print $reporter $storefile $rest }
         purge { actions::purge $reporter $storefile $rest }
+        s - status { actions::status $reporter $storefile $rest }
         u - update { actions::update $reporter $storefile $rest }
         U - unignore { actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
@@ -63,13 +63,15 @@ Stores generational copies of specified files (excluding those
 explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.\
 (For a GUI run ${::BOLD}store${::RESET}.)
 
-${::BOLD}l${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}list${::RESET}\
+${::BOLD}s${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}status${::RESET}\
     \[verbose]
-  Lists any unstored unignored nonempty files. Prompts to\
-  ${::BOLD}add${::RESET} those
-  listed, creating the store if neccessary, and prompts to\
+  Status lists any unstored unignored nonempty files. Prompts to\
+  ${::BOLD}add${::RESET}
+  those listed, creating the store if neccessary, prompts to\
   ${::BOLD}update${::RESET}
-  if needed, unless \[verbose] is quiet (e.g., for shell scripts).
+  if needed, and prompts to ${::BOLD}clean${::RESET} if needed,\
+  unless \[verbose]
+  is quiet (e.g., for shell scripts).
 ${::BOLD}u${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}update${::RESET}\
     \[verbose] \[optional message text]
   Updates all the files in the store by creating a new generation and

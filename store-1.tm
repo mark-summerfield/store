@@ -205,6 +205,11 @@ oo::define Store method clean {} {
     {*}$Reporter "cleaned $nf file$ns in $gf generation$gs"
 }
 
+oo::define Store method needs_clean {} {
+    set n [$Db eval {SELECT COUNT(*) FROM EmptyGenerations;}]
+    return $n
+}
+
 # deletes the given filename in every generation and returns the number
 # of records deleted (which could be 0)
 oo::define Store method purge {filename} {

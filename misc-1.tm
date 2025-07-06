@@ -4,6 +4,15 @@ package require globals
 
 namespace eval misc {}
 
+# inserts in case sensitive order into a list of strings
+proc misc::insort {lst x} {
+    set pos [lsearch -bisect $lst $x]
+    if {$pos == -1 || [lindex $lst $pos] ne $x} {
+        return [linsert $lst [incr pos] $x] ;# insert new unique element
+    }
+    return $lst ;# ignore duplicate element
+}
+
 # can't use globals since they are for stdout and here we need stderr
 proc misc::warn message {
     if {[dict exists [chan configure stderr] -mode]} { ;# tty

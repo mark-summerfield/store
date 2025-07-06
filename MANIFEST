@@ -6,6 +6,7 @@ app-1.tm
 actions-1.tm # TODO (1) implement HaveUpdates
 store-1.tm
 filedata-1.tm
+filesize-1.tm
 diff-1.tm
 globals-1.tm # VERSION
 misc-1.tm

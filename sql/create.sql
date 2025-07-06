@@ -44,12 +44,17 @@ CREATE VIEW EmptyGenerations AS
     SELECT DISTINCT gid FROM Files WHERE kind = 'S' AND gid NOT IN (
         SELECT gid FROM Files WHERE kind != 'S');
 
-CREATE VIEW ViewHistoryByFilename AS
+CREATE VIEW HistoryByFilename AS
     SELECT filename, gid FROM Files WHERE kind in ('U', 'Z')
         ORDER BY LOWER(filename), gid DESC;
 
-CREATE VIEW ViewHistoryByGeneration AS
+CREATE VIEW HistoryByGeneration AS
     SELECT Generations.gid, DATETIME(created) AS created, message, filename
         FROM Generations, Files
         WHERE Generations.gid = Files.gid AND kind in ('U', 'Z')
         ORDER BY Generations.gid DESC, LOWER(filename);
+
+-- TODO redo this so that I get just the first occurrence of each filename
+CREATE VIEW FileSizes AS
+    SELECT filename, usize, gid FROM Files WHERE kind IN ('U', 'Z')
+        ORDER BY gid DESC; -- we only use the gid for sanity checking

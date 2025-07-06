@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require filedata
+package require filesize
 package require lambda 1
 package require misc
 package require sqlite3 3
@@ -176,7 +177,7 @@ oo::define Store method unignore {args} {
 oo::define Store method generations {{full false}} {
     if {$full} {
         return [$Db eval {SELECT gid, created, message, filename
-                          FROM ViewHistoryByGeneration}]
+                          FROM HistoryByGeneration}]
     }
     return [$Db eval {SELECT gid, created, message FROM ViewGenerations}]
 }
@@ -273,8 +274,21 @@ oo::define Store method history {{filename ""}} {
             WHERE filename = :filename AND kind in ('U', 'Z')
             ORDER BY gid DESC}]
     } else {
-        return [$Db eval {SELECT filename, gid FROM ViewHistoryByFilename}]
+        return [$Db eval {SELECT filename, gid FROM HistoryByFilename}]
     }
+}
+
+oo::define Store method file_sizes {} {
+    set seen [list]
+    set file_sizes [list]
+    foreach {filename size} [$Db eval {SELECT filename, usize
+                                       FROM FileSizes}] {
+        if {[lsearch -sorted $seen $filename] == -1} {
+            lappend file_sizes [FileSize new $filename $size]
+            set seen [misc::insort $seen $filename]
+        }
+    }
+    return $file_sizes
 }
 
 oo::define Store method PrepareTarget {action gid filename} {

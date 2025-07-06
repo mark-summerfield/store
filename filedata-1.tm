@@ -1,7 +1,5 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require sqlite3 3
-
 oo::class create FileData {
     variable Gid 0
     variable Filename ""

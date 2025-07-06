@@ -20,9 +20,10 @@ proc actions::add {reporter storefile rest} {
 
 proc actions::update {reporter storefile rest} {
     set message [join $rest " "]
+    set mtime [file mtime $storefile]
     set str [Store new $storefile $reporter]
     try {
-        if {[HaveUpdates $str]} {
+        if {[HaveUpdates $str $mtime]} {
             $str update $message
             if {$::VERBOSE} {
                 Lst $str
@@ -45,10 +46,11 @@ proc actions::extract {reporter storefile rest} {
 }
 
 proc actions::lst {reporter storefile rest} {
+    set mtime [file mtime $storefile]
     set str [Store new $storefile $reporter]
     try {
         Lst $str $rest
-        if {[HaveUpdates $str]} {
+        if {[HaveUpdates $str $mtime]} {
             misc::info "updates needed"
             if {$::VERBOSE && [misc::yes_no "update the store"]} {
                 $str update ""
@@ -250,11 +252,15 @@ proc actions::purge {reporter storefile rest} {
     }
 }
 
-proc actions::HaveUpdates str {
-    set files [$str filenames]
-    # TODO compare each file to its disk equivalent; if they are different
-    # sizes or the same size and different bytes then return true
-    return true ;# TODO false
+# For speed this only compares file sizes so will miss the hopefully rare
+# cases when a file has been changed but is exactly the same size.
+proc actions::HaveUpdates {str mtime} {
+    foreach file_size [$str file_sizes] {
+        if {[file size [$file_size filename]] != [$file_size size]} {
+            return true
+        }
+    }
+    return false
 }
 
 proc actions::CandidatesForList str {

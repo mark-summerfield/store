@@ -3,13 +3,14 @@
 oo::class create FileSize {
     variable Filename ""
     variable Size 0
+
+    constructor {filename size} {
+        set Filename $filename 
+        set Size $size 
+    }
+
+    method filename {} { return $Filename }
+
+    method size {} { return $Size }
 }
 
-oo::define FileSize constructor {filename size} {
-    set Filename $filename 
-    set Size $size 
-}
-
-oo::define FileSize method filename {} { return $Filename }
-
-oo::define FileSize method size {} { return $Size }

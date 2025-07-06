@@ -144,7 +144,7 @@ ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
 }
 
 proc filtered_reporter message {
-    if {[regexp {^(:?added|same as|opened|closed)} $message]} {
+    if {[regexp {^(:?added|same as)} $message]} {
         return
     }
     misc::info $message

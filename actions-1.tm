@@ -20,15 +20,14 @@ proc actions::add {reporter storefile rest} {
 
 proc actions::update {reporter storefile rest} {
     set message [join $rest " "]
-    set mtime [file mtime $storefile]
     set str [Store new $storefile $reporter]
     try {
-        if {[HaveUpdates $str $mtime]} {
+        if {[HaveUpdates $str]} {
             $str update $message
             if {$::VERBOSE} {
                 Lst $str
             }
-        } elseif {$::VERBOSE} {
+        } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
         }
     } finally {
@@ -46,15 +45,16 @@ proc actions::extract {reporter storefile rest} {
 }
 
 proc actions::lst {reporter storefile rest} {
-    set mtime [file mtime $storefile]
     set str [Store new $storefile $reporter]
     try {
         Lst $str $rest
-        if {[HaveUpdates $str $mtime]} {
+        if {[HaveUpdates $str]} {
             misc::info "updates needed"
             if {$::VERBOSE && [misc::yes_no "update the store"]} {
                 $str update ""
             }
+        } elseif {$::VERBOSE > 1} {
+            misc::info "no updates needed"
         }
     } finally {
         $str close
@@ -72,7 +72,7 @@ proc actions::Lst {str {rest ""}} {
                 $str add {*}$names
             } 
         }
-    } elseif {$::VERBOSE} {
+    } elseif {$::VERBOSE > 1} {
         misc::info "no unstored unignored nonempty files found"
     }
 }
@@ -254,7 +254,7 @@ proc actions::purge {reporter storefile rest} {
 
 # For speed this only compares file sizes so will miss the hopefully rare
 # cases when a file has been changed but is exactly the same size.
-proc actions::HaveUpdates {str mtime} {
+proc actions::HaveUpdates str {
     foreach file_size [$str file_sizes] {
         if {[file size [$file_size filename]] != [$file_size size]} {
             return true

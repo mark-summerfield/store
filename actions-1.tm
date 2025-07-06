@@ -70,7 +70,7 @@ proc actions::Lst {str {rest ""}} {
                 $str add {*}$names
             } 
         }
-    } else {
+    } elseif {$::VERBOSE} {
         misc::info "no unstored unignored nonempty files found"
     }
 }

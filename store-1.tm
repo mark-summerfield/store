@@ -53,9 +53,8 @@ oo::define Store method last_generation {} {
 oo::define Store method add {args} {
     set filenames [lsort -nocase \
         [lsort -unique [list {*}[my filenames] {*}$args]]]
-    lassign [misc::n_s [llength $filenames]] n s
-    {*}$Reporter "adding/updating $n file$s"
-    my Update "adding/updating $n file$s" true {*}$filenames
+    {*}$Reporter "adding/updating"
+    my Update "adding/updating" true {*}$filenames
 }
 
 # if at least one prev generation exists, creates new generation with
@@ -134,15 +133,6 @@ oo::define Store method FindMatch {gid filename data} {
         WHERE filename = :filename AND kind IN ('U', 'Z') AND data = :data
               AND gid != :gid
         ORDER BY gid DESC LIMIT 1
-    }]
-    expr {$gid eq "" ? 0 : $gid}
-}
-
-oo::define Store method find_first_gid {filename} {
-    set gid [$Db eval {
-        SELECT gid FROM Files
-        WHERE filename = :filename AND kind IN ('U', 'Z')
-        ORDER BY gid LIMIT 1
     }]
     expr {$gid eq "" ? 0 : $gid}
 }
@@ -254,16 +244,9 @@ oo::define Store method ExtractOne {action gid filename target} {
 # pgid where the data is U or Z if the data at the given gid is S
 oo::define Store method get {gid filename} {
     $Db transaction {
-        lassign [$Db eval {SELECT kind, pgid FROM Files
-                    WHERE gid = :gid AND filename = :filename}] kind pgid
-        if {$kind eq "S"} {
-            lassign [$Db eval {SELECT kind, data FROM Files
-                    WHERE gid = :pgid AND filename = :filename}] kind data
-            set gid $pgid
-        } else {
-            lassign [$Db eval {SELECT kind, data FROM Files
+        set gid [my find_data_gid $gid $filename]
+        lassign [$Db eval {SELECT kind, data FROM Files
                     WHERE gid = :gid AND filename = :filename}] kind data
-        }
     }
     if {$kind eq "Z"} { set data [zlib inflate $data] }
     list $gid $data
@@ -281,28 +264,31 @@ oo::define Store method history {{filename ""}} {
     $Db eval {SELECT filename, gid FROM HistoryByFilename}
 }
 
+# Returns the file sizes for every file in the last generation (using the
+# size from its parent if the file's kind is 'S')
 oo::define Store method file_sizes {} {
     set file_sizes [list]
     $Db transaction {
         set gid [$Db eval {SELECT gid FROM LastGeneration}]
         foreach filename [$Db eval {SELECT filename FROM Files
                                     WHERE gid = :gid}] {
-            lassign [$Db eval {SELECT kind, pgid FROM Files
-                               WHERE gid = :gid
-                               AND filename = :filename}] kind pgid
-            if {$kind eq "S"} {
-                set usize [$Db eval {SELECT usize FROM Files
-                                     WHERE gid = :pgid
-                                     AND filename = :filename}]
-            } else {
-                set usize [$Db eval {SELECT usize FROM Files
-                                     WHERE gid = :gid
-                                     AND filename = :filename}]
-            }
+            set dgid [my find_data_gid $gid $filename]
+            set usize [$Db eval {SELECT usize FROM Files WHERE gid = :dgid
+                                 AND filename = :filename}]
             lappend file_sizes [FileSize new $filename $usize]
         }
     }
     return $file_sizes
+}
+
+# Returns the gid for the given filename at the given gid; The
+# returned gid will equal the given gid if the data is U or Z or will be the
+# pgid where the data is U or Z if the data at the given gid is S
+oo::define Store method find_data_gid {gid filename} {
+    lassign [$Db eval {SELECT kind, pgid FROM Files
+                WHERE gid = :gid AND filename = :filename}] kind pgid
+    if {$kind eq ""} { return 0 } ;# not found
+    expr {$kind eq "S" ? $pgid : $gid} ;# in fact could just return $pgid
 }
 
 oo::define Store method PrepareTarget {action gid filename} {

@@ -26,7 +26,13 @@ proc misc::warn message {
     exit 1
 }
 
-proc misc::info message { puts "${::BLUE}$message${::RESET}" }
+proc misc::info {message {need_action false}} {
+    if {$need_action} {
+        puts "${::MAGENTA}$message${::RESET}"
+    } else {
+        puts "${::BLUE}$message${::RESET}"
+    }
+}
 
 proc misc::yes_no {prompt {dangerous false}} {
     set color [expr {$dangerous ? $::RED : $::MAGENTA}]

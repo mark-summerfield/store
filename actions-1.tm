@@ -69,7 +69,7 @@ proc actions::status {reporter storefile rest} {
             lappend no_messages "no clean needed"
         }
         if {[llength $yes_messages]} {
-            misc::info [join $yes_messages "; "]
+            misc::info [join $yes_messages "; "] true
         }
         if {$::VERBOSE && [llength $no_messages]} {
             misc::info [join $no_messages "; "]
@@ -98,9 +98,9 @@ proc actions::print {reporter storefile rest} {
         if {$data ne ""} {
             puts -nonewline [encoding convertfrom utf-8 $data]
         } else {
-            set gid [$str find_first_gid $filename]
+            set gid [$str find_data_gid [$str last_generation] $filename]
             if {$gid} {
-                misc::info "\"$filename\" was added to the store in @$gid"
+                misc::info "\"$filename\" was last updated in @$gid"
             } else {
                 misc::info "\"$filename\" is not in the store"
             }
@@ -267,8 +267,9 @@ proc actions::HaveUpdates str {
 
 proc actions::CandidatesForAdd str {
     set candidates [CandidatesFromGiven $str [glob * */*]]
+    set gid [$str last_generation]
     lmap name $candidates { ;# drop already stored files
-        expr {[$str find_first_gid $name] ? [continue] : $name}
+        expr {[$str find_data_gid $gid $name] ? [continue] : $name}
     }
 }
 

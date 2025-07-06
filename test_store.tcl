@@ -196,13 +196,13 @@ proc test5 {} {
     if {$ok} { puts OK }
 }
 
-const MESSAGES1 {adding/updating 4 files
+const MESSAGES1 {adding/updating
 created @1
 added "app-1.tm" (deflated)
 added "sql/create.sql" (deflated)
 added "sql/prepare.sql" (deflated)
 added "store-1.tm" (deflated)
-adding/updating 5 files
+adding/updating
 created @2
 same as @1 "app-1.tm"
 added "README.md" (deflated)
@@ -257,8 +257,8 @@ test3: gid=6 message="should restore old README.md @5"
 test3: gid=5 message="should change to new README.md @4"
 test3: gid=4 message="should change nothing @3"
 test3: gid=3 message="should change nothing @2"
-test3: gid=2 message="adding/updating 5 files"
-test3: gid=1 message="adding/updating 4 files"
+test3: gid=2 message="adding/updating"
+test3: gid=1 message="adding/updating"
 extracted "sql/prepare.sql" → "sql/prepare@1.sql"
 extracted "README.md" → "README@5.md"
 copied "README.md" → "/tmp/test3/README.md"
@@ -267,9 +267,9 @@ copied "sql/prepare.sql" → "/tmp/test3/sql/prepare.sql"
 copied "store-1.tm" → "/tmp/test3/store-1.tm"
 }
 
-const MESSAGES2 {adding/updating 4 files
+const MESSAGES2 {adding/updating
 created @1
-adding/updating 5 files
+adding/updating
 created @2
 updating "should change nothing @2"
 created @3
@@ -290,8 +290,8 @@ test3: gid=6 message="should restore old README.md @5"
 test3: gid=5 message="should change to new README.md @4"
 test3: gid=4 message="should change nothing @3"
 test3: gid=3 message="should change nothing @2"
-test3: gid=2 message="adding/updating 5 files"
-test3: gid=1 message="adding/updating 4 files"
+test3: gid=2 message="adding/updating"
+test3: gid=1 message="adding/updating"
 extracted "sql/prepare.sql" → "sql/prepare@1.sql"
 extracted "README.md" → "README@5.md"
 copied "README.md" → "/tmp/test3/README.md"

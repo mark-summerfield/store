@@ -1,7 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require cli_actions
-package require globals
+package require cli_globals
 
 namespace eval cli {}
 
@@ -36,7 +36,7 @@ proc cli::main {} {
         u - update { cli_actions::update $reporter $storefile $rest }
         U - unignore { cli_actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
-        default { misc::warn "unrecognized command: \"$command\"" }
+        default { cli_misc::warn "unrecognized command: \"$command\"" }
     }
 }
 
@@ -59,7 +59,7 @@ proc cli::get_reporter rest {
 }
 
 proc cli::version {} {
-    misc::info "str v$::VERSION"
+    cli_misc::info "str v$::VERSION"
     exit 2
 }
 
@@ -151,7 +151,7 @@ proc filtered_reporter message {
     if {[regexp {^(:?added|same as|skipped)} $message]} {
         return
     }
-    misc::info $message
+    cli_misc::info $message
 }
 
-proc full_reporter message { misc::info $message }
+proc full_reporter message { cli_misc::info $message }

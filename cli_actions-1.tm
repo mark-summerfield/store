@@ -1,5 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require cli_misc
 package require diff
 package require misc
 package require store
@@ -29,12 +30,13 @@ proc cli_actions::update {reporter storefile rest} {
         if {[HaveUpdates $str]} {
             $str update $message
         } elseif {$::VERBOSE > 1} {
-            misc::info "no updates needed"
+            cli_misc::info "no updates needed"
         }
         set names [CandidatesForAdd $str]
         if {$::VERBOSE && [llength $names]} {
             lassign [misc::n_s [llength $names]] n s
-            misc::info "$n unstored unignored nonempty file$s present" true
+            cli_misc::info "$n unstored unignored nonempty file$s present" \
+                true
         }
     } finally {
         $str close
@@ -84,10 +86,10 @@ proc cli_actions::status {reporter storefile rest} {
             lappend no_messages "no clean needed"
         }
         if {[llength $yes_messages]} {
-            misc::info [join $yes_messages "\n"] true
+            cli_misc::info [join $yes_messages "\n"] true
         }
         if {$::VERBOSE && [llength $no_messages]} {
-            misc::info [join $no_messages "\n"]
+            cli_misc::info [join $no_messages "\n"]
         }
     } finally {
         $str close
@@ -100,7 +102,7 @@ proc cli_actions::copy {reporter storefile rest} {
         $str copy $gid $dirname
     } trap {} {message} {
         $str close
-        misc::warn $message
+        cli_misc::warn $message
     } finally {
         $str close
     }
@@ -116,14 +118,14 @@ proc cli_actions::print {reporter storefile rest} {
         } else {
             set gid [$str find_data_gid [$str last_generation] $filename]
             if {$gid} {
-                misc::info "\"$filename\" was last updated in @$gid"
+                cli_misc::info "\"$filename\" was last updated in @$gid"
             } else {
                 set gid [$str find_gid_for_untracked $filename]
                 if {$gid} {
-                    misc::info "\"$filename\" is no longer stored but\
+                    cli_misc::info "\"$filename\" is no longer stored but\
                         is available in @$gid"
                 } else {
-                    misc::info "\"$filename\" is not in the store"
+                    cli_misc::info "\"$filename\" is not in the store"
                 }
             }
         }
@@ -139,7 +141,8 @@ proc cli_actions::diff {reporter storefile rest} {
         if {$old_gid == $new_gid} { ;# compare with file
             lassign [$str get $old_gid $filename] old_gid old_data
             if {$old_data eq ""} {
-                misc::warn "\"$filename\" @$old_gid not found in the store"
+                cli_misc::warn "\"$filename\" @$old_gid not found in\
+                    the store"
             }
             set new_data [readFile $filename binary]
             set message "\"$filename\" @$old_gid with file on disk"
@@ -160,12 +163,12 @@ proc cli_actions::diff {reporter storefile rest} {
             set message "\"$filename\" @$old_gid with @$new_gid"
         }
         if {$old_data eq $new_data} {
-            misc::info "no differences $message"
+            cli_misc::info "no differences $message"
             return
         }
         set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
         set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
-        misc::info "diff of $message"
+        cli_misc::info "diff of $message"
         set delta [diff::diff $old_data $new_data]
         puts -nonewline $delta
     } finally {
@@ -177,9 +180,9 @@ proc cli_actions::WarnFileNotFound {str gid filename} {
     set gids [$str gids_for_filename $filename]
     if {[llength $gids]} {
         set message "\"$filename\" @$gid not found in the store"
-        misc::warn "$message; try: [join $gids " "]"
+        cli_misc::warn "$message; try: [join $gids " "]"
     } else {
-        misc::warn "\"$filename\" is not in the store"
+        cli_misc::warn "\"$filename\" is not in the store"
     }
 }
 
@@ -187,7 +190,7 @@ proc cli_actions::filenames {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         foreach filename [$str filenames $gid] {
-            misc::info $filename
+            cli_misc::info $filename
         }
     } finally {
         $str close
@@ -201,14 +204,14 @@ proc cli_actions::generations {reporter storefile rest} {
             set prev_gid 0
             foreach {gid created message filename} [$str generations true] {
                 if {$gid != $prev_gid} {
-                    misc::info "@$gid $created $message"
+                    cli_misc::info "@$gid $created $message"
                     set prev_gid $gid
                 }
                 puts "  $filename"
             }
         } else {
             foreach {gid created message} [$str generations] {
-                misc::info "@$gid $created $message"
+                cli_misc::info "@$gid $created $message"
             }
         }
     } finally {
@@ -249,7 +252,7 @@ proc cli_actions::ignores {reporter storefile} {
     lassign [GidStoreAndRest $reporter $storefile {}] gid str rest
     try {
         foreach pattern [$str ignores] {
-            misc::info $pattern
+            cli_misc::info $pattern
         }
     } finally {
         $str close
@@ -277,11 +280,11 @@ proc cli_actions::clean {reporter storefile rest} {
 proc cli_actions::purge {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {
-        if {[misc::yes_no "permanently permanently purge \"$filename\"\
+        if {[cli_misc::yes_no "permanently permanently purge \"$filename\"\
                           from the store" true]} {
             set n [$str purge $filename]
             lassign [misc::n_s $n] n s
-            misc::info "purged $n version$s"
+            cli_misc::info "purged $n version$s"
         }
     } finally {
         $str close

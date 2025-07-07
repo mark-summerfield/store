@@ -1,14 +1,19 @@
-store
-gui-1.tm # GUI TODO
+store # GUI
+gui-1.tm # TODO
+# gui_actions-1.tm
+# gui_globals-1.tm
+# gui_misc-1.tm
 
 str # CLI
 cli-1.tm
 cli_actions-1.tm
+cli_globals-1.tm # VERSION
+cli_misc-1.tm
+
 store-1.tm
 filedata-1.tm
 filesize-1.tm
 diff-1.tm
-globals-1.tm # VERSION
 misc-1.tm
 
 test_store.tcl

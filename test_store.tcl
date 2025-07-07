@@ -48,7 +48,7 @@ proc test2 {} {
     file delete $filename
     set str [Store new $filename]
     try {
-        $str add sql/prepare.sql sql/create.sql app-1.tm store-1.tm
+        $str add sql/prepare.sql sql/create.sql cli-1.tm store-1.tm
         $str add README.md
         $str update "should change nothing @1"
         $str update "should change nothing @2"
@@ -67,7 +67,7 @@ proc test3 {expected reporter} {
     set ::messages [list]
     set str [Store new $filename $reporter]
     try {
-        $str add sql/prepare.sql sql/create.sql app-1.tm store-1.tm
+        $str add sql/prepare.sql sql/create.sql cli-1.tm store-1.tm
         $str add README.md
         $str update "should change nothing @[$str last_generation]"
         $str update "should change nothing @[$str last_generation]"
@@ -84,9 +84,9 @@ proc test3 {expected reporter} {
         foreach {gid created message} [$str generations] {
             lappend ::messages "$procname: gid=$gid message=\"$message\"\n"
         }
-        set n [$str purge app-1.tm]
+        set n [$str purge cli-1.tm]
         if {$n != 8} {
-            puts "FAIL: expected 8 deletions of app-1.tm; got $n"
+            puts "FAIL: expected 8 deletions of cli-1.tm; got $n"
             set ok false
         }
         $str extract 5 sql/prepare.sql README.md
@@ -203,55 +203,55 @@ proc test5 {} {
 
 const MESSAGES1 {adding/updating
 created @1
-added "app-1.tm" (deflated)
+added "cli-1.tm" (deflated)
 added "sql/create.sql" (deflated)
 added "sql/prepare.sql" (deflated)
 added "store-1.tm" (deflated)
 adding/updating
 created @2
-same as @1 "app-1.tm"
+same as @1 "cli-1.tm"
 added "README.md" (deflated)
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
 updating "should change nothing @2"
 created @3
-same as @1 "app-1.tm"
+same as @1 "cli-1.tm"
 same as @2 "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
 updating "should change nothing @3"
 created @4
-same as @1 "app-1.tm"
+same as @1 "cli-1.tm"
 same as @2 "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
 updating "should change to new README.md @4"
 created @5
-same as @1 "app-1.tm"
+same as @1 "cli-1.tm"
 updated "README.md" (deflated)
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
 updating "should restore old README.md @5"
 created @6
-same as @1 "app-1.tm"
+same as @1 "cli-1.tm"
 same as @2 "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
 updating "should change nothing @6"
 created @7
-same as @1 "app-1.tm"
+same as @1 "cli-1.tm"
 same as @2 "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
 updating "should change nothing @7"
 created @8
-same as @1 "app-1.tm"
+same as @1 "cli-1.tm"
 same as @2 "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"

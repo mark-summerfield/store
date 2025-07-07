@@ -4,9 +4,9 @@ package require diff
 package require misc
 package require store
 
-namespace eval actions {}
+namespace eval cli_actions {}
 
-proc actions::add {reporter storefile rest} {
+proc cli_actions::add {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
         if {$rest eq ""} {
@@ -22,7 +22,7 @@ proc actions::add {reporter storefile rest} {
     }
 }
 
-proc actions::update {reporter storefile rest} {
+proc cli_actions::update {reporter storefile rest} {
     set message [join $rest " "]
     set str [Store new $storefile $reporter]
     try {
@@ -41,7 +41,7 @@ proc actions::update {reporter storefile rest} {
     }
 }
 
-proc actions::extract {reporter storefile rest} {
+proc cli_actions::extract {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         $str extract $gid {*}$rest
@@ -50,7 +50,7 @@ proc actions::extract {reporter storefile rest} {
     }
 }
 
-proc actions::status {reporter storefile rest} {
+proc cli_actions::status {reporter storefile rest} {
     set yes_messages [list]
     set no_messages [list]
     set str [Store new $storefile $reporter]
@@ -94,7 +94,7 @@ proc actions::status {reporter storefile rest} {
     }
 }
 
-proc actions::copy {reporter storefile rest} {
+proc cli_actions::copy {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str dirname
     try {
         $str copy $gid $dirname
@@ -106,7 +106,7 @@ proc actions::copy {reporter storefile rest} {
     }
 }
 
-proc actions::print {reporter storefile rest} {
+proc cli_actions::print {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {
         lassign [$str get $gid $filename] gid data
@@ -126,7 +126,7 @@ proc actions::print {reporter storefile rest} {
     }
 }
 
-proc actions::diff {reporter storefile rest} {
+proc cli_actions::diff {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] old_gid str rest
     try {
         lassign [GidAndRest $str $rest] new_gid filename
@@ -167,7 +167,7 @@ proc actions::diff {reporter storefile rest} {
     }
 }
 
-proc actions::WarnFileNotFound {str gid filename} {
+proc cli_actions::WarnFileNotFound {str gid filename} {
     set gids [$str gids_for_filename $filename]
     if {[llength $gids]} {
         set message "\"$filename\" @$gid not found in the store"
@@ -177,7 +177,7 @@ proc actions::WarnFileNotFound {str gid filename} {
     }
 }
 
-proc actions::filenames {reporter storefile rest} {
+proc cli_actions::filenames {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         foreach filename [$str filenames $gid] {
@@ -188,7 +188,7 @@ proc actions::filenames {reporter storefile rest} {
     }
 }
 
-proc actions::generations {reporter storefile rest} {
+proc cli_actions::generations {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         if {$rest eq "-f" || $rest eq "--full"} {
@@ -210,7 +210,7 @@ proc actions::generations {reporter storefile rest} {
     }
 }
 
-proc actions::history {reporter storefile rest} {
+proc cli_actions::history {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
         set prev_name ""
@@ -230,7 +230,7 @@ proc actions::history {reporter storefile rest} {
     }
 }
 
-proc actions::ignore {reporter storefile rest} {
+proc cli_actions::ignore {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str patterns
     try {
         $str ignore {*}$patterns
@@ -239,7 +239,7 @@ proc actions::ignore {reporter storefile rest} {
     }
 }
 
-proc actions::ignores {reporter storefile} {
+proc cli_actions::ignores {reporter storefile} {
     lassign [GidStoreAndRest $reporter $storefile {}] gid str rest
     try {
         foreach pattern [$str ignores] {
@@ -250,7 +250,7 @@ proc actions::ignores {reporter storefile} {
     }
 }
 
-proc actions::unignore {reporter storefile rest} {
+proc cli_actions::unignore {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str patterns
     try {
         $str unignore {*}$patterns
@@ -259,7 +259,7 @@ proc actions::unignore {reporter storefile rest} {
     }
 }
 
-proc actions::clean {reporter storefile rest} {
+proc cli_actions::clean {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         $str clean
@@ -268,7 +268,7 @@ proc actions::clean {reporter storefile rest} {
     }
 }
 
-proc actions::purge {reporter storefile rest} {
+proc cli_actions::purge {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {
         if {[misc::yes_no "permanently permanently purge \"$filename\"\
@@ -284,7 +284,7 @@ proc actions::purge {reporter storefile rest} {
 
 # For speed this only compares file sizes so will miss the hopefully rare
 # cases when a file has been changed but is exactly the same size.
-proc actions::HaveUpdates str {
+proc cli_actions::HaveUpdates str {
     foreach file_size [$str file_sizes] {
         if {[file size [$file_size filename]] != [$file_size size]} {
             return true
@@ -294,17 +294,19 @@ proc actions::HaveUpdates str {
 }
 
 # See HaveUpdates
-proc actions::UpdateCandidates str {
+proc cli_actions::UpdateCandidates str {
     set candidates [list]
     foreach file_size [$str file_sizes] {
-        if {[file size [$file_size filename]] != [$file_size size]} {
-            lappend candidates [$file_size filename]
+        set filename [$file_size filename]
+        if {[file exists $filename] && \
+                [file size $filename] != [$file_size size]} {
+            lappend candidates $filename
         }
     }
     return $candidates
 }
 
-proc actions::CandidatesForAdd str {
+proc cli_actions::CandidatesForAdd str {
     set candidates [CandidatesFromGiven $str [glob * */*]]
     set gid [$str last_generation]
     lmap name $candidates { ;# drop already stored files
@@ -313,7 +315,7 @@ proc actions::CandidatesForAdd str {
 }
 
 # we deliberately only go at most one level deep for folders
-proc actions::CandidatesFromGiven {str candidates} {
+proc cli_actions::CandidatesFromGiven {str candidates} {
     set ignores [$str ignores]
     set names [list]
     foreach name $candidates {
@@ -333,17 +335,17 @@ proc actions::CandidatesFromGiven {str candidates} {
     return $names
 }
 
-proc actions::ValidFile name {
+proc cli_actions::ValidFile name {
     expr {![string match {.*} [file tail $name]] && [file size $name]}
 }
 
-proc actions::GidStoreAndRest {reporter storefile rest} {
+proc cli_actions::GidStoreAndRest {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     lassign [GidAndRest $str $rest] gid rest
     list $gid $str $rest
 }
 
-proc actions::GidAndRest {str rest} {
+proc cli_actions::GidAndRest {str rest} {
     set gid [$str last_generation]
     set first [lindex $rest 0]
     if {[string match {@[0-9]*} $first]} {

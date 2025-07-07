@@ -1,15 +1,15 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require actions
+package require cli_actions
 package require globals
 
-namespace eval app {}
+namespace eval cli {}
 
-proc app::main {} {
+proc cli::main {} {
     set storefile .[file tail [pwd]].str
     if {!$::argc} {
         if {[file exists $storefile]} {
-            actions::status "" $storefile {}
+            cli_actions::status "" $storefile {}
             exit 0
         } else {
             usage
@@ -18,28 +18,29 @@ proc app::main {} {
     set command [lindex $::argv 0]
     lassign [get_reporter [lrange $::argv 1 end]] rest reporter
     switch $command {
-        a - add { actions::add $reporter $storefile $rest }
-        c - copy { actions::copy $reporter $storefile $rest }
-        C - clean { actions::clean $reporter $storefile $rest }
-        d - diff { actions::diff $reporter $storefile $rest }
-        e - extract { actions::extract $reporter $storefile $rest }
-        f - filenames { actions::filenames $reporter $storefile $rest }
-        g - generations { actions::generations $reporter $storefile $rest }
+        a - add { cli_actions::add $reporter $storefile $rest }
+        c - copy { cli_actions::copy $reporter $storefile $rest }
+        C - clean { cli_actions::clean $reporter $storefile $rest }
+        d - diff { cli_actions::diff $reporter $storefile $rest }
+        e - extract { cli_actions::extract $reporter $storefile $rest }
+        f - filenames { cli_actions::filenames $reporter $storefile $rest }
+        g - generations { cli_actions::generations $reporter $storefile \
+                          $rest }
         h - help - -h - --help { usage } 
-        H - history { actions::history $reporter $storefile $rest}
-        i - ignore { actions::ignore $reporter $storefile $rest }
-        I - ignores { actions::ignores $reporter $storefile }
-        p - print { actions::print $reporter $storefile $rest }
-        purge { actions::purge $reporter $storefile $rest }
-        s - status { actions::status $reporter $storefile $rest }
-        u - update { actions::update $reporter $storefile $rest }
-        U - unignore { actions::unignore $reporter $storefile $rest }
+        H - history { cli_actions::history $reporter $storefile $rest}
+        i - ignore { cli_actions::ignore $reporter $storefile $rest }
+        I - ignores { cli_actions::ignores $reporter $storefile }
+        p - print { cli_actions::print $reporter $storefile $rest }
+        purge { cli_actions::purge $reporter $storefile $rest }
+        s - status { cli_actions::status $reporter $storefile $rest }
+        u - update { cli_actions::update $reporter $storefile $rest }
+        U - unignore { cli_actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
         default { misc::warn "unrecognized command: \"$command\"" }
     }
 }
 
-proc app::get_reporter rest {
+proc cli::get_reporter rest {
     set reporter filtered_reporter ;# ::VERBOSE is default of 1
     set first [lindex $rest 0]
     switch $first {
@@ -57,12 +58,12 @@ proc app::get_reporter rest {
     list $rest $reporter
 }
 
-proc app::version {} {
+proc cli::version {} {
     misc::info "str v$::VERSION"
     exit 2
 }
 
-proc app::usage {} {
+proc cli::usage {} {
     puts "${::ITALIC}usage: ${::RESET}${::BOLD}str${::RESET} <command> …
 
 Stores generational copies of specified files (excluding those
@@ -147,7 +148,7 @@ ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
 }
 
 proc filtered_reporter message {
-    if {[regexp {^(:?added|same as)} $message]} {
+    if {[regexp {^(:?added|same as|skipped)} $message]} {
         return
     }
     misc::info $message

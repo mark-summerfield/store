@@ -2,8 +2,8 @@ store
 gui-1.tm # GUI TODO
 
 str # CLI
-app-1.tm
-actions-1.tm
+cli-1.tm
+cli_actions-1.tm
 store-1.tm
 filedata-1.tm
 filesize-1.tm

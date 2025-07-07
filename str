@@ -8,6 +8,6 @@ if {![catch {file readlink [info script]} name]} {
 }
 tcl::tm::path add $APPPATH
 
-package require app
+package require cli
 
-app::main
+cli::main

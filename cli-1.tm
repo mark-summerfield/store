@@ -33,6 +33,7 @@ proc cli::main {} {
         p - print { cli_actions::print $reporter $storefile $rest }
         purge { cli_actions::purge $reporter $storefile $rest }
         s - status { cli_actions::status $reporter $storefile $rest }
+        T - untracked { cli_actions::untracked $reporter $storefile $rest }
         u - update { cli_actions::update $reporter $storefile $rest }
         U - unignore { cli_actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
@@ -121,6 +122,8 @@ ${::BOLD}U${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}unignore${::RESET}\
     <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
   Unignores the given filenames, folders, and globs by removing them
   from the ignore list.
+${::BOLD}T${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}untracked${::RESET}
+  Lists any untracked files.
 ${::BOLD}C${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}clean${::RESET}
   Cleans, i.e., deletes, every “empty” generation that has no changes.
 ${::BOLD}purge${::RESET} <filename>

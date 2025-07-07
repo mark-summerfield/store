@@ -53,3 +53,8 @@ CREATE VIEW HistoryByGeneration AS
         FROM Generations, Files
         WHERE Generations.gid = Files.gid AND kind in ('U', 'Z')
         ORDER BY Generations.gid DESC, LOWER(filename);
+
+CREATE VIEW Untracked AS
+    SELECT DISTINCT filename FROM Files WHERE filename NOT IN (
+        SELECT filename FROM Files WHERE gid IN (
+            SELECT MAX(gid) FROM Generations)) ORDER BY LOWER(filename);

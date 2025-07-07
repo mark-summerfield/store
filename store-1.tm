@@ -205,6 +205,10 @@ oo::define Store method needs_clean {} {
     $Db eval {SELECT COUNT(*) FROM EmptyGenerations;}
 }
 
+oo::define Store method untracked {} {
+    $Db eval {SELECT filename FROM Untracked;}
+}
+
 # deletes the given filename in every generation and returns the number
 # of records deleted (which could be 0)
 oo::define Store method purge {filename} {

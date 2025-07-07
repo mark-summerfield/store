@@ -291,6 +291,17 @@ proc cli_actions::clean {reporter storefile rest} {
     }
 }
 
+proc cli_actions::untracked {reporter storefile rest} {
+    set str [Store new $storefile $reporter]
+    try {
+        foreach name [$str untracked] {
+            cli_misc::info $name
+        }
+    } finally {
+        $str close
+    }
+}
+
 proc cli_actions::purge {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {

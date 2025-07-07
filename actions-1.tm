@@ -53,13 +53,23 @@ proc actions::status {reporter storefile rest} {
     set no_messages [list]
     set str [Store new $storefile $reporter]
     try {
-        if {[llength [CandidatesForAdd $str]]} {
+        set names [CandidatesForAdd $str]
+        if {[llength $names]} {
             lappend yes_messages "unstored unignored nonempty files present"
+            if {$::VERBOSE > 1} {
+                lappend yes_messages \
+                    {*}[lmap name $names {expr {"  $name"}}]
+            }
         } elseif {$::VERBOSE} {
             lappend no_messages "no files need adding"
         }
-        if {[HaveUpdates $str]} {
+        set names [UpdateCandidates $str]
+        if {[llength $names]} {
             lappend yes_messages "updates needed"
+            if {$::VERBOSE > 1} {
+                lappend yes_messages \
+                    {*}[lmap name $names {expr {"  $name"}}]
+            }
         } elseif {$::VERBOSE} {
             lappend no_messages "no updates needed"
         }
@@ -69,10 +79,10 @@ proc actions::status {reporter storefile rest} {
             lappend no_messages "no clean needed"
         }
         if {[llength $yes_messages]} {
-            misc::info [join $yes_messages "; "] true
+            misc::info [join $yes_messages "\n"] true
         }
         if {$::VERBOSE && [llength $no_messages]} {
-            misc::info [join $no_messages "; "]
+            misc::info [join $no_messages "\n"]
         }
     } finally {
         $str close
@@ -111,31 +121,31 @@ proc actions::print {reporter storefile rest} {
 }
 
 proc actions::diff {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid1 str rest
+    lassign [GidStoreAndRest $reporter $storefile $rest] oldGid str rest
     try {
-        lassign [GidAndRest $str $rest] gid2 filename
-        if {$gid1 == $gid2} { ;# compare with file
-            lassign [$str get $gid1 $filename] gid1 old_data
+        lassign [GidAndRest $str $rest] newGid filename
+        if {$oldGid == $newGid} { ;# compare with file
+            lassign [$str get $oldGid $filename] oldGid old_data
             if {$old_data eq ""} {
-                misc::warn "\"$filename\" @$gid1 not found in store"
+                misc::warn "\"$filename\" @$oldGid not found in store"
             }
             set new_data [readFile $filename binary]
-            set message "\"$filename\" @$gid1 with file on disk"
+            set message "\"$filename\" @$oldGid with file on disk"
         } else { ;# compare in store
-            set origGid1 $gid1
-            set origGid2 $gid2
-            if {$gid1 > $gid2} {
-                lassign "$gid1 $gid2" gid2 gid1
+            set origOldGid $oldGid
+            set origNewGid $newGid
+            if {$oldGid < $newGid} {
+                lassign "$oldGid $newGid" newGid oldGid
             }
-            lassign [$str get $gid1 $filename] gid1 old_data
+            lassign [$str get $oldGid $filename] oldGid old_data
             if {$old_data eq ""} {
-                WarnFileNotFound $str $origGid1 $filename
+                WarnFileNotFound $str $origOldGid $filename
             }
-            lassign [$str get $gid2 $filename] gid2 new_data
+            lassign [$str get $newGid $filename] newGid new_data
             if {$new_data eq ""} {
-                WarnFileNotFound $str $origGid2 $filename
+                WarnFileNotFound $str $origNewGid $filename
             }
-            set message "\"$filename\" @$gid1 with @$gid2"
+            set message "\"$filename\" @$oldGid with @$newGid"
         }
         if {$old_data eq $new_data} {
             misc::info "no differences $message"
@@ -271,6 +281,17 @@ proc actions::HaveUpdates str {
         }
     }
     return false
+}
+
+# See HaveUpdates
+proc actions::UpdateCandidates str {
+    set candidates [list]
+    foreach file_size [$str file_sizes] {
+        if {[file size [$file_size filename]] != [$file_size size]} {
+            lappend candidates [$file_size filename]
+        }
+    }
+    return $candidates
 }
 
 proc actions::CandidatesForAdd str {

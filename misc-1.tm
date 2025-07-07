@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require globals
+package require term::receive
 
 namespace eval misc {}
 
@@ -38,8 +39,7 @@ proc misc::yes_no {prompt {dangerous false}} {
     set color [expr {$dangerous ? $::RED : $::MAGENTA}]
     puts -nonewline "${color}$prompt \[yN]?${::RESET} "
     flush stdout
-    set reply [read stdin 1]
-    expr {$reply eq "y"}
+    expr {[string match -nocase y [term::receive::getch]]}
 }
 
 proc misc::sqlite_version {} {

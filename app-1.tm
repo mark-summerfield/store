@@ -91,7 +91,7 @@ ${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
 ${::BOLD}p${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}print${::RESET}\
     \[@gid] <filename>
   Prints the given filename from the store at the generation,
-  to stdout.
+  to stdout. (Should be used only for plain text files!)
 ${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
     \[verbose] \[@gid] <dirname>
   Copies all the files at the generation into the given dirname

@@ -139,6 +139,10 @@ proc cli_actions::diff {reporter storefile rest} {
     try {
         lassign [GidAndRest $str $rest] new_gid filename
         if {$old_gid == $new_gid} { ;# compare with file
+            if {![file exists $filename]} {
+                cli_misc::warn "can't diff \"$filename\" @$old_gid not \
+                    found in on disk"
+            }
             lassign [$str get $old_gid $filename] old_gid old_data
             if {$old_data eq ""} {
                 cli_misc::warn "\"$filename\" @$old_gid not found in\
@@ -153,6 +157,9 @@ proc cli_actions::diff {reporter storefile rest} {
                 lassign "$old_gid $new_gid" new_gid old_gid
             }
             lassign [$str get $old_gid $filename] old_gid old_data
+            if {!$old_gid} {
+                cli_misc::warn "\"$filename\" not in current generation"
+            }
             if {$old_data eq ""} {
                 WarnFileNotFound $str $orig_old_gid $filename
             }

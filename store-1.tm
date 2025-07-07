@@ -234,9 +234,19 @@ oo::define Store method copy {{gid 0} {folder ""}} {
 
 oo::define Store method ExtractOne {action gid filename target} {
     lassign [my get $gid $filename] gid data
+    set extra ""
+    if {!$gid} {
+        set gid [my find_gid_for_untracked $filename]
+        lassign [my get $gid $filename] gid data
+        set extra " (no longer stored)"
+    }
+    if {!$gid} {
+        {*}$Reporter "failed to find \"$filename\" in the store"
+        return
+    }
     set target [my PrepareTarget $action $gid $target]
     writeFile $target binary $data
-    {*}$Reporter "$action \"$filename\" → \"$target\""
+    {*}$Reporter "$action \"$filename\"$extra → \"$target\""
 }
 
 # Returns the gid and data for the given filename at the given gid; The
@@ -295,6 +305,12 @@ oo::define Store method find_data_gid {gid filename} {
                 WHERE gid = :gid AND filename = :filename}] kind pgid
     if {$kind eq ""} { return 0 } ;# not found
     expr {$kind eq "S" ? $pgid : $gid} ;# in fact could just return $pgid
+}
+
+oo::define Store method find_gid_for_untracked {filename} {
+    set gid [$Db eval {SELECT gid FROM Files WHERE filename = :filename
+                       AND kind IN ('U', 'Z') ORDER BY gid DESC LIMIT 1}]
+    expr {$gid eq "" ? 0 : $gid}
 }
 
 oo::define Store method PrepareTarget {action gid filename} {

@@ -118,7 +118,13 @@ proc cli_actions::print {reporter storefile rest} {
             if {$gid} {
                 misc::info "\"$filename\" was last updated in @$gid"
             } else {
-                misc::info "\"$filename\" is not in the store"
+                set gid [$str find_gid_for_untracked $filename]
+                if {$gid} {
+                    misc::info "\"$filename\" is no longer stored but\
+                        is available in @$gid"
+                } else {
+                    misc::info "\"$filename\" is not in the store"
+                }
             }
         }
     } finally {

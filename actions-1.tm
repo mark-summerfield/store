@@ -122,16 +122,18 @@ proc actions::diff {reporter storefile rest} {
             set new_data [readFile $filename binary]
             set message "\"$filename\" @$gid1 with file on disk"
         } else { ;# compare in store
+            set origGid1 $gid1
+            set origGid2 $gid2
             if {$gid1 > $gid2} {
                 lassign "$gid1 $gid2" gid2 gid1
             }
             lassign [$str get $gid1 $filename] gid1 old_data
             if {$old_data eq ""} {
-                misc::warn "\"$filename\" @$gid1 not found in store"
+                WarnFileNotFound $str $origGid1 $filename
             }
             lassign [$str get $gid2 $filename] gid2 new_data
             if {$new_data eq ""} {
-                misc::warn "\"$filename\" @$gid2 not found in store"
+                WarnFileNotFound $str $origGid2 $filename
             }
             set message "\"$filename\" @$gid1 with @$gid2"
         }
@@ -147,6 +149,12 @@ proc actions::diff {reporter storefile rest} {
     } finally {
         $str close
     }
+}
+
+proc actions::WarnFileNotFound {str gid filename} {
+    set message "\"$filename\" @$gid not found in store; try: "
+    set gids [join [$str gids_for_filename $filename] " "]
+    misc::warn "$message$gids"
 }
 
 proc actions::filenames {reporter storefile rest} {

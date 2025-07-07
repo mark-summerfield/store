@@ -264,6 +264,12 @@ oo::define Store method history {{filename ""}} {
     $Db eval {SELECT filename, gid FROM HistoryByFilename}
 }
 
+oo::define Store method gids_for_filename {filename} {
+    $Db eval {SELECT '@' || gid FROM Files
+              WHERE filename = :filename AND kind in ('U', 'Z')
+              ORDER BY gid DESC}
+}
+
 # Returns the file sizes for every file in the last generation (using the
 # size from its parent if the file's kind is 'S')
 oo::define Store method file_sizes {} {

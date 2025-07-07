@@ -31,8 +31,10 @@ proc actions::update {reporter storefile rest} {
         } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
         }
-        if {$::VERBOSE && [llength [CandidatesForAdd $str]]} {
-            misc::info "unstored unignored nonempty files present"
+        set names [CandidatesForAdd $str]
+        if {$::VERBOSE && [llength $names]} {
+            lassign [misc::n_s [llength $names]] n s
+            misc::info "$n unstored unignored nonempty file$s present" true
         }
     } finally {
         $str close
@@ -55,7 +57,9 @@ proc actions::status {reporter storefile rest} {
     try {
         set names [CandidatesForAdd $str]
         if {[llength $names]} {
-            lappend yes_messages "unstored unignored nonempty files present"
+            lassign [misc::n_s [llength $names]] n s
+            lappend yes_messages "$n unstored unignored nonempty file$s\
+                                  present"
             if {$::VERBOSE > 1} {
                 lappend yes_messages \
                     {*}[lmap name $names {expr {"  $name"}}]
@@ -65,7 +69,8 @@ proc actions::status {reporter storefile rest} {
         }
         set names [UpdateCandidates $str]
         if {[llength $names]} {
-            lappend yes_messages "updates needed"
+            lassign [misc::n_s [llength $names]] n s
+            lappend yes_messages "$n file$s needs updating"
             if {$::VERBOSE > 1} {
                 lappend yes_messages \
                     {*}[lmap name $names {expr {"  $name"}}]
@@ -106,7 +111,8 @@ proc actions::print {reporter storefile rest} {
     try {
         lassign [$str get $gid $filename] gid data
         if {$data ne ""} {
-            puts -nonewline [encoding convertfrom utf-8 $data]
+            puts -nonewline [encoding convertfrom -profile replace utf-8 \
+                             $data]
         } else {
             set gid [$str find_data_gid [$str last_generation] $filename]
             if {$gid} {
@@ -121,31 +127,31 @@ proc actions::print {reporter storefile rest} {
 }
 
 proc actions::diff {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] oldGid str rest
+    lassign [GidStoreAndRest $reporter $storefile $rest] old_gid str rest
     try {
-        lassign [GidAndRest $str $rest] newGid filename
-        if {$oldGid == $newGid} { ;# compare with file
-            lassign [$str get $oldGid $filename] oldGid old_data
+        lassign [GidAndRest $str $rest] new_gid filename
+        if {$old_gid == $new_gid} { ;# compare with file
+            lassign [$str get $old_gid $filename] old_gid old_data
             if {$old_data eq ""} {
-                misc::warn "\"$filename\" @$oldGid not found in store"
+                misc::warn "\"$filename\" @$old_gid not found in the store"
             }
             set new_data [readFile $filename binary]
-            set message "\"$filename\" @$oldGid with file on disk"
+            set message "\"$filename\" @$old_gid with file on disk"
         } else { ;# compare in store
-            set origOldGid $oldGid
-            set origNewGid $newGid
-            if {$oldGid < $newGid} {
-                lassign "$oldGid $newGid" newGid oldGid
+            set orig_old_gid $old_gid
+            set orig_new_gid $new_gid
+            if {$old_gid < $new_gid} {
+                lassign "$old_gid $new_gid" new_gid old_gid
             }
-            lassign [$str get $oldGid $filename] oldGid old_data
+            lassign [$str get $old_gid $filename] old_gid old_data
             if {$old_data eq ""} {
-                WarnFileNotFound $str $origOldGid $filename
+                WarnFileNotFound $str $orig_old_gid $filename
             }
-            lassign [$str get $newGid $filename] newGid new_data
+            lassign [$str get $new_gid $filename] new_gid new_data
             if {$new_data eq ""} {
-                WarnFileNotFound $str $origNewGid $filename
+                WarnFileNotFound $str $orig_new_gid $filename
             }
-            set message "\"$filename\" @$oldGid with @$newGid"
+            set message "\"$filename\" @$old_gid with @$new_gid"
         }
         if {$old_data eq $new_data} {
             misc::info "no differences $message"
@@ -162,9 +168,13 @@ proc actions::diff {reporter storefile rest} {
 }
 
 proc actions::WarnFileNotFound {str gid filename} {
-    set message "\"$filename\" @$gid not found in store; try: "
-    set gids [join [$str gids_for_filename $filename] " "]
-    misc::warn "$message$gids"
+    set gids [$str gids_for_filename $filename]
+    if {[llength $gids]} {
+        set message "\"$filename\" @$gid not found in the store"
+        misc::warn "$message; try: [join $gids " "]"
+    } else {
+        misc::warn "\"$filename\" is not in the store"
+    }
 }
 
 proc actions::filenames {reporter storefile rest} {

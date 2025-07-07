@@ -2,7 +2,6 @@
 
 package require actions
 package require globals
-package require gui
 
 namespace eval app {}
 

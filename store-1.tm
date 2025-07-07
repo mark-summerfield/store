@@ -34,6 +34,7 @@ oo::define Store destructor { my close }
 
 oo::define Store method close {} {
     if {![my is_closed]} {
+        $Db eval {VACUUM;}
         $Db close
         set Db {}
     }
@@ -160,7 +161,6 @@ oo::define Store method unignore {args} {
             $Db eval {DELETE FROM Ignores WHERE pattern = :pattern}
         }
     }
-    $Db eval {VACUUM;}
 }
 
 # lists all generations (gid, created, message)
@@ -189,7 +189,6 @@ oo::define Store method clean {} {
                     SELECT gid FROM Files);}
         set ngens [$Db changes]
     }
-    $Db eval {VACUUM;}
     lassign [misc::n_s $nfiles] nf ns
     lassign [misc::n_s $ngens] gf gs
     {*}$Reporter "cleaned $nf file$ns in $gf generation$gs"
@@ -204,7 +203,6 @@ oo::define Store method needs_clean {} {
 oo::define Store method purge {filename} {
     $Db eval {DELETE FROM Files WHERE filename = :filename}
     set n [$Db changes]
-    $Db eval {VACUUM;}
     return $n
 }
 
@@ -238,7 +236,7 @@ oo::define Store method ExtractOne {action gid filename target} {
     if {!$gid} {
         set gid [my find_gid_for_untracked $filename]
         lassign [my get $gid $filename] gid data
-        set extra " (no longer stored)"
+        set extra " (no longer tracked)"
     }
     if {!$gid} {
         {*}$Reporter "failed to find \"$filename\" in the store"

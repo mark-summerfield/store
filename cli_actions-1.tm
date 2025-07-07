@@ -122,7 +122,7 @@ proc cli_actions::print {reporter storefile rest} {
             } else {
                 set gid [$str find_gid_for_untracked $filename]
                 if {$gid} {
-                    cli_misc::info "\"$filename\" is no longer stored but\
+                    cli_misc::info "\"$filename\" is not being tracked but\
                         is available in @$gid"
                 } else {
                     cli_misc::info "\"$filename\" is not in the store"

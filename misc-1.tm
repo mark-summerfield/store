@@ -5,13 +5,14 @@ package require term::receive
 
 namespace eval misc {}
 
-# inserts in case sensitive order into a list of strings
-proc misc::insort {lst x} {
-    set pos [lsearch -bisect $lst $x]
-    if {$pos == -1 || [lindex $lst $pos] ne $x} {
-        return [linsert $lst [incr pos] $x] ;# insert new unique element
+# inserts a string in case sensitive order into a list of strings if it
+# is not already present
+proc misc::insort {str_list s} {
+    set pos [lsearch -bisect $str_list $s]
+    if {$pos == -1 || [lindex $str_list $pos] ne $s} {
+        return [linsert $str_list [incr pos] $s] ;# insert new unique string
     }
-    return $lst ;# ignore duplicate element
+    return $str_list ;# ignore duplicate string
 }
 
 # can't use globals since they are for stdout and here we need stderr
@@ -42,6 +43,12 @@ proc misc::yes_no {prompt {dangerous false}} {
     expr {[string match -nocase y [term::receive::getch]]}
 }
 
+proc misc::n_s size {
+    if {!$size} { return [list "no" "s"] }
+    if {$size == 1} { return [list "one" ""] }
+    list $size "s"
+}
+
 proc misc::sqlite_version {} {
     set db ::DB#[string range [clock clicks] end-8 end]
     sqlite3 $db :memory:
@@ -50,12 +57,6 @@ proc misc::sqlite_version {} {
     } finally {
         $db close
     }
-}
-
-proc misc::n_s size {
-    if {!$size} { return [list "no" "s"] }
-    if {$size == 1} { return [list "one" ""] }
-    list $size "s"
 }
 
 proc misc::ignore {filename ignores} {

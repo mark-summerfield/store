@@ -63,7 +63,7 @@ oo::define Store method add {args} {
 # must only be used after at least one call to add
 oo::define Store method update {message} {
     set gid [my last_generation]
-    if {!$gid} { error "can only update an existing non-empty store" }
+    if {!$gid} { error "can only update an existing nonempty store" }
     if {$message ne ""} { {*}$Reporter "updating \"$message\"" }
     my Update $message false {*}[my filenames $gid]
 }
@@ -76,7 +76,7 @@ oo::define Store method Update {message adding args} {
         if {[file isfile $filename]} {
             lappend filenames $filename
         } else {
-            {*}$Reporter "skipped missing or non-file \"$filename\""
+            {*}$Reporter "skipped missing or nonfile \"$filename\""
         }
     }
     if {![llength $filenames]} {
@@ -308,3 +308,5 @@ oo::define Store method PrepareTarget {action gid filename} {
     if {![file isdirectory $dirname]} { file mkdir $dirname }
     return $target
 }
+
+oo::define Store method to_string {} { return "Store \"$Filename\"" }

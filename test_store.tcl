@@ -130,9 +130,14 @@ proc test4 {} {
     file delete $filename
     set str [Store new $filename]
     try {
+        if {[$str to_string] ne "Store \"/tmp/test4.db\""} {
+            puts "FAIL: expected 'Store \"/tmp/test4.db\"'; got\
+                '[$str to_string]'"
+            set ok false
+        }
         catch { $str update "should cause error" } err_message
-        if {$err_message ne "can only update an existing non-empty store"} {
-            puts "FAIL: expected non-empty store error; got $err_message"
+        if {$err_message ne "can only update an existing nonempty store"} {
+            puts "FAIL: expected nonempty store error; got $err_message"
             set ok false
         }
         $str add README.md

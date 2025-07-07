@@ -10,7 +10,6 @@ oo::class create FileSize {
     }
 
     method filename {} { return $Filename }
-
     method size {} { return $Size }
+    method to_string {} { return "FileSize \"$Filename\" $Size" }
 }
-

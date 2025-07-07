@@ -44,8 +44,8 @@ oo::define Store method is_closed {} { catch {$Db version} }
 
 oo::define Store method filename {} { return $Filename }
 
-oo::define Store method last_generation {} {
-    $Db eval {SELECT gid FROM LastGeneration}
+oo::define Store method current_generation {} {
+    $Db eval {SELECT gid FROM CurrentGeneration}
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file and
@@ -59,11 +59,11 @@ oo::define Store method add {args} {
 }
 
 # if at least one prev generation exists, creates new generation with
-# 'U' or 'Z' or 'S' for every file present in the _last_ generation that
+# 'U' or 'Z' or 'S' for every file present in the current generation that
 # hasn't been deleted and returns the number updated (which could be 0);
 # must only be used after at least one call to add
 oo::define Store method update {message} {
-    set gid [my last_generation]
+    set gid [my current_generation]
     if {!$gid} { error "can only update an existing nonempty store" }
     if {$message ne ""} { {*}$Reporter "updating \"$message\"" }
     my Update $message false {*}[my filenames $gid]
@@ -172,11 +172,18 @@ oo::define Store method generations {{full false}} {
     $Db eval {SELECT gid, created, message FROM ViewGenerations}
 }
 
-# returns a list of the last or given gid's filenames
+# returns a list of the current or given gid's filenames
 oo::define Store method filenames {{gid 0}} {
-    if {!$gid} { set gid [my last_generation] }
+    if {!$gid} { set gid [my current_generation] }
     $Db eval {SELECT filename FROM Files WHERE gid = :gid
               ORDER BY LOWER(filename)}
+}
+
+# returns true if the filename is in the current generation; otherwise false
+oo::define Store method is_current {filename} {
+    set gid [my current_generation]
+    $Db eval {SELECT EXISTS(SELECT filename FROM Files WHERE gid = :gid
+              AND filename = :filename LIMIT 1)}
 }
 
 # cleans, i.e., deletes, every “empty” generation that has no changes
@@ -206,19 +213,19 @@ oo::define Store method purge {filename} {
     return $n
 }
 
-# extracts all files at last or given gid into the current dir or only
+# extracts all files at current or given gid into the current dir or only
 # the specified files, in both cases using the naming convention
 # path/filename1.ext → path/filename1@gid.ext,
 # path/filename2 → path/filename2@gid, etc
 oo::define Store method extract {{gid 0} args} {
-    if {!$gid} { set gid [my last_generation] }
+    if {!$gid} { set gid [my current_generation] }
     set filenames [expr {[llength $args] ? $args : [my filenames $gid]}]
     foreach filename $filenames {
         my ExtractOne extracted $gid $filename $filename
     }
 }
 
-# copy all files at last or given gid into the given folder (which
+# copy all files at current or given gid into the given folder (which
 # must not already exist)
 oo::define Store method copy {{gid 0} {folder ""}} {
     if {[file isdirectory $folder]} {
@@ -278,12 +285,12 @@ oo::define Store method gids_for_filename {filename} {
               ORDER BY gid DESC}
 }
 
-# Returns the file sizes for every file in the last generation (using the
+# Returns the file sizes for every file in the current generation (using the
 # size from its parent if the file's kind is 'S')
 oo::define Store method file_sizes {} {
     set file_sizes [list]
     $Db transaction {
-        set gid [$Db eval {SELECT gid FROM LastGeneration}]
+        set gid [$Db eval {SELECT gid FROM CurrentGeneration}]
         foreach filename [$Db eval {SELECT filename FROM Files
                                     WHERE gid = :gid}] {
             set dgid [my find_data_gid $gid $filename]

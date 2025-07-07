@@ -25,9 +25,9 @@ proc test1 {} {
             puts "FAIL: expected store to be open"
             set ok false
         }
-        set gid [$str last_generation]
+        set gid [$str current_generation]
         if {$gid != 0} {
-            puts "FAIL: expected no last generation; got $gid"
+            puts "FAIL: expected no current generation; got $gid"
             set ok false
         }
         if {[$str filename] ne $filename} {
@@ -69,24 +69,34 @@ proc test3 {expected reporter} {
     try {
         $str add sql/prepare.sql sql/create.sql cli-1.tm store-1.tm
         $str add README.md
-        $str update "should change nothing @[$str last_generation]"
-        $str update "should change nothing @[$str last_generation]"
+        $str update "should change nothing @[$str current_generation]"
+        $str update "should change nothing @[$str current_generation]"
+        if {![$str is_current README.md]} {
+            puts "FAIL: expected README.md to be current"
+            set ok false
+        }
         # change README.md
         set readme [readFile README.md]
         set readmex "$readme\nanother line\nand more!\n"
         writeFile README.md $readmex
-        $str update "should change to new README.md @[$str last_generation]"
+        $str update "should change to new README.md\
+            @[$str current_generation]"
         # restore original README.md
         writeFile README.md $readme
-        $str update "should restore old README.md @[$str last_generation]"
-        $str update "should change nothing @[$str last_generation]"
-        $str update "should change nothing @[$str last_generation]"
+        $str update "should restore old README.md\
+            @[$str current_generation]"
+        $str update "should change nothing @[$str current_generation]"
+        $str update "should change nothing @[$str current_generation]"
         foreach {gid created message} [$str generations] {
             lappend ::messages "$procname: gid=$gid message=\"$message\"\n"
         }
         set n [$str purge cli-1.tm]
         if {$n != 8} {
             puts "FAIL: expected 8 deletions of cli-1.tm; got $n"
+            set ok false
+        }
+        if {[$str is_current cli-1.tm]} {
+            puts "FAIL: expected cli-1.tm to not be current"
             set ok false
         }
         $str extract 5 sql/prepare.sql README.md

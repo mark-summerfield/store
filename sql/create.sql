@@ -37,7 +37,7 @@ CREATE VIEW ViewGenerations AS
     SELECT gid, DATETIME(created) AS created, message FROM Generations
         ORDER BY gid DESC;
 
-CREATE VIEW LastGeneration AS SELECT COALESCE(MAX(gid), 0) AS gid
+CREATE VIEW CurrentGeneration AS SELECT COALESCE(MAX(gid), 0) AS gid
     FROM Generations;
 
 CREATE VIEW EmptyGenerations AS

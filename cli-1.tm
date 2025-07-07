@@ -136,7 +136,7 @@ ${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
   Show store’s version and exit.
 
 • @gid — @-prefixed generation number, e.g., @28;
-  if unspecified, the last generation is assumed
+  if unspecified, the current generation is assumed
 • glob — when using globs for ignore or unignore use quotes
   to avoid shell expansion of glob characters (e.g., '*.o').
 • verbose — default is filtered; otherwise specified as

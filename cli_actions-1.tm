@@ -116,7 +116,7 @@ proc cli_actions::print {reporter storefile rest} {
             puts -nonewline [encoding convertfrom -profile replace utf-8 \
                              $data]
         } else {
-            set gid [$str find_data_gid [$str last_generation] $filename]
+            set gid [$str find_data_gid [$str current_generation] $filename]
             if {$gid} {
                 cli_misc::info "\"$filename\" was last updated in @$gid"
             } else {
@@ -197,7 +197,9 @@ proc cli_actions::filenames {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         foreach filename [$str filenames $gid] {
-            cli_misc::info $filename
+            set tracked [expr {[$str is_current $filename] \
+                    ? "" : " ${::RED}(untracked)${::RESET}"}]
+            cli_misc::info "$filename$tracked"
         }
     } finally {
         $str close
@@ -214,7 +216,9 @@ proc cli_actions::generations {reporter storefile rest} {
                     cli_misc::info "@$gid $created $message"
                     set prev_gid $gid
                 }
-                puts "  $filename"
+                set tracked [expr {[$str is_current $filename] \
+                        ? "" : " ${::RED}(untracked)${::RESET}"}]
+                puts "  $filename$tracked"
             }
         } else {
             foreach {gid created message} [$str generations] {
@@ -236,7 +240,10 @@ proc cli_actions::history {reporter storefile rest} {
                 puts -nonewline " @$gid"
             } else {
                 set prev_name $name
-                puts -nonewline "$prefix${::BLUE}$name${::RESET} @$gid"
+                set tracked [expr {[$str is_current $name] \
+                    ? "" : " ${::RED}(untracked)${::RESET}"}]
+                puts -nonewline "$prefix${::BLUE}$name${::RESET}$tracked\
+                    @$gid"
                 set prefix "\n"
             }
         }
@@ -324,7 +331,7 @@ proc cli_actions::UpdateCandidates str {
 
 proc cli_actions::CandidatesForAdd str {
     set candidates [CandidatesFromGiven $str [glob * */*]]
-    set gid [$str last_generation]
+    set gid [$str current_generation]
     lmap name $candidates { ;# drop already stored files
         expr {[$str find_data_gid $gid $name] ? [continue] : $name}
     }
@@ -362,7 +369,7 @@ proc cli_actions::GidStoreAndRest {reporter storefile rest} {
 }
 
 proc cli_actions::GidAndRest {str rest} {
-    set gid [$str last_generation]
+    set gid [$str current_generation]
     set first [lindex $rest 0]
     if {[string match {@[0-9]*} $first]} {
         set gid [string range $first 1 end]

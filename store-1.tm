@@ -76,6 +76,8 @@ oo::define Store method Update {message adding args} {
     foreach filename $args {
         if {[file isfile $filename]} {
             lappend filenames $filename
+        } elseif {[my find_gid_for_untracked $filename]} {
+            {*}$Reporter "skipped untracked file \"$filename\""
         } else {
             {*}$Reporter "skipped missing or nonfile \"$filename\""
         }

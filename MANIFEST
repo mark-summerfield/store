@@ -6,7 +6,7 @@
 # TODO load/save geometry!
 store # GUI
 gui-1.tm
-gui_app-1.tm
+gui_app-1.tm # TODO switch to grid or figure out how to make resizing work!
 gui_misc-1.tm
 
 str # CLI

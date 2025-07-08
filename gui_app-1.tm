@@ -5,7 +5,7 @@ package require gui_misc
 package require ntext 1
 
 oo::class create App {
-    variable Str
+    variable StoreFilename
     variable FilenameTree
     variable GenerationTree
     variable Text
@@ -13,7 +13,8 @@ oo::class create App {
 }
 
 oo::define App constructor {} {
-    set Str [Store new .[file tail [pwd]].str]
+    set StoreFilename .[file tail [pwd]].str
+
 }
 
 oo::define App method show {} {
@@ -46,7 +47,7 @@ oo::define App method make_widgets {} {
     $panes add [my make_tabs]
     $panes add [my make_text_frame]
     pack [my make_status_frame] -fill x -expand true -side bottom
-    pack [my make_buttons] -fill y -expand true -side left
+    pack [my make_buttons] -fill y -expand true -side right
     pack $panes -fill both -expand true
 }    
 
@@ -68,25 +69,27 @@ oo::define App method make_tabs {} {
         -striped true]
     $tabs add $FilenameTree -text Files -underline 0
     $tabs add $GenerationTree -text Generations -underline 0
+    pack $tabs -fill both -expand true
     return $tabs
 }
 
 oo::define App method make_text_frame {} {
     set textFrame [ttk::frame .textFrame]
-    set Text [text .textFrame.text -wrap word -width 76 -height 32 \
+    set Text [text .textFrame.text -wrap word \
         -yscrollcommand {.textFrame.scrolly set} -font CommitMono]
     bindtags $Text {$Text Ntext . all}
     ttk::scrollbar .textFrame.scrolly -orient vertical \
         -command {.textFrame.text yview}
-    pack .textFrame.scrolly -side right -fill y
+    pack .textFrame.scrolly -side right -fill y -expand true
     pack .textFrame.text -side left -fill both -expand true
+    pack .textFrame -fill both -expand true
     autoscroll::autoscroll .textFrame.scrolly
     return $textFrame
 }
 
 oo::define App method make_status_frame {} {
     set StatusLabel [ttk::label .statusLabel -relief sunken\
-        -text "Loaded '[$Str filename]'"]
+        -text "Using '$StoreFilename'"]
     after 10_000 [callback set_status ""]
     return $StatusLabel
 }
@@ -99,7 +102,6 @@ oo::define App method make_bindings {} {
 
 oo::define App method on_quit {} {
     puts "App::on_quit TODO save geometry!" ;# TODO delete
-    $Str close
     exit
 }
 

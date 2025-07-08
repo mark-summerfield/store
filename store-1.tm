@@ -126,8 +126,8 @@ oo::define Store method UpdateOne {gid filename} {
     set action [expr {$updated ? "updated" : "added"}]
     switch $kind {
         S { {*}$Reporter "same as @$pgid \"$filename\"" }
+        Z -
         U { {*}$Reporter "$action \"$filename\"" }
-        Z { {*}$Reporter "$action \"$filename\" (deflated)" }
     }
     expr {!$updated} ;# not updated → added
 }

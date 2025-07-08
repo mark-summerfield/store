@@ -213,14 +213,14 @@ proc test5 {} {
 
 const MESSAGES1 {adding/updating
 created @1
-added "cli-1.tm" (deflated)
-added "sql/create.sql" (deflated)
-added "sql/prepare.sql" (deflated)
-added "store-1.tm" (deflated)
+added "cli-1.tm"
+added "sql/create.sql"
+added "sql/prepare.sql"
+added "store-1.tm"
 adding/updating
 created @2
 same as @1 "cli-1.tm"
-added "README.md" (deflated)
+added "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
@@ -241,7 +241,7 @@ same as @1 "store-1.tm"
 updating "should change to new README.md @4"
 created @5
 same as @1 "cli-1.tm"
-updated "README.md" (deflated)
+updated "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"

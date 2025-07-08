@@ -55,8 +55,11 @@ oo::define App method make_widgets {} {
 oo::define App method make_buttons {} {
     set buttonFrame [ttk::frame .buttonFrame]
     # TODO more buttons
+    puts $::ICON_SIZE
     set quitButton [ttk::button .buttonFrame.quitButton \
-        -text Quit -underline 0 -command [callback on_quit]]
+        -text Quit -underline 0 -compound left \
+        -image [gui_misc::icon quit.svg $::ICON_SIZE] \
+        -command [callback on_quit]]
     # TODO layout buttons
     pack .buttonFrame.quitButton -side bottom -padx $::PAD -pady $::PAD
 }

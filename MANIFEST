@@ -3,8 +3,7 @@
 # Generations tab has a tree view generation x file (HistoryByGeneration)
 # For ignores pop up a modal dialog with list and Add Remove Close buttons
 
-# TODO use icons for buttons (& tabs?)
-# TODO load/save geometry!
+# TODO load/save geometry! will need ~/.store.ini ; see gravitate
 store # GUI
 gui-1.tm
 gui_app-1.tm

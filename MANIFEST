@@ -3,11 +3,13 @@
 # Generations tab has a tree view generation x file (HistoryByGeneration)
 # For ignores pop up a modal dialog with list and Add Remove Close buttons
 
+# TODO use icons for buttons (& tabs?)
 # TODO load/save geometry!
 store # GUI
 gui-1.tm
-gui_app-1.tm # TODO switch to grid or figure out how to make resizing work!
+gui_app-1.tm
 gui_misc-1.tm
+gui_globals-1.tm
 
 str # CLI
 cli-1.tm

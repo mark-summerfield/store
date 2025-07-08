@@ -37,5 +37,5 @@ proc cli_misc::width {{defwidth 72}} {
     if {[dict exists [chan configure stdout] -mode]} { ;# tty
         return [lindex [chan configure stdout -winsize] 0]
     }
-    return $defwidth
+    return $defwidth ;# redirected
 }

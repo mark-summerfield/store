@@ -241,7 +241,7 @@ same as @1 "store-1.tm"
 updating "should change to new README.md @4"
 created @5
 same as @1 "cli-1.tm"
-added "README.md" (deflated)
+updated "README.md" (deflated)
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
@@ -325,6 +325,7 @@ puts "test3 with filtered reporter"
 test3 $MESSAGES2 [lambda {message} {
     if {[string match {test3*} $message] || \
             [string match {added*} $message] || \
+            [string match {updated*} $message] || \
             [string match {same as*} $message] } {
         return
     }

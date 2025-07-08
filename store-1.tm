@@ -101,7 +101,6 @@ oo::define Store method Update {message args} {
 # adds the given file as 'U' or 'Z' or 'S'; returns 1 for 'U' or 'Z' or
 # 0 for 'S'
 oo::define Store method UpdateOne {gid filename} {
-    set added 1
     set fileData [FileData load $gid $filename]
     set data [$fileData data]
     set oldGid [my FindMatch $gid $filename $data]
@@ -110,7 +109,6 @@ oo::define Store method UpdateOne {gid filename} {
         set pgid $oldGid
         set sql {INSERT INTO Files (gid, filename, kind, pgid) VALUES
                  (:gid, :filename, :kind, :pgid)}
-        set added 0
     } else {
         set kind [$fileData kind]
         set pgid [$fileData pgid]
@@ -120,14 +118,18 @@ oo::define Store method UpdateOne {gid filename} {
                  (gid, filename, kind, usize, zsize, pgid, data) VALUES
                  (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     }
-    $Db eval $sql
-    set action [expr {$added ? "added" : "updated"}]
+    $Db transaction {
+        set updated [$Db eval {SELECT EXISTS(SELECT filename FROM FILES
+                                             WHERE filename = :filename)}]
+        $Db eval $sql
+    }
+    set action [expr {$updated ? "updated" : "added"}]
     switch $kind {
         S { {*}$Reporter "same as @$pgid \"$filename\"" }
         U { {*}$Reporter "$action \"$filename\"" }
         Z { {*}$Reporter "$action \"$filename\" (deflated)" }
     }
-    return $added
+    expr {!$updated} ;# not updated → added
 }
 
 oo::define Store method FindMatch {gid filename data} {

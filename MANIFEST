@@ -1,8 +1,20 @@
+# /Files\/Generations\
+# Files tab has a tree view file x generation (HistoryByFilename)
+# Generations tab has a tree view generation x file (HistoryByGeneration)
+#
+# Use two splitters:
+#
+# Buttons | Tabs | Text widget
+#
+# Status bar
+#
+# For ignores pop up a modal dialog with list and Add Remove Close buttons
+
+# TODO load/save geometry!
 store # GUI
-gui-1.tm # TODO
-# gui_actions-1.tm
-# gui_globals-1.tm
-# gui_misc-1.tm
+gui-1.tm
+gui_app-1.tm
+gui_misc-1.tm
 
 str # CLI
 cli-1.tm

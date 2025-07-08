@@ -2,6 +2,7 @@
 nagelfar.sh \
     | grep -v Unknown.command \
     | grep -v Unknown.variable \
+    | grep -v Bad.option.-striped.to..ttk::treeview. \
     | grep -v Variable.*is.never.read
 echo --- Tests ---
 ./test_store.tcl

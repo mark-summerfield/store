@@ -67,12 +67,12 @@ proc cli_actions::status {reporter storefile rest} {
                     {*}[lmap name $names {expr {"  $name"}}]
             }
         } elseif {$::VERBOSE} {
-            lappend no_messages "no files need adding"
+            lappend no_messages "no files to add"
         }
         set names [UpdateCandidates $str]
         if {[llength $names]} {
             lassign [misc::n_s [llength $names]] n s
-            lappend yes_messages "$n file$s needs updating"
+            lappend yes_messages "$n file$s to update"
             if {$::VERBOSE > 1} {
                 lappend yes_messages \
                     {*}[lmap name $names {expr {"  $name"}}]
@@ -343,9 +343,9 @@ proc cli_actions::UpdateCandidates str {
 proc cli_actions::CandidatesForAdd str {
     set candidates [CandidatesFromGiven $str [glob * */*]]
     set gid [$str current_generation]
-    lmap name $candidates { ;# drop already stored files
+    lsort -unique [lmap name $candidates { ;# drop already stored files
         expr {[$str find_data_gid $gid $name] ? [continue] : $name}
-    }
+    }]
 }
 
 # we deliberately only go at most one level deep for folders
@@ -366,7 +366,7 @@ proc cli_actions::CandidatesFromGiven {str candidates} {
             }
         }
     }
-    return $names
+    lsort -unique $names
 }
 
 proc cli_actions::ValidFile name {

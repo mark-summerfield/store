@@ -241,7 +241,7 @@ same as @1 "store-1.tm"
 updating "should change to new README.md @4"
 created @5
 same as @1 "cli-1.tm"
-updated "README.md" (deflated)
+added "README.md" (deflated)
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"
@@ -292,7 +292,6 @@ updating "should change nothing @3"
 created @4
 updating "should change to new README.md @4"
 created @5
-updated "README.md" (deflated)
 updating "should restore old README.md @5"
 created @6
 updating "should change nothing @6"

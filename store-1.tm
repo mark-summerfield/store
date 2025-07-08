@@ -55,7 +55,7 @@ oo::define Store method add {args} {
     set filenames [lsort -nocase \
         [lsort -unique [list {*}[my filenames] {*}$args]]]
     {*}$Reporter "adding/updating"
-    my Update "adding/updating" true {*}$filenames
+    my Update "adding/updating" {*}$filenames
 }
 
 # if at least one prev generation exists, creates new generation with
@@ -66,12 +66,12 @@ oo::define Store method update {message} {
     set gid [my current_generation]
     if {!$gid} { error "can only update an existing nonempty store" }
     if {$message ne ""} { {*}$Reporter "updating \"$message\"" }
-    my Update $message false {*}[my filenames $gid]
+    my Update $message {*}[my filenames $gid]
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file —
 # providing it still exists
-oo::define Store method Update {message adding args} {
+oo::define Store method Update {message args} {
     set filenames [list]
     foreach filename $args {
         if {[file isfile $filename]} {
@@ -92,7 +92,7 @@ oo::define Store method Update {message adding args} {
         {*}$Reporter "created @$gid"
         set n 0
         foreach filename [lsort -nocase $filenames] {
-            incr n [my UpdateOne $adding $gid $filename]
+            incr n [my UpdateOne $gid $filename]
         }
     }
     return $n
@@ -100,7 +100,7 @@ oo::define Store method Update {message adding args} {
 
 # adds the given file as 'U' or 'Z' or 'S'; returns 1 for 'U' or 'Z' or
 # 0 for 'S'
-oo::define Store method UpdateOne {adding gid filename} {
+oo::define Store method UpdateOne {gid filename} {
     set added 1
     set fileData [FileData load $gid $filename]
     set data [$fileData data]
@@ -121,7 +121,7 @@ oo::define Store method UpdateOne {adding gid filename} {
                  (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     }
     $Db eval $sql
-    set action [expr {$adding ? "added" : "updated"}]
+    set action [expr {$added ? "added" : "updated"}]
     switch $kind {
         S { {*}$Reporter "same as @$pgid \"$filename\"" }
         U { {*}$Reporter "$action \"$filename\"" }

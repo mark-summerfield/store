@@ -32,3 +32,10 @@ proc cli_misc::yes_no {prompt {dangerous false}} {
     flush stdout
     expr {[string match -nocase y [term::receive::getch]]}
 }
+
+proc cli_misc::width {{defwidth 76}} {
+    if {[dict exists [chan configure stdout] -mode]} { ;# tty
+        return [lindex [chan configure stdout -winsize] 0]
+    }
+    return $defwidth
+}

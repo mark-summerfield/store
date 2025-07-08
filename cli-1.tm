@@ -2,6 +2,7 @@
 
 package require cli_actions
 package require cli_globals
+package require textutil
 
 namespace eval cli {}
 
@@ -65,89 +66,124 @@ proc cli::version {} {
 }
 
 proc cli::usage {} {
-    puts "${::ITALIC}usage: ${::RESET}${::BOLD}str${::RESET} <command> …
+    set width [cli_misc::width]
+    set width2 [incr width -2]
+    puts [unmark "^usage: %^str% <command> …\n"]
+    puts [unmark [textutil::adjust \
+        "Stores generational copies of specified files (excluding those
+        explicitly ignored) in .~dirname%.str.
+        (For a GUI run ^store%.)" \
+        -strictlength true -length $width]]
+    puts [unmark "\n^s% ~or% ^status% \[verbose\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Status reports any unstored unignored nonempty files and whether
+        updates or cleaning are needed. (Default action for store.)" \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^u% ~or% ^update% \[verbose\] \[message\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Updates all the files in the store by creating a new generation
+        and storing all those that have changed." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^a% ~or% ^add% \[verbose\] \[filename1|dirname1 …\
+        filenameN|dirnameN\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Adds the given files or the files in the given folders to the
+        store, or if none given then the files in the current folder and
+        its immediate subfolders, except for those ignored or empty,
+        creating the store if necessary." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^e% ~or% ^extract% \[verbose\] \[@gid\] <filename1 \[…\
+        filenameN\]>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Extracts the given filenames at the generation, e.g.,
+        filename.ext will be extracted as filename@gid.ext, etc." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^p% ~or% ^print% \[@gid\] <filename>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Prints the given filename from the store at the generation,
+        to stdout. (Should be used only for plain text files!)" \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^c% ~or% ^copy% \[verbose\] \[@gid\] <dirname>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Copies all the files at the generation into the given dirname
+        (which must not exist)." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^d% ~or% ^diff% <@gid1> \[@gid2\] <filename>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Diffs the filename at @gid1 against the one in the current folder,
+        or against the one stored at @gid2 if given." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^f% ~or% ^filenames% \[@gid\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Prints the generation’s filenames to stdout." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^H% ~or% ^history% \[filename\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Prints the given file’s generations, or all the files’
+        generations if no file specified, where a change has occurred,
+        to stdout." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^g% ~or% ^generations% \[full\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Prints all the generations (number, created, message), and if
+        \[full\] specified as ^-f% ^or% ^--full%, all their filenames, to
+        stdout." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^i% ~or% ^ignore% <filename1|dirname1|glob1\
+        \[… filenameN|dirnameN|globN\]>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Adds the given filenames, folders, and globs to the ignore list." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^I% ~or% ^ignores%"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Lists the filenames, folders, and globs in the ignore list." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^U% ~or% ^unignore% <filename1|dirname1|glob1\
+        \[… filenameN|dirnameN|globN\]>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Unignores the given filenames, folders, and globs by removing them
+        from the ignore list." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^T% ~or% ^untracked%"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Lists any untracked files." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^C% ~or% ^clean%"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Cleans, i.e., deletes, every “empty” generation that has no
+        changes." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^purge% <filename>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Purges the given filename from the store by deleting every copy
+        of it at every generation." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^h% ~or% ^help% ~or% ^-h% ~or% ^--help%"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Show this usage message and exit. (Default action if no store.)" \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^v% ~or% ^version% ~or% ^-v% ~or% ^--version%"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Show ^str%’s version and exit." \
+        -strictlength true -length $width2] "  "]]
+    puts ""
+    puts [unmark [textutil::indent [textutil::adjust \
+        "• @gid — @-prefixed generation number, e.g., @28;
+        if unspecified, the current generation is assumed" \
+        -strictlength true -length $width2] "  " 1]]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "• glob — when using globs for ignore or unignore use quotes
+        to avoid shell expansion of glob characters (e.g., '*.o')." \
+        -strictlength true -length $width2] "  " 1]]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "• verbose — default is filtered; otherwise specified as
+        ^-v% ~or% ^--verbose% full, ~or% ^-q% ~or% ^--quiet% silent." \
+        -strictlength true -length $width2] "  " 1]]
+}
 
-Stores generational copies of specified files (excluding those
-explicitly ignored) in .${::ITALIC}dirname${::RESET}.str.\
-(For a GUI run ${::BOLD}store${::RESET}.)
-
-${::BOLD}s${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}status${::RESET}\
-    \[verbose]
-  Status reports any unstored unignored nonempty files and whether
-  updates or cleaning are needed. (Default action for store.)
-${::BOLD}u${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}update${::RESET}\
-    \[verbose] \[optional message text]
-  Updates all the files in the store by creating a new generation and
-  storing all those that have changed.
-${::BOLD}a${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}add${::RESET}\
-    \[verbose] \[filename1|dirname1 … filenameN|dirnameN]
-  Adds the given files or the files in the given folders to the store,
-  or if none given then the files in the current folder and its
-  immediate subfolders, except for those ignored or empty,
-  creating the store if necessary.
-${::BOLD}e${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}extract${::RESET}\
-    \[verbose] \[@gid] <filename1 \[… filenameN]>
-  Extracts the given filenames at the generation,
-  e.g., filename.ext will be extracted as filename@gid.ext, etc.
-${::BOLD}p${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}print${::RESET}\
-    \[@gid] <filename>
-  Prints the given filename from the store at the generation,
-  to stdout. (Should be used only for plain text files!)
-${::BOLD}c${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}copy${::RESET}\
-    \[verbose] \[@gid] <dirname>
-  Copies all the files at the generation into the given dirname
-  (which must not exist).
-${::BOLD}d${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}diff${::RESET}\
-    <@gid1> \[@gid2] <filename>
-  Diffs the filename at @gid1 against the one in the current folder,
-  or against the one stored at @gid2 if given.
-${::BOLD}f${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}filenames${::RESET}\
-    \[@gid]
-  Prints the generation’s filenames to stdout.
-${::BOLD}H${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}history${::RESET}\
-    \[filename]
-  Prints the given file’s generations, or all the files’ generations
-  if no file specified, where a change has occurred, to stdout.
-${::BOLD}g${::RESET} ${::ITALIC}or${::RESET}\
-  ${::BOLD}generations${::RESET} \[full]
-  Prints all the generations (number, created, message), and if
-  \[full] specified as ${::BOLD}-f${::RESET} ${::ITALIC}or${::RESET}\
-  ${::BOLD}--full${::RESET}, all their filenames, to stdout.
-${::BOLD}i${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}ignore${::RESET}\
-    <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
-  Adds the given filenames, folders, and globs to the ignore list.
-${::BOLD}I${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}ignores${::RESET}
-  Lists the filenames, folders, and globs in the ignore list.
-${::BOLD}U${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}unignore${::RESET}\
-    <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN]>
-  Unignores the given filenames, folders, and globs by removing them
-  from the ignore list.
-${::BOLD}T${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}untracked${::RESET}
-  Lists any untracked files.
-${::BOLD}C${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}clean${::RESET}
-  Cleans, i.e., deletes, every “empty” generation that has no changes.
-${::BOLD}purge${::RESET} <filename>
-  Purges the given filename from the store by deleting every copy
-  of it at every generation.
-${::BOLD}h${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}help${::RESET}\
-    ${::ITALIC}or${::RESET} ${::BOLD}-h${::RESET} ${::ITALIC}or${::RESET}\
-    ${::BOLD}--help${::RESET}
-  Show this usage message and exit. (Default action if no store.)
-${::BOLD}v${::RESET} ${::ITALIC}or${::RESET} ${::BOLD}version${::RESET}\
-    ${::ITALIC}or${::RESET} ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
-    ${::BOLD}--version${::RESET}
-  Show store’s version and exit.
-
-• @gid — @-prefixed generation number, e.g., @28;
-  if unspecified, the current generation is assumed
-• glob — when using globs for ignore or unignore use quotes
-  to avoid shell expansion of glob characters (e.g., '*.o').
-• verbose — default is filtered; otherwise specified as
-  ${::BOLD}-v${::RESET} ${::ITALIC}or${::RESET}\
-  ${::BOLD}--verbose${::RESET} full, ${::ITALIC}or${::RESET}\
-  ${::BOLD}-q${::RESET} ${::ITALIC}or${::RESET}\
-  ${::BOLD}--quiet${::RESET} silent."
-    exit 2
+proc cli::unmark s {
+    subst -nobackslashes -nocommands \
+        [string map {"^" ${::BOLD} "~" ${::ITALIC} "%" ${::RESET}} $s]
 }
 
 proc filtered_reporter message {

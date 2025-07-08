@@ -187,7 +187,7 @@ proc cli::unmark s {
 }
 
 proc filtered_reporter message {
-    if {[regexp {^(:?added|same as|skipped)} $message]} {
+    if {[regexp {^(:?same as|skipped)} $message]} {
         return
     }
     cli_misc::info $message

@@ -1,4 +1,8 @@
-# TODO use ctext for color syntax highlighting?
+# TODO create tk font CommitMono at default size & save/restore font size
+# TODO
+# (*) Show as-is
+# ( ) Diff to Disk
+# ( ) Diff to @[ 12v^]
 # NOTE For ignores pop up a modal dialog with list and Add Remove Close buttons
 # NOTE for Open… use a directory (not file!) chooser
 

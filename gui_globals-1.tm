@@ -8,3 +8,4 @@ const MEDIUM_WAIT 30_000
 # .ini
 const SECT_WINDOW Window
 const KEY_GEOMETRY Geometry
+# const KEY_FONTSIZE FontSize

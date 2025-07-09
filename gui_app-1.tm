@@ -1,9 +1,12 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+#lappend ::auto_path [file home]/opt/tclpkg/hl_tcl
+
 package require autoscroll 1
 package require diff
 package require gui_globals
 package require gui_misc
+#package require hl_tcl
 package require inifile
 package require ntext 1
 
@@ -41,9 +44,11 @@ oo::define App method read_config {} {
     }
     set ini [ini::open $ConfigFilename -encoding utf-8 r]
     try {
-        set geometry [ini::value $ini $::SECT_WINDOW $::KEY_GEOMETRY ""]
-        if {$geometry ne ""} {
-            wm geometry . $geometry
+        if {[ini::exists $ini $::SECT_WINDOW]} {
+            set geometry [ini::value $ini $::SECT_WINDOW $::KEY_GEOMETRY ""]
+            if {$geometry ne ""} {
+                wm geometry . $geometry
+            }
         }
     } finally {
         ::ini::close $ini
@@ -53,14 +58,11 @@ oo::define App method read_config {} {
 
 oo::define App method prepare {} {
     wm withdraw .
-    puts "App::prepare TODO load geometry!" ;# TODO delete
     wm title . [tk appname]
     wm iconname . [tk appname]
     wm iconphoto . -default [misc::icon store.svg]
     wm minsize . 260 300
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
-    option add *font default
-    ttk::style configure TButton -font default
 }
 
 oo::define App method display {} {
@@ -241,11 +243,13 @@ oo::define App method show_file {gid filename} {
     set str [Store new $StoreFilename]
     try {
         lassign [$str get $gid $filename] _ data
-        $Text delete 1.0 end
-        $Text insert end [encoding convertfrom -profile replace utf-8 $data]
     } finally {
         $str close
     }
+    $Text delete 1.0 end
+    #hl_tcl::hl_init $Text -readonly yes
+    $Text insert end [encoding convertfrom -profile replace utf-8 $data]
+    #hl_tcl::hl_text $Text
 }
 
 oo::define App method on_tab_changed {} {

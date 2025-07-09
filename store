@@ -6,7 +6,7 @@ if {![catch {file readlink [info script]} name]} {
 } else {
     const APPPATH [file normalize [file dirname [info script]]]
 }
-tcl::tm::path add $APPPATH
+tcl::tm::path add $APPPATH 
 
 package require gui
 

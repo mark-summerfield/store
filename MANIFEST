@@ -7,6 +7,7 @@
 # [               ]
 # NOTE For ignores pop up a modal dialog with list and Add Remove Close buttons
 # NOTE for Open… use a directory (not file!) chooser
+# TODO do simple per-language syntax highlighting (e.g., keywords)
 
 store # GUI
 gui-1.tm

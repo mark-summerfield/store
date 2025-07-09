@@ -1,12 +1,9 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-#lappend ::auto_path [file home]/opt/tclpkg/hl_tcl
-
 package require autoscroll 1
 package require diff
 package require gui_globals
 package require gui_misc
-#package require hl_tcl
 package require inifile
 package require ntext 1
 
@@ -39,7 +36,9 @@ oo::define App method show {} {
 }
 
 oo::define App method read_config {} {
+    set size [expr {1 + [font configure TkDefaultFont -size]}]
     if {![file exists $ConfigFilename]} {
+        font create CommitMono -family CommitMono -size $size
         return
     }
     set ini [ini::open $ConfigFilename -encoding utf-8 r]
@@ -49,7 +48,9 @@ oo::define App method read_config {} {
             if {$geometry ne ""} {
                 wm geometry . $geometry
             }
+            set size [ini::value $ini $::SECT_WINDOW $::KEY_FONTSIZE $size]
         }
+        font create CommitMono -family CommitMono -size $size
     } finally {
         ::ini::close $ini
     }
@@ -117,10 +118,11 @@ oo::define App method make_files_tree {} {
     ttk::scrollbar .panes.tabs.filenameTreeFrame.scrolly -orient vertical \
         -command {.panes.tabs.filenameTreeFrame.filenameTree yview}
     my set_tree_tags $FilenameTree
-    pack .panes.tabs.filenameTreeFrame.scrolly -side right -fill y \
-        -expand true
-    pack .panes.tabs.filenameTreeFrame.filenameTree -side left -fill both \
-        -expand true
+    grid .panes.tabs.filenameTreeFrame.filenameTree -row 0 -column 0 \
+        -sticky news
+    grid .panes.tabs.filenameTreeFrame.scrolly -row 0 -column 1 -sticky ns
+    grid columnconfigure .panes.tabs.filenameTreeFrame 0 -weight 9
+    grid rowconfigure .panes.tabs.filenameTreeFrame 0 -weight 1
     autoscroll::autoscroll .panes.tabs.filenameTreeFrame.scrolly
     return $filenameTreeFrame
 }
@@ -129,16 +131,29 @@ oo::define App method make_generations_tree {} {
     set generationTreeFrame [ttk::frame .panes.tabs.generationTreeFrame]
     set GenerationTree [ttk::treeview \
         .panes.tabs.generationTreeFrame.generationTree \
-        -yscrollcommand {.panes.tabs.generationTreeFrame.scrolly set}]
+        -columns {Created Message} \
+        -yscrollcommand {.panes.tabs.generationTreeFrame.scrolly set} \
+        -xscrollcommand {.panes.tabs.generationTreeFrame.scrollx set}]
     $GenerationTree configure -show tree -selectmode browse
+    $GenerationTree column #0 -stretch false
+    $GenerationTree column 0 -stretch false
+    $GenerationTree column 1 -stretch true
     ttk::scrollbar .panes.tabs.generationTreeFrame.scrolly \
         -orient vertical \
         -command {.panes.tabs.generationTreeFrame.generationTree yview}
-    pack .panes.tabs.generationTreeFrame.scrolly -side right -fill y \
-        -expand true
-    pack .panes.tabs.generationTreeFrame.generationTree -side left \
-        -fill both -expand true
+    ttk::scrollbar .panes.tabs.generationTreeFrame.scrollx \
+        -orient horizontal \
+        -command {.panes.tabs.generationTreeFrame.generationTree xview}
+    grid .panes.tabs.generationTreeFrame.generationTree -row 0 -column 0 \
+        -sticky news
+    grid .panes.tabs.generationTreeFrame.scrolly -row 0 -column 1 \
+        -sticky ns
+    grid .panes.tabs.generationTreeFrame.scrollx -row 1 -column 0 \
+        -sticky we
+    grid columnconfigure .panes.tabs.generationTreeFrame 0 -weight 9
+    grid rowconfigure .panes.tabs.generationTreeFrame 0 -weight 1
     autoscroll::autoscroll .panes.tabs.generationTreeFrame.scrolly
+    autoscroll::autoscroll .panes.tabs.generationTreeFrame.scrollx
     my set_tree_tags $GenerationTree
     return $generationTreeFrame
 }
@@ -228,7 +243,7 @@ oo::define App method populate_generation_tree {} {
             if {$gid ne $prev_gid} {
                 set prev_gid $gid
                 set parent [$GenerationTree insert {} end -text @$gid \
-                            -tags parent]
+                    -tags parent -values [list $created $message]]
             }
             set tag [expr {[$str untracked $filename] ? "untracked" \
                                                       : "generation"}]
@@ -247,9 +262,7 @@ oo::define App method show_file {gid filename} {
         $str close
     }
     $Text delete 1.0 end
-    #hl_tcl::hl_init $Text -readonly yes
     $Text insert end [encoding convertfrom -profile replace utf-8 $data]
-    #hl_tcl::hl_text $Text
 }
 
 oo::define App method on_tab_changed {} {
@@ -304,6 +317,8 @@ oo::define App method on_quit {} {
     set ini [ini::open $ConfigFilename -encoding utf-8 w]
     try {
         ini::set $ini $::SECT_WINDOW $::KEY_GEOMETRY [wm geometry .]
+        ini::set $ini $::SECT_WINDOW $::KEY_FONTSIZE \
+            [font configure CommitMono -size]
         ini::commit $ini
     } finally {
         ::ini::close $ini

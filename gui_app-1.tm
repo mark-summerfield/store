@@ -31,7 +31,7 @@ oo::define App method prepare {} {
     puts "App::prepare TODO load geometry!" ;# TODO delete
     wm title . [tk appname]
     wm iconname . [tk appname]
-    wm iconphoto . -default [gui_misc::icon store.svg]
+    wm iconphoto . -default [misc::icon store.svg]
     wm minsize . 260 300
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
     option add *font default
@@ -58,7 +58,7 @@ oo::define App method make_buttons {} {
     puts $::ICON_SIZE
     set quitButton [ttk::button .buttonFrame.quitButton \
         -text Quit -underline 0 -compound left \
-        -image [gui_misc::icon quit.svg $::ICON_SIZE] \
+        -image [misc::icon quit.svg $::ICON_SIZE] \
         -command [callback on_quit]]
     # TODO layout buttons
     pack .buttonFrame.quitButton -side bottom -padx $::PAD -pady $::PAD

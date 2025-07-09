@@ -3,10 +3,10 @@
 package require cli_globals
 package require term::receive
 
-namespace eval cli_misc {}
+namespace eval misc {}
 
-# can't use cli_globals since they are for stdout and here we need stderr
-proc cli_misc::warn message {
+# can't use globals since they are for stdout and here we need stderr
+proc misc::warn message {
     if {[dict exists [chan configure stderr] -mode]} { ;# tty
         set reset "\033\[0m"
         set red "\x1B\[31m"
@@ -18,7 +18,7 @@ proc cli_misc::warn message {
     exit 1
 }
 
-proc cli_misc::info {message {need_action false}} {
+proc misc::info {message {need_action false}} {
     if {$need_action} {
         puts "${::MAGENTA}$message${::RESET}"
     } else {
@@ -26,14 +26,14 @@ proc cli_misc::info {message {need_action false}} {
     }
 }
 
-proc cli_misc::yes_no {prompt {dangerous false}} {
+proc misc::yes_no {prompt {dangerous false}} {
     set color [expr {$dangerous ? $::RED : $::MAGENTA}]
     puts -nonewline "${color}$prompt \[yN]?${::RESET} "
     flush stdout
     expr {[string match -nocase y [term::receive::getch]]}
 }
 
-proc cli_misc::width {{defwidth 72}} {
+proc misc::width {{defwidth 72}} {
     if {[dict exists [chan configure stdout] -mode]} { ;# tty
         return [lindex [chan configure stdout -winsize] 0]
     }

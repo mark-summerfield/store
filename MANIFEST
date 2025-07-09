@@ -8,7 +8,7 @@ store # GUI
 gui-1.tm
 gui_app-1.tm
 gui_misc-1.tm
-gui_globals-1.tm
+gui_globals-1.tm # TODO move contents elsewhere?
 
 str # CLI
 cli-1.tm

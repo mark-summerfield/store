@@ -299,7 +299,7 @@ oo::define Store method find_data_gid {gid filename} {
     lassign [$Db eval {SELECT kind, pgid FROM Files
                 WHERE gid = :gid AND filename = :filename}] kind pgid
     if {$kind eq ""} { return 0 } ;# not found
-    expr {$kind eq "S" ? $pgid : $gid} ;# in fact could just return $pgid
+    expr {$kind eq "S" ? $pgid : $gid}
 }
 
 oo::define Store method find_gid_for_untracked {filename} {

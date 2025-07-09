@@ -1,9 +1,7 @@
-# /Files\/Generations\
-# Files tab has a tree view file x generation (HistoryByFilename)
-# Generations tab has a tree view generation x file (HistoryByGeneration)
-# For ignores pop up a modal dialog with list and Add Remove Close buttons
-
+# TODO use ctext for color syntax highlighting?
+# NOTE For ignores pop up a modal dialog with list and Add Remove Close buttons
 # NOTE for Open… use a directory (not file!) chooser
+
 store # GUI
 gui-1.tm
 gui_app-1.tm

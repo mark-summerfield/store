@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require autoscroll 1
+package require diff
 package require gui_globals
 package require gui_misc
 package require inifile
@@ -8,6 +9,7 @@ package require ntext 1
 
 oo::class create App {
     variable ConfigFilename
+    variable Tabs
     variable StoreFilename
     variable FilenameTree
     variable GenerationTree
@@ -66,11 +68,9 @@ oo::define App method display {} {
     if {$StoreFilename ne ""} {
         wm title . "Store — [file dirname $StoreFilename]"
         set widget $FilenameTree
-        set first [my populate_file_tree]
-        $FilenameTree see $first
-        $FilenameTree selection set $first
-        $FilenameTree focus $first
+        my populate_file_tree
         my populate_generation_tree
+        my on_files_tab
     } else {
         wm title . Store
     }
@@ -99,18 +99,19 @@ oo::define App method make_buttons {} {
 }
 
 oo::define App method make_tabs {} {
-    set tabs [ttk::notebook .panes.tabs]
-    ttk::notebook::enableTraversal $tabs
-    $tabs add [my make_files_tree] -text Files -underline 0
-    $tabs add [my make_generations_tree] -text Generations -underline 0
-    return $tabs
+    set Tabs [ttk::notebook .panes.tabs]
+    ttk::notebook::enableTraversal $Tabs
+    $Tabs add [my make_files_tree] -text Files -underline 0
+    $Tabs add [my make_generations_tree] -text Generations -underline 0
+    return $Tabs
 }
 
 oo::define App method make_files_tree {} {
     set filenameTreeFrame [ttk::frame .panes.tabs.filenameTreeFrame]
     set FilenameTree [ttk::treeview \
-        .panes.tabs.filenameTreeFrame.filenameTree -striped true \
+        .panes.tabs.filenameTreeFrame.filenameTree \
         -yscrollcommand {.panes.tabs.filenameTreeFrame.scrolly set}]
+    $FilenameTree configure -show tree -selectmode browse
     ttk::scrollbar .panes.tabs.filenameTreeFrame.scrolly -orient vertical \
         -command {.panes.tabs.filenameTreeFrame.filenameTree yview}
     my set_tree_tags $FilenameTree
@@ -125,8 +126,9 @@ oo::define App method make_files_tree {} {
 oo::define App method make_generations_tree {} {
     set generationTreeFrame [ttk::frame .panes.tabs.generationTreeFrame]
     set GenerationTree [ttk::treeview \
-        .panes.tabs.generationTreeFrame.generationTree -striped true \
+        .panes.tabs.generationTreeFrame.generationTree \
         -yscrollcommand {.panes.tabs.generationTreeFrame.scrolly set}]
+    $GenerationTree configure -show tree -selectmode browse
     ttk::scrollbar .panes.tabs.generationTreeFrame.scrolly \
         -orient vertical \
         -command {.panes.tabs.generationTreeFrame.generationTree yview}
@@ -180,21 +182,14 @@ oo::define App method make_layout {} {
 }
 
 oo::define App method make_bindings {} {
+    bind $Tabs <<NotebookTabChanged>> [callback on_tab_changed]
+    bind $FilenameTree <<TreeviewSelect>> [callback on_filename_tree_select]
+    bind $GenerationTree <<TreeviewSelect>> \
+        [callback on_generation_tree_select]
     bind . <Escape> [callback on_quit]
     bind . <Alt-q> [callback on_quit]
     puts "App::make_bindings" ;# TODO
 }    
-
-oo::define App method on_quit {} {
-    set ini [ini::open $ConfigFilename -encoding utf-8 w]
-    try {
-        ini::set $ini $::SECT_WINDOW $::KEY_GEOMETRY [wm geometry .]
-        ini::commit $ini
-    } finally {
-        ::ini::close $ini
-    }
-    exit
-}
 
 oo::define App method set_status {{text ""}} {
     $StatusLabel configure -text $text
@@ -203,7 +198,6 @@ oo::define App method set_status {{text ""}} {
 oo::define App method populate_file_tree {} {
     $FilenameTree delete [$FilenameTree children {}]
     set prev_name ""
-    set first ""
     set parent {}
     set str [Store new $StoreFilename]
     try {
@@ -214,16 +208,12 @@ oo::define App method populate_file_tree {} {
                                                       : "parent"}]
                 set parent [$FilenameTree insert {} end -text $name \
                             -tags $tag]
-                if {$first eq ""} {
-                    set first $parent
-                }
             }
             $FilenameTree insert $parent end -text @$gid -tags generation
         }
     } finally {
         $str close
     }
-    return $first
 }
 
 oo::define App method populate_generation_tree {} {
@@ -245,4 +235,74 @@ oo::define App method populate_generation_tree {} {
     } finally {
         $str close
     }
+}
+
+oo::define App method show_file {gid filename} {
+    set str [Store new $StoreFilename]
+    try {
+        lassign [$str get $gid $filename] _ data
+        $Text delete 1.0 end
+        $Text insert end [encoding convertfrom -profile replace utf-8 $data]
+    } finally {
+        $str close
+    }
+}
+
+oo::define App method on_tab_changed {} {
+    if {[$Tabs index [$Tabs select]]} {
+        my on_generations_tab
+    } else {
+        my on_files_tab
+    }
+}
+
+oo::define App method on_filename_tree_select {} {
+    set item [$FilenameTree selection]
+    set gid [$FilenameTree item $item -text]
+    set parent [$FilenameTree parent $item]
+    set filename [$FilenameTree item $parent -text]
+    if {$filename ne "" && $gid ne ""} {
+        my show_file [string trimleft $gid @] $filename
+    }
+}
+
+oo::define App method on_generation_tree_select {} {
+    set item [$GenerationTree selection]
+    set filename [$GenerationTree item $item -text]
+    set parent [$GenerationTree parent $item]
+    set gid [$GenerationTree item $parent -text]
+    if {$filename ne "" && $gid ne ""} {
+        my show_file [string trimleft $gid @] $filename
+    }
+}
+
+oo::define App method on_files_tab {} {
+    focus $FilenameTree
+    if {![llength [$FilenameTree selection]]} {
+        set first [lindex [$FilenameTree children {}] 0]
+        $FilenameTree see $first
+        $FilenameTree selection set $first
+        $FilenameTree focus $first
+    }
+}
+
+oo::define App method on_generations_tab {} {
+    focus $GenerationTree
+    if {![llength [$GenerationTree selection]]} {
+        set first [lindex [$GenerationTree children {}] 0]
+        $GenerationTree see $first
+        $GenerationTree selection set $first
+        $GenerationTree focus $first
+    }
+}
+
+oo::define App method on_quit {} {
+    set ini [ini::open $ConfigFilename -encoding utf-8 w]
+    try {
+        ini::set $ini $::SECT_WINDOW $::KEY_GEOMETRY [wm geometry .]
+        ini::commit $ini
+    } finally {
+        ::ini::close $ini
+    }
+    exit
 }

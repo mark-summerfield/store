@@ -101,15 +101,42 @@ oo::define App method make_buttons {} {
 oo::define App method make_tabs {} {
     set tabs [ttk::notebook .panes.tabs]
     ttk::notebook::enableTraversal $tabs
-    set FilenameTree [ttk::treeview .panes.tabs.filenameTree \
-        -striped true]
-    my set_tree_tags $FilenameTree
-    set GenerationTree [ttk::treeview .panes.tabs.generationTree \
-        -striped true]
-    my set_tree_tags $GenerationTree
-    $tabs add $FilenameTree -text Files -underline 0
-    $tabs add $GenerationTree -text Generations -underline 0
+    $tabs add [my make_files_tree] -text Files -underline 0
+    $tabs add [my make_generations_tree] -text Generations -underline 0
     return $tabs
+}
+
+oo::define App method make_files_tree {} {
+    set filenameTreeFrame [ttk::frame .panes.tabs.filenameTreeFrame]
+    set FilenameTree [ttk::treeview \
+        .panes.tabs.filenameTreeFrame.filenameTree -striped true \
+        -yscrollcommand {.panes.tabs.filenameTreeFrame.scrolly set}]
+    ttk::scrollbar .panes.tabs.filenameTreeFrame.scrolly -orient vertical \
+        -command {.panes.tabs.filenameTreeFrame.filenameTree yview}
+    my set_tree_tags $FilenameTree
+    pack .panes.tabs.filenameTreeFrame.scrolly -side right -fill y \
+        -expand true
+    pack .panes.tabs.filenameTreeFrame.filenameTree -side left -fill both \
+        -expand true
+    autoscroll::autoscroll .panes.tabs.filenameTreeFrame.scrolly
+    return $filenameTreeFrame
+}
+
+oo::define App method make_generations_tree {} {
+    set generationTreeFrame [ttk::frame .panes.tabs.generationTreeFrame]
+    set GenerationTree [ttk::treeview \
+        .panes.tabs.generationTreeFrame.generationTree -striped true \
+        -yscrollcommand {.panes.tabs.generationTreeFrame.scrolly set}]
+    ttk::scrollbar .panes.tabs.generationTreeFrame.scrolly \
+        -orient vertical \
+        -command {.panes.tabs.generationTreeFrame.generationTree yview}
+    pack .panes.tabs.generationTreeFrame.scrolly -side right -fill y \
+        -expand true
+    pack .panes.tabs.generationTreeFrame.generationTree -side left \
+        -fill both -expand true
+    autoscroll::autoscroll .panes.tabs.generationTreeFrame.scrolly
+    my set_tree_tags $GenerationTree
+    return $generationTreeFrame
 }
 
 oo::define App method set_tree_tags {tree} {

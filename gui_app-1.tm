@@ -9,7 +9,6 @@ package require ntext 1
 oo::class create App {
     variable ConfigFilename
     variable StoreFilename
-    # TODO delete if not needed e.g., if bindings sufficient
     variable FilenameTree
     variable GenerationTree
     variable Text
@@ -40,8 +39,7 @@ oo::define App method read_config {} {
     }
     set ini [ini::open $ConfigFilename -encoding utf-8 r]
     try {
-        set section $::WINDOW
-        set geometry [ini::value $ini $section $::GEOMETRY ""]
+        set geometry [ini::value $ini $::SECT_WINDOW $::KEY_GEOMETRY ""]
         if {$geometry ne ""} {
             wm geometry . $geometry
         }
@@ -64,11 +62,21 @@ oo::define App method prepare {} {
 }
 
 oo::define App method display {} {
-    wm title . [expr {$StoreFilename ne "" \
-        ? "Store — [file dirname $StoreFilename]" : "Store"}]
+    set widget .
+    if {$StoreFilename ne ""} {
+        wm title . "Store — [file dirname $StoreFilename]"
+        set widget $FilenameTree
+        set first [my populate_file_tree]
+        $FilenameTree see $first
+        $FilenameTree selection set $first
+        $FilenameTree focus $first
+        my populate_generation_tree
+    } else {
+        wm title . Store
+    }
     wm deiconify .
     raise .
-    focus .
+    focus $widget
 }
 
 oo::define App method make_widgets {} {
@@ -95,11 +103,19 @@ oo::define App method make_tabs {} {
     ttk::notebook::enableTraversal $tabs
     set FilenameTree [ttk::treeview .panes.tabs.filenameTree \
         -striped true]
+    my set_tree_tags $FilenameTree
     set GenerationTree [ttk::treeview .panes.tabs.generationTree \
         -striped true]
+    my set_tree_tags $GenerationTree
     $tabs add $FilenameTree -text Files -underline 0
     $tabs add $GenerationTree -text Generations -underline 0
     return $tabs
+}
+
+oo::define App method set_tree_tags {tree} {
+    $tree tag configure parent -foreground blue
+    $tree tag configure untracked -foreground red
+    $tree tag configure generation -foreground green
 }
 
 oo::define App method make_text_frame {} {
@@ -117,11 +133,11 @@ oo::define App method make_text_frame {} {
 
 oo::define App method make_status_label {} {
     if {$StoreFilename ne ""} {
-        set message "Using '$StoreFilename'"
-        set ms 5_000
+        set message "Read '$StoreFilename'"
+        set ms $::MEDIUM_WAIT
     } else {
         set message "Click Open… to choose a store"
-        set ms 60_000
+        set ms $::LONG_WAIT
     }
     set StatusLabel [ttk::label .statusLabel -relief sunken -text $message]
     after $ms [callback set_status ""]
@@ -145,8 +161,7 @@ oo::define App method make_bindings {} {
 oo::define App method on_quit {} {
     set ini [ini::open $ConfigFilename -encoding utf-8 w]
     try {
-        set section $::WINDOW
-        ini::set $ini $section $::GEOMETRY [wm geometry .]
+        ini::set $ini $::SECT_WINDOW $::KEY_GEOMETRY [wm geometry .]
         ini::commit $ini
     } finally {
         ::ini::close $ini
@@ -156,4 +171,51 @@ oo::define App method on_quit {} {
 
 oo::define App method set_status {{text ""}} {
     $StatusLabel configure -text $text
+}
+
+oo::define App method populate_file_tree {} {
+    $FilenameTree delete [$FilenameTree children {}]
+    set prev_name ""
+    set first ""
+    set parent {}
+    set str [Store new $StoreFilename]
+    try {
+        foreach {name gid} [$str history {}] {
+            if {$name ne $prev_name} {
+                set prev_name $name
+                set tag [expr {[$str untracked $name] ? "untracked" \
+                                                      : "parent"}]
+                set parent [$FilenameTree insert {} end -text $name \
+                            -tags $tag]
+                if {$first eq ""} {
+                    set first $parent
+                }
+            }
+            $FilenameTree insert $parent end -text @$gid -tags generation
+        }
+    } finally {
+        $str close
+    }
+    return $first
+}
+
+oo::define App method populate_generation_tree {} {
+    $GenerationTree delete [$GenerationTree children {}]
+    set prev_gid ""
+    set parent {}
+    set str [Store new $StoreFilename]
+    try {
+        foreach {gid created message filename} [$str generations true] {
+            if {$gid ne $prev_gid} {
+                set prev_gid $gid
+                set parent [$GenerationTree insert {} end -text @$gid \
+                            -tags parent]
+            }
+            set tag [expr {[$str untracked $filename] ? "untracked" \
+                                                      : "generation"}]
+            $GenerationTree insert $parent end -text $filename -tags $tag
+        }
+    } finally {
+        $str close
+    }
 }

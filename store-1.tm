@@ -208,8 +208,12 @@ oo::define Store method needs_clean {} {
     $Db eval {SELECT COUNT(*) FROM EmptyGenerations;}
 }
 
-oo::define Store method untracked {} {
-    $Db eval {SELECT filename FROM Untracked;}
+oo::define Store method untracked {{filename ""}} {
+    if {$filename ne ""} {
+        return [$Db eval {SELECT EXISTS(SELECT filename FROM Untracked
+                                        WHERE filename = :filename)}]
+    }
+    $Db eval {SELECT filename FROM Untracked}
 }
 
 # deletes the given filename in every generation and returns the number

@@ -2,5 +2,9 @@
 
 const PAD 3
 
-const WINDOW Window
-const GEOMETRY Geometry
+const LONG_WAIT 60_000
+const MEDIUM_WAIT 30_000
+
+# .ini
+const SECT_WINDOW Window
+const KEY_GEOMETRY Geometry

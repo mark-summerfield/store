@@ -1,7 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require filedata
-package require filesize
 package require lambda 1
 package require misc
 package require sqlite3 3
@@ -293,23 +292,6 @@ oo::define Store method gids_for_filename {filename} {
               ORDER BY gid DESC}
 }
 
-# Returns the file sizes for every file in the current generation (using the
-# size from its parent if the file's kind is 'S')
-oo::define Store method file_sizes {} {
-    set file_sizes [list]
-    $Db transaction {
-        set gid [$Db eval {SELECT gid FROM CurrentGeneration}]
-        foreach filename [$Db eval {SELECT filename FROM Files
-                                    WHERE gid = :gid}] {
-            set dgid [my find_data_gid $gid $filename]
-            set usize [$Db eval {SELECT usize FROM Files WHERE gid = :dgid
-                                 AND filename = :filename}]
-            lappend file_sizes [FileSize new $filename $usize]
-        }
-    }
-    return $file_sizes
-}
-
 # Returns the gid for the given filename at the given gid; The
 # returned gid will equal the given gid if the data is U or Z or will be the
 # pgid where the data is U or Z if the data at the given gid is S
@@ -336,6 +318,29 @@ oo::define Store method PrepareTarget {action gid filename} {
     set dirname [file dirname $target]
     if {![file isdirectory $dirname]} { file mkdir $dirname }
     return $target
+}
+
+oo::define Store method is_same_on_disk {filename} {
+    if {![file exists $filename]} {
+        return false ;# not on disk
+    }
+    $Db transaction {
+        set gid [$Db eval {SELECT gid FROM CurrentGeneration}]
+        set dgid [my find_data_gid $gid $filename]
+        if {!$dgid} {
+            return false ;# not in store
+        }
+        set usize [$Db eval {SELECT usize FROM Files WHERE gid = :dgid
+                             AND filename = :filename}]
+        if {$usize != [file size $filename]} {
+            return false ;# different sizes
+        }
+        set disk_data [readFile $filename binary]
+        lassign [$Db eval {SELECT kind, data FROM Files WHERE gid = :dgid
+                           AND filename = :filename}] kind data
+        if {$kind eq "Z"} { set data [zlib inflate $data] }
+        return [expr {$data eq $disk_data}] ;# same or different data
+    }
 }
 
 oo::define Store method to_string {} { return "Store \"$Filename\"" }

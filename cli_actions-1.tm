@@ -316,24 +316,17 @@ proc actions::purge {reporter storefile rest} {
     }
 }
 
-# For speed this only compares file sizes so will miss the hopefully rare
-# cases when a file has been changed but is exactly the same size.
 proc actions::HaveUpdates str {
-    foreach file_size [$str file_sizes] {
-        if {[file size [$file_size filename]] != [$file_size size]} {
-            return true
-        }
+    foreach filename [$str filenames] {
+        if {![$str is_same_on_disk $filename]} { return true }
     }
     return false
 }
 
-# See HaveUpdates
 proc actions::UpdateCandidates str {
     set candidates [list]
-    foreach file_size [$str file_sizes] {
-        set filename [$file_size filename]
-        if {[file exists $filename] && \
-                [file size $filename] != [$file_size size]} {
+    foreach filename [$str filenames] {
+        if {![$str is_same_on_disk $filename]} {
             lappend candidates $filename
         }
     }

@@ -14,7 +14,10 @@ oo::class create App {
 }
 
 oo::define App constructor {} {
-    set StoreFilename .[file tail [pwd]].str
+    set StoreFilename [file normalize .[file tail [pwd]].str]
+    if {![file exists $StoreFilename]} {
+        set StoreFilename ""
+    }
 
 }
 
@@ -55,7 +58,6 @@ oo::define App method make_widgets {} {
 oo::define App method make_buttons {} {
     set buttonFrame [ttk::frame .buttonFrame]
     # TODO more buttons
-    puts $::ICON_SIZE
     set quitButton [ttk::button .buttonFrame.quitButton \
         -text Quit -underline 0 -compound left \
         -image [misc::icon quit.svg $::ICON_SIZE] \
@@ -90,9 +92,15 @@ oo::define App method make_text_frame {} {
 }
 
 oo::define App method make_status_label {} {
-    set StatusLabel [ttk::label .statusLabel -relief sunken\
-        -text "Using '$StoreFilename'"]
-    after 10_000 [callback set_status ""]
+    if {$StoreFilename ne ""} {
+        set message "Using '$StoreFilename'"
+        set ms 10_000
+    } else {
+        set message "Click Open… to choose a store"
+        set ms 60_000
+    }
+    set StatusLabel [ttk::label .statusLabel -relief sunken -text $message]
+    after $ms [callback set_status ""]
 }
 
 oo::define App method make_layout {} {

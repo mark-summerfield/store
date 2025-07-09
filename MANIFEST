@@ -4,6 +4,7 @@
 # For ignores pop up a modal dialog with list and Add Remove Close buttons
 
 # TODO load/save geometry! will need ~/.store.ini ; see gravitate
+# NOTE for Open… use a directory (not file!) chooser
 store # GUI
 gui-1.tm
 gui_app-1.tm

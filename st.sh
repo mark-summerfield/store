@@ -11,5 +11,5 @@ echo -------------
 du -sh .git
 ls -sh .store.str
 clc -s -l tcl
-str status
+str s
 git st

@@ -3,10 +3,13 @@
 package require autoscroll 1
 package require gui_globals
 package require gui_misc
+package require inifile
 package require ntext 1
 
 oo::class create App {
+    variable ConfigFilename
     variable StoreFilename
+    # TODO delete if not needed e.g., if bindings sufficient
     variable FilenameTree
     variable GenerationTree
     variable Text
@@ -14,6 +17,7 @@ oo::class create App {
 }
 
 oo::define App constructor {} {
+    set ConfigFilename [misc::get_ini_filename]
     set StoreFilename [file normalize .[file tail [pwd]].str]
     if {![file exists $StoreFilename]} {
         set StoreFilename ""
@@ -22,11 +26,29 @@ oo::define App constructor {} {
 }
 
 oo::define App method show {} {
+    my read_config
     my prepare
     my make_widgets
     my make_layout
     my make_bindings
     my display
+}
+
+oo::define App method read_config {} {
+    if {![file exists $ConfigFilename]} {
+        return
+    }
+    set ini [ini::open $ConfigFilename -encoding utf-8 r]
+    try {
+        set section $::WINDOW
+        set geometry [ini::value $ini $section $::GEOMETRY ""]
+        if {$geometry ne ""} {
+            wm geometry . $geometry
+        }
+    } finally {
+        ::ini::close $ini
+    }
+
 }
 
 oo::define App method prepare {} {
@@ -42,6 +64,8 @@ oo::define App method prepare {} {
 }
 
 oo::define App method display {} {
+    wm title . [expr {$StoreFilename ne "" \
+        ? "Store — [file dirname $StoreFilename]" : "Store"}]
     wm deiconify .
     raise .
     focus .
@@ -94,7 +118,7 @@ oo::define App method make_text_frame {} {
 oo::define App method make_status_label {} {
     if {$StoreFilename ne ""} {
         set message "Using '$StoreFilename'"
-        set ms 10_000
+        set ms 5_000
     } else {
         set message "Click Open… to choose a store"
         set ms 60_000
@@ -119,7 +143,14 @@ oo::define App method make_bindings {} {
 }    
 
 oo::define App method on_quit {} {
-    puts "App::on_quit TODO save geometry!" ;# TODO delete
+    set ini [ini::open $ConfigFilename -encoding utf-8 w]
+    try {
+        set section $::WINDOW
+        ini::set $ini $section $::GEOMETRY [wm geometry .]
+        ini::commit $ini
+    } finally {
+        ::ini::close $ini
+    }
     exit
 }
 

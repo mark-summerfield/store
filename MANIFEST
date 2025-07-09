@@ -1,3 +1,7 @@
+# TODO
+# Files store MD5 or cheapest poss. file hash & use in cli_actions
+# HaveUpdates & UpdateCandidates when file sizes are equal
+
 # /Files\/Generations\
 # Files tab has a tree view file x generation (HistoryByFilename)
 # Generations tab has a tree view generation x file (HistoryByGeneration)

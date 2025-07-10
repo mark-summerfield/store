@@ -30,11 +30,11 @@ proc gui::wishinit {} {
 }
 
 proc gui::read_config {} {
-    set configFilename [misc::get_ini_filename]
+    set filename [misc::get_ini_filename]
     set family Courier
     set size [expr {1 + [font configure TkDefaultFont -size]}]
-    if {[file exists $configFilename] && [file size $configFilename]} {
-        set ini [ini::open $configFilename -encoding utf-8 r]
+    if {[file exists $filename] && [file size $filename]} {
+        set ini [ini::open $filename -encoding utf-8 r]
         try {
             if {[ini::exists $ini $::SECT_WINDOW]} {
                 set geometry [ini::value $ini $::SECT_WINDOW \
@@ -52,5 +52,5 @@ proc gui::read_config {} {
         }
     }
     font create CommitMono -family $family -size $size
-    return $configFilename
+    return $filename
 }

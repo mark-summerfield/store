@@ -15,7 +15,10 @@ oo::class create App {
     variable GenerationTree
     variable Text
     variable StatusInfoLabel
-    variable StatusLabel
+    variable StatusAddableLabel
+    variable StatusUpdatableLabel
+    variable StatusCleanableLabel
+    variable StatusSizeLabel
 }
 
 oo::define App constructor {configFilename} {
@@ -65,18 +68,78 @@ oo::define App method make_widgets {} {
     $panes add [my make_tabs]
     $panes add [my make_text_frame]
     my make_status_bar
-    my make_buttons
+    my make_controls
+    my layout_controls
 }    
 
-oo::define App method make_buttons {} {
-    set buttonFrame [ttk::frame .buttonFrame]
-    # TODO more buttons
-    set quitButton [ttk::button .buttonFrame.quitButton \
-        -text Quit -underline 0 -compound left \
-        -image [misc::icon quit.svg $::ICON_SIZE] \
-        -command [callback on_quit]]
-    # TODO layout buttons
-    pack .buttonFrame.quitButton -side bottom -padx $::PAD -pady $::PAD
+# TODO add tooltips…
+oo::define App method make_controls {} {
+    set controlsFrame [ttk::frame .controlsFrame]
+    ttk::button .controlsFrame.openButton -text {Open Store…} \
+        -underline 0 -compound left -command [callback on_open]] \
+        -image [misc::icon document-open.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.addButton -text Add -underline 0 \
+        -compound left -command [callback on_add] \
+        -image [misc::icon document-save-as.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.updateButton -text Update -underline 0 \
+        -compound left -command [callback on_update]] \
+        -image [misc::icon document-save.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.extractButton -text Extract -underline 0 \
+        -compound left -command [callback on_extract] \
+        -image [misc::icon edit-copy.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.copyToButton -text {Copy To…} -underline 0 \
+        -compound left -command [callback on_copy_to] \
+        -image [misc::icon folder-new.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.ignoresButton -text Ignores… -underline 0 \
+        -compound left -command [callback on_ignores] \
+        -image [misc::icon document-properties.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.cleanButton -text Clean -underline 1 \
+        -compound left -command [callback on_clean] \
+        -image [misc::icon edit-clear.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.purgeButton -text Purge… -underline 0 \
+        -compound left -command [callback on_purge] \
+        -image [misc::icon edit-cut.svg $::ICON_SIZE]
+    # TODO Show radio buttons frame
+    # +----------------------+
+    # | (*) Show as-is       |
+    # | ( ) Diff to Disk     |
+    # | ( ) Diff to @[ 12v^] |
+    # +----------------------+
+    # TODO Find frame
+    # +----------------------+
+    # | Find:                |
+    # | [                  ] |
+    # +----------------------+
+    ttk::button .controlsFrame.optionsButton -text Options… -underline 2 \
+        -compound left -command [callback on_options] \
+        -image [misc::icon preferences-system.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.helpButton -text Help -compound left \
+        -command [callback on_help] \
+        -image [misc::icon help.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.aboutButton -text About -underline 1 \
+        -compound left -command [callback on_about] \
+        -image [misc::icon about.svg $::ICON_SIZE]
+    ttk::button .controlsFrame.quitButton -text Quit -underline 0 \
+        -compound left -command [callback on_quit] \
+        -image [misc::icon quit.svg $::ICON_SIZE]
+}
+
+oo::define App method layout_controls {} {
+    set opts "-padx $::PAD -pady $::PAD"
+    pack .controlsFrame.openButton -side top {*}$opts
+    pack .controlsFrame.addButton -side top {*}$opts
+    pack .controlsFrame.updateButton -side top {*}$opts
+    pack .controlsFrame.extractButton -side top {*}$opts
+    pack .controlsFrame.copyToButton -side top {*}$opts
+    pack .controlsFrame.ignoresButton -side top {*}$opts
+    pack .controlsFrame.cleanButton -side top {*}$opts
+    pack .controlsFrame.purgeButton -side top {*}$opts
+    # TODO show radio buttons frame
+    # TODO find frame
+    pack .controlsFrame.optionsButton -side top {*}$opts
+    pack .controlsFrame.quitButton -side bottom {*}$opts
+    pack .controlsFrame.helpButton -side bottom {*}$opts
+    pack .controlsFrame.aboutButton -side bottom {*}$opts
 }
 
 oo::define App method make_tabs {} {
@@ -166,16 +229,26 @@ oo::define App method make_status_bar {} {
     set statusFrame [ttk::frame .statusFrame]
     set StatusInfoLabel [ttk::label .statusFrame.statusInfoLabel \
                          -relief sunken -text $message]
-    set StatusLabel [ttk::label .statusFrame.statusLabel -relief sunken]
+    set StatusAddableLabel [ttk::label .statusFrame.statusAddableLabel \
+                            -relief sunken]
+    set StatusUpdatableLabel [ttk::label .statusFrame.statusUpdatableLabel \
+                              -relief sunken]
+    set StatusCleanableLabel [ttk::label .statusFrame.statusCleanableLabel \
+                              -relief sunken]
+    set StatusSizeLabel [ttk::label .statusFrame.statusSizeLabel \
+                         -relief sunken]
     pack .statusFrame.statusInfoLabel -side left -fill x -expand true
-    pack .statusFrame.statusLabel -side right -fill x
+    pack .statusFrame.statusSizeLabel -side right -fill x
+    pack .statusFrame.statusCleanableLabel -side right -fill x
+    pack .statusFrame.statusUpdatableLabel -side right -fill x
+    pack .statusFrame.statusAddableLabel -side right -fill x
     after $ms [callback set_status_info ""]
     my report_status
 }
 
 oo::define App method make_layout {} {
     grid .panes -column 0 -row 0 -sticky news
-    grid .buttonFrame -column 1 -row 0 -sticky ns
+    grid .controlsFrame -column 1 -row 0 -sticky ns
     grid .statusFrame -row 1 -columnspan 2 -sticky ew -pady $::PAD
     grid rowconfigure . 0 -weight 1
     grid columnconfigure . 0 -weight 1
@@ -188,24 +261,64 @@ oo::define App method make_bindings {} {
     bind $GenerationTree <<TreeviewSelect>> \
         [callback on_generation_tree_select]
     bind . <Escape> [callback on_quit]
+    bind . <F1> [callback on_help]
+    bind . <Alt-a> [callback on_add]
+    bind . <Alt-b> [callback on_about]
+    bind . <Alt-c> [callback on_copy_to]
+    bind . <Alt-e> [callback on_extract]
+    bind . <Alt-i> [callback on_ignores]
+    bind . <Alt-l> [callback on_clean]
+    bind . <Alt-o> [callback on_open]
+    bind . <Alt-p> [callback on_purge]
     bind . <Alt-q> [callback on_quit]
+    bind . <Alt-t> [callback on_options]
+    bind . <Alt-u> [callback on_update]
     puts "App::make_bindings" ;# TODO
 }    
 
 oo::define App method set_status_info {{text ""}} {
-    $StatusLabel configure -text $text
+    $StatusInfoLabel configure -text $text
 }
 
+# Subtle difference "addable" vs. "to update" is deliberate
 oo::define App method report_status {} {
     if {[file exists $StoreFilename]} {
         set str [Store new $StoreFilename]
         try {
-            puts "TODO report_status"
+            set names [$str addable]
+            if {[llength $names]} {
+                lassign [misc::n_s [llength $names]] n s
+                $StatusAddableLabel configure -text "$n addable" \
+                    -foreground red
+            } else {
+                $StatusAddableLabel configure -text "none to add" \
+                    -foreground green
+            }
+            set names [$str updatable]
+            if {[llength $names]} {
+                lassign [misc::n_s [llength $names]] n s
+                $StatusUpdatableLabel configure -text "$n to update" \
+                    -foreground red
+            } else {
+                $StatusUpdatableLabel configure -text "none to update" \
+                    -foreground green
+            }
+            if {[$str needs_clean]} {
+                $StatusCleanableLabel configure -text "cleanable" \
+                    -foreground red
+            } else {
+                $StatusCleanableLabel configure -text "clean" \
+                    -foreground green
+            }
         } finally {
             $str close
         }
+        $StatusSizeLabel configure -text [misc::human_size \
+                                            [file size $StoreFilename]]
+    } else {
+        $StatusSizeLabel configure -text ""
     }
-    after 150_000 [callback report_status]
+    after $::STATUS_WAIT [callback report_status]
 }
 
 oo::define App method populate_file_tree {} {
@@ -307,6 +420,50 @@ oo::define App method on_generations_tab {} {
         $GenerationTree selection set $first
         $GenerationTree focus $first
     }
+}
+
+oo::define App method on_open {} {
+    puts "TODO on_open" ;# TODO
+}
+
+oo::define App method on_add {} {
+    puts "TODO on_add" ;# TODO
+}
+
+oo::define App method on_update {} {
+    puts "TODO on_update" ;# TODO
+}
+
+oo::define App method on_extract {} {
+    puts "TODO on_extract" ;# TODO
+}
+
+oo::define App method on_copy_to {} {
+    puts "TODO on_copy_to" ;# TODO
+}
+
+oo::define App method on_ignores {} {
+    puts "TODO on_ignores" ;# TODO
+}
+
+oo::define App method on_clean {} {
+    puts "TODO on_clean" ;# TODO
+}
+
+oo::define App method on_purge {} {
+    puts "TODO on_purge" ;# TODO prompt yes/no first!
+}
+
+oo::define App method on_options {} {
+    puts "TODO on_options" ;# TODO
+}
+
+oo::define App method on_help {} {
+    puts "TODO on_help" ;# TODO
+}
+
+oo::define App method on_about {} {
+    puts "TODO on_about" ;# TODO
 }
 
 oo::define App method on_quit {} {

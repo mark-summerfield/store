@@ -50,6 +50,6 @@ proc gui::read_config {} {
             ::ini::close $ini
         }
     }
-    font create CommitMono -family $family -size $size
+    font create Mono -family $family -size $size
     return $filename
 }

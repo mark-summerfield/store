@@ -43,7 +43,7 @@ oo::define App method prepare {} {
     wm title . [tk appname]
     wm iconname . [tk appname]
     wm iconphoto . -default [misc::icon store.svg]
-    wm minsize . 260 300
+    wm minsize . 640 480
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
 
@@ -208,7 +208,7 @@ oo::define App method set_tree_tags {tree} {
 oo::define App method make_text_frame {} {
     set textFrame [ttk::frame .textFrame]
     set Text [text .textFrame.text -wrap word \
-        -yscrollcommand {.textFrame.scrolly set} -font CommitMono]
+        -yscrollcommand {.textFrame.scrolly set} -font Mono]
     bindtags $Text {$Text Ntext . all}
     ttk::scrollbar .textFrame.scrolly -orient vertical \
         -command {.textFrame.text yview}
@@ -223,7 +223,7 @@ oo::define App method make_status_bar {} {
         set message "Read '$StoreFilename'"
         set ms $::MEDIUM_WAIT
     } else {
-        set message "Click Open… to choose a store"
+        set message "Click Open Store… to choose a store"
         set ms $::LONG_WAIT
     }
     set statusFrame [ttk::frame .statusFrame]
@@ -273,7 +273,6 @@ oo::define App method make_bindings {} {
     bind . <Alt-q> [callback on_quit]
     bind . <Alt-t> [callback on_options]
     bind . <Alt-u> [callback on_update]
-    puts "App::make_bindings" ;# TODO
 }    
 
 oo::define App method set_status_info {{text ""}} {
@@ -471,9 +470,9 @@ oo::define App method on_quit {} {
     try {
         ini::set $ini $::SECT_WINDOW $::KEY_GEOMETRY [wm geometry .]
         ini::set $ini $::SECT_WINDOW $::KEY_FONTSIZE \
-            [font configure CommitMono -size]
+            [font configure Mono -size]
         ini::set $ini $::SECT_WINDOW $::KEY_FONTFAMILY \
-            [font configure CommitMono -family]
+            [font configure Mono -family]
         ini::commit $ini
     } finally {
         ::ini::close $ini

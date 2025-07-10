@@ -17,8 +17,8 @@ oo::class create App {
     variable StatusLabel
 }
 
-oo::define App constructor {} {
-    set ConfigFilename [misc::get_ini_filename]
+oo::define App constructor {configFilename} {
+    set ConfigFilename $configFilename
     set StoreFilename [file normalize .[file tail [pwd]].str]
     if {![file exists $StoreFilename]} {
         set StoreFilename ""
@@ -27,34 +27,11 @@ oo::define App constructor {} {
 }
 
 oo::define App method show {} {
-    my read_config
     my prepare
     my make_widgets
     my make_layout
     my make_bindings
     my display
-}
-
-oo::define App method read_config {} {
-    set size [expr {1 + [font configure TkDefaultFont -size]}]
-    if {![file exists $ConfigFilename]} {
-        font create CommitMono -family CommitMono -size $size
-        return
-    }
-    set ini [ini::open $ConfigFilename -encoding utf-8 r]
-    try {
-        if {[ini::exists $ini $::SECT_WINDOW]} {
-            set geometry [ini::value $ini $::SECT_WINDOW $::KEY_GEOMETRY ""]
-            if {$geometry ne ""} {
-                wm geometry . $geometry
-            }
-            set size [ini::value $ini $::SECT_WINDOW $::KEY_FONTSIZE $size]
-        }
-        font create CommitMono -family CommitMono -size $size
-    } finally {
-        ::ini::close $ini
-    }
-
 }
 
 oo::define App method prepare {} {
@@ -319,6 +296,8 @@ oo::define App method on_quit {} {
         ini::set $ini $::SECT_WINDOW $::KEY_GEOMETRY [wm geometry .]
         ini::set $ini $::SECT_WINDOW $::KEY_FONTSIZE \
             [font configure CommitMono -size]
+        ini::set $ini $::SECT_WINDOW $::KEY_FONTFAMILY \
+            [font configure CommitMono -family]
         ini::commit $ini
     } finally {
         ::ini::close $ini

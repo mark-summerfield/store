@@ -34,3 +34,7 @@ proc misc::ignore {filename ignores} {
     }
     return false
 }
+
+proc misc::valid_file name {
+    expr {![string match {.*} [file tail $name]] && [file size $name]}
+}

@@ -14,6 +14,7 @@ oo::class create App {
     variable FilenameTree
     variable GenerationTree
     variable Text
+    variable StatusInfoLabel
     variable StatusLabel
 }
 
@@ -63,7 +64,7 @@ oo::define App method make_widgets {} {
     set panes [ttk::panedwindow .panes -orient horizontal]
     $panes add [my make_tabs]
     $panes add [my make_text_frame]
-    my make_status_label
+    my make_status_bar
     my make_buttons
 }    
 
@@ -154,7 +155,7 @@ oo::define App method make_text_frame {} {
     return $textFrame
 }
 
-oo::define App method make_status_label {} {
+oo::define App method make_status_bar {} {
     if {$StoreFilename ne ""} {
         set message "Read '$StoreFilename'"
         set ms $::MEDIUM_WAIT
@@ -162,14 +163,20 @@ oo::define App method make_status_label {} {
         set message "Click Open… to choose a store"
         set ms $::LONG_WAIT
     }
-    set StatusLabel [ttk::label .statusLabel -relief sunken -text $message]
-    after $ms [callback set_status ""]
+    set statusFrame [ttk::frame .statusFrame]
+    set StatusInfoLabel [ttk::label .statusFrame.statusInfoLabel \
+                         -relief sunken -text $message]
+    set StatusLabel [ttk::label .statusFrame.statusLabel -relief sunken]
+    pack .statusFrame.statusInfoLabel -side left -fill x -expand true
+    pack .statusFrame.statusLabel -side right -fill x
+    after $ms [callback set_status_info ""]
+    my report_status
 }
 
 oo::define App method make_layout {} {
     grid .panes -column 0 -row 0 -sticky news
     grid .buttonFrame -column 1 -row 0 -sticky ns
-    grid .statusLabel -row 1 -columnspan 2 -sticky ew -pady $::PAD
+    grid .statusFrame -row 1 -columnspan 2 -sticky ew -pady $::PAD
     grid rowconfigure . 0 -weight 1
     grid columnconfigure . 0 -weight 1
 
@@ -185,8 +192,20 @@ oo::define App method make_bindings {} {
     puts "App::make_bindings" ;# TODO
 }    
 
-oo::define App method set_status {{text ""}} {
+oo::define App method set_status_info {{text ""}} {
     $StatusLabel configure -text $text
+}
+
+oo::define App method report_status {} {
+    if {[file exists $StoreFilename]} {
+        set str [Store new $StoreFilename]
+        try {
+            puts "TODO report_status"
+        } finally {
+            $str close
+        }
+    }
+    after 150_000 [callback report_status]
 }
 
 oo::define App method populate_file_tree {} {

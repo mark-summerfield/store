@@ -11,9 +11,9 @@ proc actions::add {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {
         if {$rest eq ""} {
-            set names [CandidatesForAdd $str]
+            set names [$str addable]
         } else {
-            set names [CandidatesFromGiven $str $rest]
+            set names [$str candidates_from_given $rest]
         }
         if {[llength $names]} {
             $str add {*}$names
@@ -27,12 +27,12 @@ proc actions::update {reporter storefile rest} {
     set message [join $rest " "]
     set str [Store new $storefile $reporter]
     try {
-        if {[HaveUpdates $str]} {
+        if {[$str have_updates]} {
             $str update $message
         } elseif {$::VERBOSE > 1} {
             misc::info "no updates needed"
         }
-        set names [CandidatesForAdd $str]
+        set names [$str addable]
         if {$::VERBOSE && [llength $names]} {
             lassign [misc::n_s [llength $names]] n s
             misc::info "$n unstored unignored nonempty file$s present" \
@@ -57,7 +57,7 @@ proc actions::status {reporter storefile rest} {
     set no_messages [list]
     set str [Store new $storefile $reporter]
     try {
-        set names [CandidatesForAdd $str]
+        set names [$str addable]
         if {[llength $names]} {
             lassign [misc::n_s [llength $names]] n s
             lappend yes_messages "$n unstored unignored nonempty file$s\
@@ -69,7 +69,7 @@ proc actions::status {reporter storefile rest} {
         } elseif {$::VERBOSE} {
             lappend no_messages "no files to add"
         }
-        set names [UpdateCandidates $str]
+        set names [$str updatable]
         if {[llength $names]} {
             lassign [misc::n_s [llength $names]] n s
             lappend yes_messages "$n file$s to update"
@@ -314,56 +314,6 @@ proc actions::purge {reporter storefile rest} {
     } finally {
         $str close
     }
-}
-
-proc actions::HaveUpdates str {
-    foreach filename [$str filenames] {
-        if {![$str is_same_on_disk $filename]} { return true }
-    }
-    return false
-}
-
-proc actions::UpdateCandidates str {
-    set candidates [list]
-    foreach filename [$str filenames] {
-        if {![$str is_same_on_disk $filename]} {
-            lappend candidates $filename
-        }
-    }
-    return $candidates
-}
-
-proc actions::CandidatesForAdd str {
-    set candidates [CandidatesFromGiven $str [glob * */*]]
-    set gid [$str current_generation]
-    lsort -unique [lmap name $candidates { ;# drop already stored files
-        expr {[$str find_data_gid $gid $name] ? [continue] : $name}
-    }]
-}
-
-# we deliberately only go at most one level deep for folders
-proc actions::CandidatesFromGiven {str candidates} {
-    set ignores [$str ignores]
-    set names [list]
-    foreach name $candidates {
-        if {![misc::ignore $name $ignores]} {
-            if {[file isdirectory $name]} {
-                foreach subname [glob -directory $name -types f *] {
-                    if {![misc::ignore $subname $ignores] &&
-                            [ValidFile $subname]} {
-                        lappend names $subname   
-                    }
-                }
-            } elseif {[ValidFile $name]} {
-                lappend names $name
-            }
-        }
-    }
-    lsort -unique $names
-}
-
-proc actions::ValidFile name {
-    expr {![string match {.*} [file tail $name]] && [file size $name]}
 }
 
 proc actions::GidStoreAndRest {reporter storefile rest} {

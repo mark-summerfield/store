@@ -347,4 +347,50 @@ oo::define Store method is_same_on_disk {filename} {
     }
 }
 
+oo::define Store method addable {} {
+    set candidates [my candidates_from_given [glob * */*]]
+    set gid [my current_generation]
+    lsort -unique [lmap name $candidates { ;# drop already stored files
+        expr {[my find_data_gid $gid $name] ? [continue] : $name}
+    }]
+}
+
+oo::define Store method updatable {} {
+    set candidates [list]
+    foreach filename [my filenames] {
+        if {![my is_same_on_disk $filename]} {
+            lappend candidates $filename
+        }
+    }
+    return $candidates
+}
+
+oo::define Store method have_updates {} {
+    foreach filename [my filenames] {
+        if {![my is_same_on_disk $filename]} { return true }
+    }
+    return false
+}
+
+# we deliberately only go at most one level deep for folders
+oo::define Store method candidates_from_given {candidates} {
+    set ignores [my ignores]
+    set names [list]
+    foreach name $candidates {
+        if {![misc::ignore $name $ignores]} {
+            if {[file isdirectory $name]} {
+                foreach subname [glob -directory $name -types f *] {
+                    if {![misc::ignore $subname $ignores] &&
+                            [misc::valid_file $subname]} {
+                        lappend names $subname   
+                    }
+                }
+            } elseif {[misc::valid_file $name]} {
+                lappend names $name
+            }
+        }
+    }
+    lsort -unique $names
+}
+
 oo::define Store method to_string {} { return "Store \"$Filename\"" }

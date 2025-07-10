@@ -282,38 +282,40 @@ oo::define App method set_status_info {{text ""}} {
 # Subtle difference "addable" vs. "to update" is deliberate
 oo::define App method report_status {} {
     if {[file exists $StoreFilename]} {
-        set str [Store new $StoreFilename]
-        try {
-            set names [$str addable]
-            if {[llength $names]} {
-                lassign [misc::n_s [llength $names]] n s
-                $StatusAddableLabel configure -text "$n addable" \
-                    -foreground red
-            } else {
-                $StatusAddableLabel configure -text "none to add" \
-                    -foreground green
+        catch { ;# if the timeout coincides with other db action we skip
+            set str [Store new $StoreFilename]
+            try {
+                set names [$str addable]
+                if {[llength $names]} {
+                    lassign [misc::n_s [llength $names]] n s
+                    $StatusAddableLabel configure -text "$n addable" \
+                        -foreground red
+                } else {
+                    $StatusAddableLabel configure -text "none to add" \
+                        -foreground green
+                }
+                set names [$str updatable]
+                if {[llength $names]} {
+                    lassign [misc::n_s [llength $names]] n s
+                    $StatusUpdatableLabel configure -text "$n to update" \
+                        -foreground red
+                } else {
+                    $StatusUpdatableLabel configure -text "none to update" \
+                        -foreground green
+                }
+                if {[$str needs_clean]} {
+                    $StatusCleanableLabel configure -text "cleanable" \
+                        -foreground red
+                } else {
+                    $StatusCleanableLabel configure -text "clean" \
+                        -foreground green
+                }
+            } finally {
+                $str close
             }
-            set names [$str updatable]
-            if {[llength $names]} {
-                lassign [misc::n_s [llength $names]] n s
-                $StatusUpdatableLabel configure -text "$n to update" \
-                    -foreground red
-            } else {
-                $StatusUpdatableLabel configure -text "none to update" \
-                    -foreground green
-            }
-            if {[$str needs_clean]} {
-                $StatusCleanableLabel configure -text "cleanable" \
-                    -foreground red
-            } else {
-                $StatusCleanableLabel configure -text "clean" \
-                    -foreground green
-            }
-        } finally {
-            $str close
+            $StatusSizeLabel configure -text [misc::human_size \
+                                                [file size $StoreFilename]]
         }
-        $StatusSizeLabel configure -text [misc::human_size \
-                                            [file size $StoreFilename]]
     } else {
         $StatusSizeLabel configure -text ""
     }

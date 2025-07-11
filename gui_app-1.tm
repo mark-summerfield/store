@@ -6,6 +6,8 @@ package require gui_misc
 package require inifile
 package require ntext 1
 
+set ShowState asis ;# should be an instance variable!
+
 oo::class create App {
     variable ConfigFilename
     variable Tabs
@@ -98,17 +100,23 @@ oo::define App method make_controls {} {
     ttk::button .controlsFrame.purgeButton -text Purge… -underline 0 \
         -compound left -command [callback on_purge] \
         -image [misc::icon edit-cut.svg $::ICON_SIZE]
-    # TODO Show radio buttons frame
-    # +----------------------+
-    # | (*) Show as-is       |
-    # | ( ) Diff to Disk     |
-    # | ( ) Diff to @[ 12v^] |
-    # +----------------------+
-    # TODO Find frame
-    # +----------------------+
-    # | Find:                |
-    # | [                  ] |
-    # +----------------------+
+    ttk::frame .controlsFrame.showFrame -relief groove 
+    ttk::radiobutton .controlsFrame.showFrame.asIsRadio \
+        -text "Show As-Is" -underline 0 -value asis -variable ::ShowState \
+        -command [callback on_show_asis]
+    ttk::radiobutton .controlsFrame.showFrame.diffWithDiskRadio \
+        -text "Diff with Disk" -underline 5 -value disk \
+        -variable ::ShowState -command [callback on_show_diff_with_disk]
+    ttk::radiobutton .controlsFrame.showFrame.diffToRadio \
+        -text "Diff to Gen.:" -underline 0 -value generation \
+        -variable ::ShowState -command [callback on_show_diff_to]
+    ttk::label .controlsFrame.showFrame.diffLabel -text @
+    ttk::spinbox .controlsFrame.showFrame.diffGenSpinbox -format %.0f \
+        -from 0 -to 99999 -width 5 -command [callback on_show_diff_to]
+    .controlsFrame.showFrame.diffGenSpinbox set 0
+    ttk::frame .controlsFrame.findFrame -relief groove 
+    ttk::label .controlsFrame.findFrame.findLabel -text Find: -underline 2
+    ttk::entry .controlsFrame.findFrame.findEntry -width 15
     ttk::button .controlsFrame.optionsButton -text Options… -underline 2 \
         -compound left -command [callback on_options] \
         -image [misc::icon preferences-system.svg $::ICON_SIZE]
@@ -133,8 +141,22 @@ oo::define App method layout_controls {} {
     pack .controlsFrame.ignoresButton -side top {*}$opts
     pack .controlsFrame.cleanButton -side top {*}$opts
     pack .controlsFrame.purgeButton -side top {*}$opts
-    # TODO show radio buttons frame
-    # TODO find frame
+    pack .controlsFrame.showFrame -side top -fill x {*}$opts
+    grid .controlsFrame.showFrame.asIsRadio -row 0 -column 0 -columnspan 2 \
+        -sticky w {*}$opts
+    grid .controlsFrame.showFrame.diffWithDiskRadio -row 1 -column 0 \
+        -columnspan 2 -sticky w {*}$opts
+    grid .controlsFrame.showFrame.diffToRadio -row 2 -column 0 \
+        -columnspan 2 -sticky w {*}$opts
+    grid .controlsFrame.showFrame.diffLabel -row 3 -column 0 -sticky e \
+        -pady [expr {2 * $::PAD}]
+    grid .controlsFrame.showFrame.diffGenSpinbox -row 3 -column 1 \
+        -sticky w -pady [expr {2 * $::PAD}]
+    pack .controlsFrame.findFrame -side top -fill x {*}$opts
+    grid .controlsFrame.findFrame.findLabel -row 0 -column 0 -sticky w \
+        {*}$opts
+    grid .controlsFrame.findFrame.findEntry -row 1 -column 0 -sticky w \
+        {*}$opts
     pack .controlsFrame.optionsButton -side top {*}$opts
     pack .controlsFrame.quitButton -side bottom {*}$opts
     pack .controlsFrame.helpButton -side bottom {*}$opts
@@ -260,18 +282,28 @@ oo::define App method make_bindings {} {
     bind $GenerationTree <<TreeviewSelect>> \
         [callback on_generation_tree_select]
     bind . <Escape> [callback on_quit]
+    bind . <Return> [callback on_find]
+    bind . <KP_Enter> [callback on_find]
     bind . <F1> [callback on_help]
+    bind . <F3> [callback on_find]
     bind . <Alt-a> [callback on_add]
     bind . <Alt-b> [callback on_about]
     bind . <Alt-c> [callback on_copy_to]
+    bind . <Alt-d> {
+        .controlsFrame.showFrame.diffToRadio invoke
+        focus .controlsFrame.showFrame.diffGenSpinbox
+    }
     bind . <Alt-e> [callback on_extract]
     bind . <Alt-i> [callback on_ignores]
     bind . <Alt-l> [callback on_clean]
+    bind . <Alt-n> {focus .controlsFrame.findFrame.findEntry}
     bind . <Alt-o> [callback on_open]
     bind . <Alt-p> [callback on_purge]
     bind . <Alt-q> [callback on_quit]
+    bind . <Alt-s> {.controlsFrame.showFrame.asIsRadio invoke}
     bind . <Alt-t> [callback on_options]
     bind . <Alt-u> [callback on_update]
+    bind . <Alt-w> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
 }    
 
 oo::define App method set_status_info {{text ""}} {
@@ -452,6 +484,22 @@ oo::define App method on_clean {} {
 
 oo::define App method on_purge {} {
     puts "TODO on_purge" ;# TODO prompt yes/no first!
+}
+
+oo::define App method on_show_asis {} {
+    puts "TODO on_show_asis" ;# TODO
+}
+
+oo::define App method on_show_diff_with_disk {} {
+    puts "TODO on_show_diff_with_disk" ;# TODO
+}
+
+oo::define App method on_show_diff_to {} {
+    puts "TODO on_show_diff_to" ;# TODO
+}
+
+oo::define App method on_find {} {
+    puts "TODO on_find" ;# TODO
 }
 
 oo::define App method on_options {} {

@@ -1,9 +1,8 @@
-# TODO Controls Frame
 # TODO do simple per-language syntax highlighting (e.g., keywords)
 
 store # GUI
 gui-1.tm
-gui_app-1.tm
+gui_app-1.tm # TODO complete bindings
 gui_misc-1.tm
 gui_globals-1.tm
 

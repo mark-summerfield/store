@@ -108,11 +108,13 @@ proc cli::usage {} {
         "Copies all the files at the generation into the given dirname
         (which must not exist)." \
         -strictlength true -length $width2] "  "]]
-    puts [unmark "^d% ~or% ^diff% <@gid1> \[@gid2\] <filename>"]
+    puts [unmark "^d% ~or% ^diff% \[verbose] <@gid1> \[@gid2\] <filename>"]
     puts [unmark [textutil::indent [textutil::adjust \
         "Diffs the filename at @gid1 against the one in the current folder,
-        or against the one stored at @gid2 if given." \
-        -strictlength true -length $width2] "  "]]
+        or against the one stored at @gid2 if given; shows the entire file,
+        unless verbose is quiet when only differences and context lines are
+        shown." \
+            -strictlength true -length $width2] "  "]]
     puts [unmark "^f% ~or% ^filenames% \[@gid\]"]
     puts [unmark [textutil::indent [textutil::adjust \
         "Prints the generation’s filenames to stdout." \

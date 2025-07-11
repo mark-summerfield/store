@@ -1,7 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require autoscroll 1
-package require diff
 package require gui_globals
 package require gui_misc
 package require inifile
@@ -76,13 +75,13 @@ oo::define App method make_widgets {} {
 oo::define App method make_controls {} {
     set controlsFrame [ttk::frame .controlsFrame]
     ttk::button .controlsFrame.openButton -text {Open Store…} \
-        -underline 0 -compound left -command [callback on_open]] \
+        -underline 0 -compound left -command [callback on_open] \
         -image [misc::icon document-open.svg $::ICON_SIZE]
     ttk::button .controlsFrame.addButton -text Add -underline 0 \
         -compound left -command [callback on_add] \
         -image [misc::icon document-save-as.svg $::ICON_SIZE]
     ttk::button .controlsFrame.updateButton -text Update -underline 0 \
-        -compound left -command [callback on_update]] \
+        -compound left -command [callback on_update] \
         -image [misc::icon document-save.svg $::ICON_SIZE]
     ttk::button .controlsFrame.extractButton -text Extract -underline 0 \
         -compound left -command [callback on_extract] \

@@ -176,8 +176,8 @@ proc actions::diff {reporter storefile rest} {
         set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
         set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
         misc::info "diff of $message"
-        set delta [diff::diff $old_data $new_data]
-        puts -nonewline $delta
+        set delta [diff::colorize [diff::diff $old_data $new_data]]
+        puts [join $delta \n]
     } finally {
         $str close
     }

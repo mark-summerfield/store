@@ -66,8 +66,8 @@ oo::define App method display {} {
 
 oo::define App method make_widgets {} {
     set panes [ttk::panedwindow .panes -orient horizontal]
-    $panes add [my make_tabs] -weight 1
-    $panes add [my make_text_frame] -weight 8
+    $panes add [my make_tabs]
+    $panes add [my make_text_frame]
     my make_status_bar
     my make_controls
     my layout_controls

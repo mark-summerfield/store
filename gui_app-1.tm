@@ -265,7 +265,7 @@ oo::define App method make_status_bar {} {
     pack .statusFrame.statusCleanableLabel -side right -fill x
     pack .statusFrame.statusUpdatableLabel -side right -fill x
     pack .statusFrame.statusAddableLabel -side right -fill x
-    after $ms [callback set_status_info ""]
+    after $ms [callback set_status_info]
     my report_status
 }
 
@@ -283,8 +283,10 @@ oo::define App method make_bindings {} {
     bind $FilenameTree <<TreeviewSelect>> [callback on_filename_tree_select]
     bind $GenerationTree <<TreeviewSelect>> \
         [callback on_generation_tree_select]
+    bind .controlsFrame.findFrame.findEntry <Return> [callback on_find]
+    bind .controlsFrame.showFrame.diffToRadio <Return> \
+            [callback on_show_diff_to]
     bind . <Escape> [callback on_quit]
-    bind . <Return> [callback on_find]
     bind . <KP_Enter> [callback on_find]
     bind . <F1> [callback on_help]
     bind . <F3> [callback on_find]
@@ -308,8 +310,11 @@ oo::define App method make_bindings {} {
     bind . <Alt-w> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
 }    
 
-oo::define App method set_status_info {{text ""}} {
+oo::define App method set_status_info {{text ""} {timeout 0}} {
     $StatusInfoLabel configure -text $text
+    if {$text ne "" && $timeout > 0} {
+        after $timeout [callback set_status_info]
+    }
 }
 
 # Subtle difference "addable" vs. "to update" is deliberate
@@ -456,6 +461,41 @@ oo::define App method on_generations_tab {} {
     }
 }
 
+oo::define App method get_selected {} {
+    set ok false
+    if {[$Tabs  select] eq ".panes.tabs.filenameTreeFrame"} {
+        set item [$FilenameTree selection]
+        set txt [$FilenameTree item $item -text]
+        if {[string match {@*} $txt]} {
+            set gid [string range $txt 1 end]
+            set filename [$FilenameTree item [$FilenameTree parent $item] \
+                    -text]
+        } else {
+            set gid 0
+            set filename $txt
+        }
+        set ok true
+    } else {
+        set item [$GenerationTree selection]
+        set txt [$GenerationTree item $item -text]
+        if {[string match {@*} $txt]} {
+            set gid [string range $txt 1 end]
+            set filename "" ;# no filename specified
+        } else {
+            set gid [$GenerationTree item [$GenerationTree parent $item] \
+                    -text]
+            set gid [string range $gid 1 end]
+            set filename $txt
+            set ok true
+        }
+    }
+    return [list $ok $gid $filename]
+}
+
+oo::define App method diff {new_gid old_gid filename} {
+    puts "TODO diff: @$new_gid vs @$old_gid '$filename'" ;# TODO
+}
+
 oo::define App method on_open {} {
     puts "TODO on_open" ;# TODO
 }
@@ -493,11 +533,27 @@ oo::define App method on_show_asis {} {
 }
 
 oo::define App method on_show_diff_with_disk {} {
-    puts "TODO on_show_diff_with_disk" ;# TODO
+    lassign [my get_selected] ok gid filename
+    if {!$ok} {
+        my set_status_info "Select a file to diff against" $::SHORT_WAIT
+    } else {
+        my diff $gid $gid $filename
+    }
 }
 
 oo::define App method on_show_diff_to {} {
-    puts "TODO on_show_diff_to" ;# TODO
+    lassign [my get_selected] ok gid filename
+    if {!$ok} {
+        my set_status_info "Select a file to diff against" $::SHORT_WAIT
+    } else {
+        set gid2 [.controlsFrame.showFrame.diffGenSpinbox get]
+        if {$gid && $gid2 > $gid} {
+            set t $gid
+            set gid $gid2
+            set gid2 $t
+        }
+        my diff $gid $gid2 $filename
+    }
 }
 
 oo::define App method on_find {} {

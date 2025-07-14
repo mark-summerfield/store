@@ -4,6 +4,7 @@ const VERSION 0.1.0
 
 const PAD 3
 
+const SHORT_WAIT 20_000
 const LONG_WAIT 60_000
 const MEDIUM_WAIT 30_000
 const STATUS_WAIT 120_000

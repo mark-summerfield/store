@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require autoscroll 1
+package require diff
 package require gui_globals
 package require gui_misc
 package require inifile
@@ -413,6 +414,70 @@ oo::define App method show_file {gid filename} {
     $Text insert end [encoding convertfrom -profile replace utf-8 $data]
 }
 
+oo::define App method get_selected {} {
+    set ok false
+    if {[$Tabs  select] eq ".panes.tabs.filenameTreeFrame"} {
+        set item [$FilenameTree selection]
+        set txt [$FilenameTree item $item -text]
+        if {[string match {@*} $txt]} {
+            set gid [string range $txt 1 end]
+            set filename [$FilenameTree item [$FilenameTree parent $item] \
+                    -text]
+        } else {
+            set gid 0
+            set filename $txt
+        }
+        set ok true
+    } else {
+        set item [$GenerationTree selection]
+        set txt [$GenerationTree item $item -text]
+        if {[string match {@*} $txt]} {
+            set gid [string range $txt 1 end]
+            set filename "" ;# no filename specified
+        } else {
+            set gid [$GenerationTree item [$GenerationTree parent $item] \
+                    -text]
+            set gid [string range $gid 1 end]
+            set filename $txt
+            set ok true
+        }
+    }
+    return [list $ok $gid $filename]
+}
+
+oo::define App method diff {new_gid old_gid filename} {
+    puts "@$new_gid @$old_gid $filename"
+    set str [Store new $StoreFilename]
+    try {
+        if {$new_gid} {
+            lassign [$str get $new_gid $filename] _ new_data
+        } else {
+            if {![file exists $filename]} {
+                my set_status_info "can't diff \"$filename\"; not found\
+                        on disk" $::SHORT_WAIT
+                return
+            }
+            set new_data [readFile $filename binary]
+        }
+        if {!$old_gid} {
+            set old_gid [$str current_generation]
+        }
+        lassign [$str get $old_gid $filename] gid old_data
+    } finally {
+        $str close
+    }
+    if {!$gid} {
+        my set_status_info "can't diff @$old_gid \"$filename\"; not\
+                present in that generation" $::SHORT_WAIT
+        return
+    }
+    set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
+    set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
+    set delta [diff::diff $old_data $new_data]
+    set delta [diff::contextualize $delta]
+    diff::diff_text $delta $Text
+}
+
 oo::define App method on_tab_changed {} {
     if {[$Tabs index [$Tabs select]]} {
         my on_generations_tab
@@ -461,41 +526,6 @@ oo::define App method on_generations_tab {} {
     }
 }
 
-oo::define App method get_selected {} {
-    set ok false
-    if {[$Tabs  select] eq ".panes.tabs.filenameTreeFrame"} {
-        set item [$FilenameTree selection]
-        set txt [$FilenameTree item $item -text]
-        if {[string match {@*} $txt]} {
-            set gid [string range $txt 1 end]
-            set filename [$FilenameTree item [$FilenameTree parent $item] \
-                    -text]
-        } else {
-            set gid 0
-            set filename $txt
-        }
-        set ok true
-    } else {
-        set item [$GenerationTree selection]
-        set txt [$GenerationTree item $item -text]
-        if {[string match {@*} $txt]} {
-            set gid [string range $txt 1 end]
-            set filename "" ;# no filename specified
-        } else {
-            set gid [$GenerationTree item [$GenerationTree parent $item] \
-                    -text]
-            set gid [string range $gid 1 end]
-            set filename $txt
-            set ok true
-        }
-    }
-    return [list $ok $gid $filename]
-}
-
-oo::define App method diff {new_gid old_gid filename} {
-    puts "TODO diff: @$new_gid vs @$old_gid '$filename'" ;# TODO
-}
-
 oo::define App method on_open {} {
     puts "TODO on_open" ;# TODO
 }
@@ -529,7 +559,12 @@ oo::define App method on_purge {} {
 }
 
 oo::define App method on_show_asis {} {
-    puts "TODO on_show_asis" ;# TODO
+    lassign [my get_selected] ok gid filename
+    if {!$ok} {
+        my set_status_info "Select a file to show" $::SHORT_WAIT
+    } else {
+        my show_file $gid $filename
+    }
 }
 
 oo::define App method on_show_diff_with_disk {} {
@@ -537,7 +572,7 @@ oo::define App method on_show_diff_with_disk {} {
     if {!$ok} {
         my set_status_info "Select a file to diff against" $::SHORT_WAIT
     } else {
-        my diff $gid $gid $filename
+        my diff 0 $gid $filename
     }
 }
 

@@ -89,7 +89,7 @@ proc diff::diff_text {delta txt} {
     $txt tag configure del -foreground brown
     $txt tag configure deleted -foreground brown -overstrike true
     $txt tag configure unchanged -foreground gray67
-    $txt tag configure ellipsis -background teal
+    $txt tag configure ellipsis -foreground teal
     foreach line $delta {
         set action [string index $line 0]
         switch $action {
@@ -99,7 +99,7 @@ proc diff::diff_text {delta txt} {
                 $txt insert end [string range $line 2 end]\n deleted
                 }
             " " { $txt insert end $line\n unchanged }
-            "%" { $txt insert "≣ [string repeat ┈ 40]" ellipsis }
+            "%" { $txt insert end "≣ [string repeat ┈ 40]\n" ellipsis }
         }
     }
     $txt see 1.0

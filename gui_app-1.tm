@@ -8,8 +8,6 @@ package require inifile
 package require lambda 1
 package require ntext 1
 
-#set ShowState asis ;# should be an instance variable!
-
 oo::class create App {
     variable ConfigFilename
     variable Tabs
@@ -494,8 +492,9 @@ oo::define App method on_filename_tree_select {} {
     set gid [$FilenameTree item $item -text]
     set parent [$FilenameTree parent $item]
     set filename [$FilenameTree item $parent -text]
-    if {$filename ne "" && $gid ne ""} {
-        my show_file [string trimleft $gid @] $filename
+    lassign [my get_selected] ok gid filename
+    if {$ok} {
+        my show_file $gid $filename
     }
 }
 
@@ -504,8 +503,9 @@ oo::define App method on_generation_tree_select {} {
     set filename [$GenerationTree item $item -text]
     set parent [$GenerationTree parent $item]
     set gid [$GenerationTree item $parent -text]
-    if {$filename ne "" && $gid ne ""} {
-        my show_file [string trimleft $gid @] $filename
+    lassign [my get_selected] ok gid filename
+    if {$ok} {
+        my show_file $gid $filename
     }
 }
 

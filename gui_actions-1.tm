@@ -4,8 +4,8 @@ package require diff
 
 namespace eval gui_actions {}
 
-proc gui_actions::diff {store_filename txt set_status_info new_gid \
-                            old_gid filename} {
+proc gui_actions::diff {store_filename txt in_context set_status_info \
+                        new_gid old_gid filename} {
     set str [Store new $store_filename]
     try {
         if {$new_gid} {
@@ -33,7 +33,7 @@ proc gui_actions::diff {store_filename txt set_status_info new_gid \
     set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
     set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
     set delta [diff::diff $old_data $new_data]
-    set delta [diff::contextualize $delta]
+    if {$in_context} { set delta [diff::contextualize $delta] }
     diff::diff_text $delta $txt
 }
 

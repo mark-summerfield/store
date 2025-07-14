@@ -9,6 +9,7 @@ package require lambda 1
 
 oo::class create App {
     variable ShowState
+    variable InContext
     variable ConfigFilename
     variable StoreFilename
     variable Tabs
@@ -24,6 +25,7 @@ oo::class create App {
 
 oo::define App constructor {configFilename} {
     set ShowState asis
+    set InContext true
     set ConfigFilename $configFilename
     set StoreFilename [file normalize .[file tail [pwd]].str]
     if {![file exists $StoreFilename]} {
@@ -114,6 +116,9 @@ oo::define App method make_controls {} {
     ttk::radiobutton .controlsFrame.showFrame.diffToRadio \
         -text "Diff to Gen.:" -underline 0 -value generation \
         -variable [my varname ShowState] -command [callback on_show_diff_to]
+    ttk::checkbutton .controlsFrame.showFrame.inContextCheck \
+        -text "In Context" -underline 6 -onvalue true -offvalue false \
+        -variable [my varname InContext] -command [callback on_in_context]
     ttk::label .controlsFrame.showFrame.diffLabel -text @
     ttk::spinbox .controlsFrame.showFrame.diffGenSpinbox -format %.0f \
         -from 0 -to 99999 -width 5 -command [callback on_show_diff_to]
@@ -121,12 +126,6 @@ oo::define App method make_controls {} {
     ttk::frame .controlsFrame.findFrame -relief groove 
     ttk::label .controlsFrame.findFrame.findLabel -text Find: -underline 2
     ttk::entry .controlsFrame.findFrame.findEntry -width 15
-    ttk::button .controlsFrame.optionsButton -text Options… -underline 2 \
-        -compound left -command [callback on_options] \
-        -image [gui_misc::icon preferences-system.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.helpButton -text Help -compound left \
-        -command [callback on_help] \
-        -image [gui_misc::icon help.svg $::ICON_SIZE]
     ttk::button .controlsFrame.aboutButton -text About -underline 1 \
         -compound left -command [callback on_about] \
         -image [gui_misc::icon about.svg $::ICON_SIZE]
@@ -156,14 +155,14 @@ oo::define App method layout_controls {} {
         -pady [expr {2 * $::PAD}]
     grid .controlsFrame.showFrame.diffGenSpinbox -row 3 -column 1 \
         -sticky w -pady [expr {2 * $::PAD}]
+    grid .controlsFrame.showFrame.inContextCheck -row 4 -column 0 \
+        -columnspan 2 -sticky w {*}$opts
     pack .controlsFrame.findFrame -side top -fill x {*}$opts
     grid .controlsFrame.findFrame.findLabel -row 0 -column 0 -sticky w \
         {*}$opts
     grid .controlsFrame.findFrame.findEntry -row 1 -column 0 -sticky w \
         {*}$opts
-    pack .controlsFrame.optionsButton -side top {*}$opts
     pack .controlsFrame.quitButton -side bottom {*}$opts
-    pack .controlsFrame.helpButton -side bottom {*}$opts
     pack .controlsFrame.aboutButton -side bottom {*}$opts
 }
 
@@ -277,7 +276,6 @@ oo::define App method make_bindings {} {
             [callback on_show_diff_to]
     bind . <Escape> [callback on_quit]
     bind . <KP_Enter> [callback on_find]
-    bind . <F1> [callback on_help]
     bind . <F3> [callback on_find]
     bind . <Alt-a> [callback on_add]
     bind . <Alt-b> [callback on_about]
@@ -294,7 +292,7 @@ oo::define App method make_bindings {} {
     bind . <Alt-p> [callback on_purge]
     bind . <Alt-q> [callback on_quit]
     bind . <Alt-s> {.controlsFrame.showFrame.asIsRadio invoke}
-    bind . <Alt-t> [callback on_options]
+    bind . <Alt-t> {.controlsFrame.showFrame.inContextCheck invoke}
     bind . <Alt-u> [callback on_update]
     bind . <Alt-w> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
 }    
@@ -435,8 +433,8 @@ oo::define App method get_selected {} {
 }
 
 oo::define App method diff {new_gid old_gid filename} {
-    gui_actions::diff $StoreFilename $Text [callback set_status_info] \
-        $new_gid $old_gid $filename
+    gui_actions::diff $StoreFilename $Text $InContext \
+        [callback set_status_info] $new_gid $old_gid $filename
 }
 
 oo::define App method on_tab_changed {} {
@@ -554,16 +552,16 @@ oo::define App method on_show_diff_to {} {
     }
 }
 
+oo::define App method on_in_context {} {
+    if {$ShowState eq "disk"} {
+        my on_show_diff_with_disk
+    } elseif {$ShowState eq "generation"} {
+        my on_show_diff_to
+    } ;# ignore asis
+}
+
 oo::define App method on_find {} {
     puts "TODO on_find" ;# TODO
-}
-
-oo::define App method on_options {} {
-    puts "TODO on_options" ;# TODO
-}
-
-oo::define App method on_help {} {
-    puts "TODO on_help" ;# TODO
 }
 
 oo::define App method on_about {} { gui_about::show_modal }

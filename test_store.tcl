@@ -168,10 +168,11 @@ proc test5 {} {
     set ok true
     set filename /tmp/${procname}.db
     file delete $filename
-    set expecteds {{*.a} {*.bak} {*.class} {*.dll} {*.exe} {*.jar} {*.ld} \
-        {*.ldx} {*.li} {*.lix} {*.o} {*.obj} {*.py[co]} {*.rs.bk} \
-        {*.so} {*.sw[nop]} {*.tmp} {*~} {[#]*#} {__pycache__} \
-        {louti[0-9]*} {moc_*.cpp} {qrc_*.cpp} {test*} {ui_*.h} {zOld}}
+    set expecteds {{*.a} {*.bak} {*.class} {*.dll} {*.exe} {*.jar}\
+        {*.jpeg} {*.jpg} {*.ld} {*.ldx} {*.li} {*.lix} {*.o} {*.obj}\
+        {*.png} {*.py[co]} {*.rs.bk} {*.so} {*.svg} {*.sw[nop]} {*.tmp}\
+        {*~} {[#]*#} {__pycache__} {louti[0-9]*} {moc_*.cpp} {qrc_*.cpp}\
+        {test*} {ui_*.h} {zOld}}
     set str [Store new $filename]
     try {
         set i 0

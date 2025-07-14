@@ -8,7 +8,7 @@ package require inifile
 package require lambda 1
 package require ntext 1
 
-set ShowState asis ;# should be an instance variable!
+#set ShowState asis ;# should be an instance variable!
 
 oo::class create App {
     variable ConfigFilename
@@ -17,6 +17,7 @@ oo::class create App {
     variable FilenameTree
     variable GenerationTree
     variable Text
+    variable ShowState
     variable StatusInfoLabel
     variable StatusAddableLabel
     variable StatusUpdatableLabel
@@ -25,6 +26,7 @@ oo::class create App {
 }
 
 oo::define App constructor {configFilename} {
+    set ShowState asis
     set ConfigFilename $configFilename
     set StoreFilename [file normalize .[file tail [pwd]].str]
     if {![file exists $StoreFilename]} {
@@ -105,14 +107,15 @@ oo::define App method make_controls {} {
         -image [misc::icon edit-cut.svg $::ICON_SIZE]
     ttk::frame .controlsFrame.showFrame -relief groove 
     ttk::radiobutton .controlsFrame.showFrame.asIsRadio \
-        -text "Show As-Is" -underline 0 -value asis -variable ::ShowState \
-        -command [callback on_show_asis]
+        -text "Show As-Is" -underline 0 -value asis \
+        -variable [my varname ShowState] -command [callback on_show_asis]
     ttk::radiobutton .controlsFrame.showFrame.diffWithDiskRadio \
         -text "Diff with Disk" -underline 5 -value disk \
-        -variable ::ShowState -command [callback on_show_diff_with_disk]
+        -variable [my varname ShowState] \
+        -command [callback on_show_diff_with_disk]
     ttk::radiobutton .controlsFrame.showFrame.diffToRadio \
         -text "Diff to Gen.:" -underline 0 -value generation \
-        -variable ::ShowState -command [callback on_show_diff_to]
+        -variable [my varname ShowState] -command [callback on_show_diff_to]
     ttk::label .controlsFrame.showFrame.diffLabel -text @
     ttk::spinbox .controlsFrame.showFrame.diffGenSpinbox -format %.0f \
         -from 0 -to 99999 -width 5 -command [callback on_show_diff_to]
@@ -406,6 +409,7 @@ oo::define App method populate_generation_tree {} {
 oo::define App method show_file {gid filename} {
     set str [Store new $StoreFilename]
     try {
+        if {!$gid} { set gid [$str current_generation] }
         lassign [$str get $gid $filename] _ data
     } finally {
         $str close
@@ -446,7 +450,6 @@ oo::define App method get_selected {} {
 }
 
 oo::define App method diff {new_gid old_gid filename} {
-    puts "@$new_gid @$old_gid $filename"
     set str [Store new $StoreFilename]
     try {
         if {$new_gid} {

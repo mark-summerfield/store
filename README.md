@@ -2,6 +2,10 @@
 
 An easy-to-use and simple alternative to a version control system.
 
+A command line tool, `str`, and a GUI application, `store`, are available.
+
+## Command Line — str
+
 Add files:
 
     str a
@@ -70,6 +74,14 @@ Store does not support branching, staging, or anything else that’s
 complicated, making it ideal for small personal projects where you just want
 to save regular “generations” of your changes and be able to look back in
 time.
+
+## GUI — store
+
+![Screenshot](images/screenshot.png)
+
+This provides the same facilities as the command line `str` program but can
+be much more convenient for viewing and diffing previous generations of
+files.
 
 ## License
 

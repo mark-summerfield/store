@@ -1,5 +1,3 @@
-# TODO on_about
-# TODO on_find
 # TODO on_add
 # TODO on_update
 # TODO on_extract
@@ -8,6 +6,7 @@
 # TODO on_copy_to
 # TODO on_options # font family; font size; (*) Context Diff ( ) Full Diff
 # TODO on_open
+# TODO on_find
 # TODO on_help
 # TODO tooltips for buttons etc.
 # TODO do simple per-language syntax highlighting (e.g., keywords)
@@ -15,8 +14,9 @@
 store # GUI
 gui-1.tm
 gui_app-1.tm
+gui_about-1.tm
 gui_misc-1.tm
-gui_globals-1.tm
+gui_globals-1.tm # VERSION
 
 str # CLI
 cli-1.tm

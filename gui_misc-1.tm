@@ -10,6 +10,39 @@ proc misc::icon {svg {width 0}} {
         -format "svg -scaletowidth $width"
 }
 
+proc misc::prepare_form {window on_close {modal true} {x 0} {y 0}} {
+    wm withdraw $window
+    if {$modal} {
+        wm transient $window .
+    }
+    set parent [winfo parent $window]
+    if {!($x && $y)} {
+        set x [expr {[winfo x $parent] + [winfo width $parent] / 3}]
+        set y [expr {[winfo y $parent] + [winfo height $parent] / 3}]
+    }
+    wm geometry $window "+$x+$y"
+    wm protocol $window WM_DELETE_WINDOW $on_close
+    if {$modal} {
+        grab $window ;# caller must call: grab release $window
+    }
+    wm deiconify $window
+    raise $window
+    focus $window
+}
+
+proc misc::open_webpage url {
+    if {[tk windowingsystem] eq "win32"} {
+        set cmd [list {*}[auto_execok start] {}]
+    } else {
+        set cmd [auto_execok xdg-open]
+    }
+    try {
+        exec {*}$cmd $url &
+    } trap CHILDSTATUS {err} {
+        puts "failed to open $url: $err"
+    }
+}
+
 proc misc::get_ini_filename {} {
     set name [string totitle [tk appname]].ini
     set home [file home]

@@ -1,8 +1,9 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-const VERSION 0.1.0
+const VERSION 0.2.0
 
 const PAD 3
+const VGAP 6
 
 const SHORT_WAIT 20_000
 const LONG_WAIT 60_000

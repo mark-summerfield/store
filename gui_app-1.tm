@@ -2,6 +2,7 @@
 
 package require autoscroll 1
 package require diff
+package require gui_about
 package require gui_globals
 package require gui_misc
 package require inifile
@@ -606,9 +607,7 @@ oo::define App method on_help {} {
     puts "TODO on_help" ;# TODO
 }
 
-oo::define App method on_about {} {
-    puts "TODO on_about" ;# TODO
-}
+oo::define App method on_about {} { gui_about::show_modal }
 
 oo::define App method on_quit {} {
     set ini [ini::open $ConfigFilename -encoding utf-8 w]

@@ -4,6 +4,7 @@ package require autoscroll 1
 package require gui_globals
 package require gui_misc
 package require inifile
+package require lambda 1
 package require ntext 1
 
 set ShowState asis ;# should be an instance variable!
@@ -62,6 +63,7 @@ oo::define App method display {} {
     wm deiconify .
     raise .
     focus $widget
+    after 50 [lambda {} { .panes sashpos 0 [winfo width .controlsFrame] }]
 }
 
 oo::define App method make_widgets {} {

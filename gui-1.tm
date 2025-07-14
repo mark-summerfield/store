@@ -29,7 +29,7 @@ proc gui::wishinit {} {
 }
 
 proc gui::read_config {} {
-    set filename [misc::get_ini_filename]
+    set filename [gui_misc::get_ini_filename]
     set family Courier
     set size [expr {1 + [font configure TkDefaultFont -size]}]
     if {[file exists $filename] && [file size $filename]} {

@@ -1,8 +1,11 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-namespace eval misc {}
+package require autoscroll 1
+package require ntext 1
 
-proc misc::icon {svg {width 0}} {
+namespace eval gui_misc {}
+
+proc gui_misc::icon {svg {width 0}} {
     if {!$width} {
         return [image create photo -file $::APPPATH/images/$svg]
     }
@@ -10,7 +13,7 @@ proc misc::icon {svg {width 0}} {
         -format "svg -scaletowidth $width"
 }
 
-proc misc::prepare_form {window on_close {modal true} {x 0} {y 0}} {
+proc gui_misc::prepare_form {window on_close {modal true} {x 0} {y 0}} {
     wm withdraw $window
     if {$modal} {
         wm transient $window .
@@ -30,7 +33,20 @@ proc misc::prepare_form {window on_close {modal true} {x 0} {y 0}} {
     focus $window
 }
 
-proc misc::open_webpage url {
+proc gui_misc::make_text_frame {} {
+    set textFrame [ttk::frame .textFrame]
+    set txt [text .textFrame.text -wrap word \
+        -yscrollcommand {.textFrame.scrolly set} -font Mono]
+    bindtags $txt {$txt Ntext . all}
+    ttk::scrollbar .textFrame.scrolly -orient vertical \
+        -command {.textFrame.text yview}
+    pack .textFrame.scrolly -side right -fill y -expand true
+    pack .textFrame.text -side left -fill both -expand true
+    autoscroll::autoscroll .textFrame.scrolly
+    list $textFrame $txt
+}
+
+proc gui_misc::open_webpage url {
     if {[tk windowingsystem] eq "win32"} {
         set cmd [list {*}[auto_execok start] {}]
     } else {
@@ -43,7 +59,7 @@ proc misc::open_webpage url {
     }
 }
 
-proc misc::get_ini_filename {} {
+proc gui_misc::get_ini_filename {} {
     set name [string totitle [tk appname]].ini
     set home [file home]
     if {[tk windowingsystem] eq "win32"} {
@@ -62,22 +78,4 @@ proc misc::get_ini_filename {} {
         }
     }
     lindex $names $index
-}
-
-proc misc::human_size {value {suffix B} {dp 0}} {
-    if {!$value} {
-        return "$value $suffix"
-    }
-    set factor 1
-    if {$value < 0} {
-        set factor -1
-        set value [expr {$value * $factor}]
-    }
-
-    set log_n [expr {int(log($value) / log(1024))}]
-    set prefix [lindex [list "" "Ki" "Mi" "Gi" "Ti" "Pi" "Ei" "Zi" "Yi"] \
-        $log_n]
-    set value [expr {$value / (pow(1024, $log_n))}]
-    set value [expr {$value * $factor}]
-    return "[format %.${dp}f $value] ${prefix}${suffix}"
 }

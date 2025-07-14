@@ -1,6 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require misc
+package require gui_misc
 
 namespace eval gui_about {}
 
@@ -8,7 +8,7 @@ proc gui_about::show_modal {} {
     make_widgets
     make_layout
     make_bindings
-    misc::prepare_form .about { gui_about::on_close }
+    gui_misc::prepare_form .about { gui_about::on_close }
 }
 
 proc gui_about::make_widgets {} {
@@ -21,7 +21,7 @@ proc gui_about::make_widgets {} {
     populate_about_text
     .about.text configure -state disabled
     ttk::button .about.ok_button -text OK -compound left \
-        -image [misc::icon ok.svg $::ICON_SIZE] \
+        -image [gui_misc::icon ok.svg $::ICON_SIZE] \
         -command { gui_about::on_close } -underline 0 
 }
 
@@ -47,7 +47,7 @@ proc gui_about::on_click_url index {
         if {![string match -nocase http?://* $url]} {
             set url [string cat http:// $url]
         }
-        misc::open_webpage $url
+        gui_misc::open_webpage $url
     }
 }
 
@@ -61,7 +61,7 @@ proc gui_about::on_close {} {
 proc gui_about::populate_about_text {} {
     add_text_tags .about.text
     set img [.about.text image create end -align center \
-             -image [misc::icon store.svg 64]]
+             -image [gui_misc::icon store.svg 64]]
     .about.text tag add spaceabove $img
     .about.text tag add center $img
     .about.text insert end "\nStore $::VERSION\n" {center title}

@@ -1,22 +1,20 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require autoscroll 1
-package require diff
 package require gui_about
+package require gui_actions
 package require gui_globals
 package require gui_misc
 package require inifile
 package require lambda 1
-package require ntext 1
 
 oo::class create App {
+    variable ShowState
     variable ConfigFilename
-    variable Tabs
     variable StoreFilename
+    variable Tabs
     variable FilenameTree
     variable GenerationTree
     variable Text
-    variable ShowState
     variable StatusInfoLabel
     variable StatusAddableLabel
     variable StatusUpdatableLabel
@@ -46,7 +44,7 @@ oo::define App method prepare {} {
     wm withdraw .
     wm title . [tk appname]
     wm iconname . [tk appname]
-    wm iconphoto . -default [misc::icon store.svg]
+    wm iconphoto . -default [gui_misc::icon store.svg]
     wm minsize . 640 480
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
@@ -71,7 +69,8 @@ oo::define App method display {} {
 oo::define App method make_widgets {} {
     set panes [ttk::panedwindow .panes -orient horizontal]
     $panes add [my make_tabs]
-    $panes add [my make_text_frame]
+    lassign [gui_misc::make_text_frame] textFrame Text
+    $panes add $textFrame
     my make_status_bar
     my make_controls
     my layout_controls
@@ -82,28 +81,28 @@ oo::define App method make_controls {} {
     set controlsFrame [ttk::frame .controlsFrame]
     ttk::button .controlsFrame.openButton -text {Open Store…} \
         -underline 0 -compound left -command [callback on_open] \
-        -image [misc::icon document-open.svg $::ICON_SIZE]
+        -image [gui_misc::icon document-open.svg $::ICON_SIZE]
     ttk::button .controlsFrame.addButton -text Add -underline 0 \
         -compound left -command [callback on_add] \
-        -image [misc::icon document-save-as.svg $::ICON_SIZE]
+        -image [gui_misc::icon document-save-as.svg $::ICON_SIZE]
     ttk::button .controlsFrame.updateButton -text Update -underline 0 \
         -compound left -command [callback on_update] \
-        -image [misc::icon document-save.svg $::ICON_SIZE]
+        -image [gui_misc::icon document-save.svg $::ICON_SIZE]
     ttk::button .controlsFrame.extractButton -text Extract -underline 0 \
         -compound left -command [callback on_extract] \
-        -image [misc::icon edit-copy.svg $::ICON_SIZE]
+        -image [gui_misc::icon edit-copy.svg $::ICON_SIZE]
     ttk::button .controlsFrame.copyToButton -text {Copy To…} -underline 0 \
         -compound left -command [callback on_copy_to] \
-        -image [misc::icon folder-new.svg $::ICON_SIZE]
+        -image [gui_misc::icon folder-new.svg $::ICON_SIZE]
     ttk::button .controlsFrame.ignoresButton -text Ignores… -underline 0 \
         -compound left -command [callback on_ignores] \
-        -image [misc::icon document-properties.svg $::ICON_SIZE]
+        -image [gui_misc::icon document-properties.svg $::ICON_SIZE]
     ttk::button .controlsFrame.cleanButton -text Clean -underline 1 \
         -compound left -command [callback on_clean] \
-        -image [misc::icon edit-clear.svg $::ICON_SIZE]
+        -image [gui_misc::icon edit-clear.svg $::ICON_SIZE]
     ttk::button .controlsFrame.purgeButton -text Purge… -underline 0 \
         -compound left -command [callback on_purge] \
-        -image [misc::icon edit-cut.svg $::ICON_SIZE]
+        -image [gui_misc::icon edit-cut.svg $::ICON_SIZE]
     ttk::frame .controlsFrame.showFrame -relief groove 
     ttk::radiobutton .controlsFrame.showFrame.asIsRadio \
         -text "Show As-Is" -underline 0 -value asis \
@@ -124,16 +123,16 @@ oo::define App method make_controls {} {
     ttk::entry .controlsFrame.findFrame.findEntry -width 15
     ttk::button .controlsFrame.optionsButton -text Options… -underline 2 \
         -compound left -command [callback on_options] \
-        -image [misc::icon preferences-system.svg $::ICON_SIZE]
+        -image [gui_misc::icon preferences-system.svg $::ICON_SIZE]
     ttk::button .controlsFrame.helpButton -text Help -compound left \
         -command [callback on_help] \
-        -image [misc::icon help.svg $::ICON_SIZE]
+        -image [gui_misc::icon help.svg $::ICON_SIZE]
     ttk::button .controlsFrame.aboutButton -text About -underline 1 \
         -compound left -command [callback on_about] \
-        -image [misc::icon about.svg $::ICON_SIZE]
+        -image [gui_misc::icon about.svg $::ICON_SIZE]
     ttk::button .controlsFrame.quitButton -text Quit -underline 0 \
         -compound left -command [callback on_quit] \
-        -image [misc::icon quit.svg $::ICON_SIZE]
+        -image [gui_misc::icon quit.svg $::ICON_SIZE]
 }
 
 oo::define App method layout_controls {} {
@@ -229,19 +228,6 @@ oo::define App method set_tree_tags {tree} {
     $tree tag configure parent -foreground blue
     $tree tag configure untracked -foreground red
     $tree tag configure generation -foreground green
-}
-
-oo::define App method make_text_frame {} {
-    set textFrame [ttk::frame .textFrame]
-    set Text [text .textFrame.text -wrap word \
-        -yscrollcommand {.textFrame.scrolly set} -font Mono]
-    bindtags $Text {$Text Ntext . all}
-    ttk::scrollbar .textFrame.scrolly -orient vertical \
-        -command {.textFrame.text yview}
-    pack .textFrame.scrolly -side right -fill y -expand true
-    pack .textFrame.text -side left -fill both -expand true
-    autoscroll::autoscroll .textFrame.scrolly
-    return $textFrame
 }
 
 oo::define App method make_status_bar {} {
@@ -449,35 +435,8 @@ oo::define App method get_selected {} {
 }
 
 oo::define App method diff {new_gid old_gid filename} {
-    set str [Store new $StoreFilename]
-    try {
-        if {$new_gid} {
-            lassign [$str get $new_gid $filename] _ new_data
-        } else {
-            if {![file exists $filename]} {
-                my set_status_info "can't diff \"$filename\"; not found\
-                        on disk" $::SHORT_WAIT
-                return
-            }
-            set new_data [readFile $filename binary]
-        }
-        if {!$old_gid} {
-            set old_gid [$str current_generation]
-        }
-        lassign [$str get $old_gid $filename] gid old_data
-    } finally {
-        $str close
-    }
-    if {!$gid} {
-        my set_status_info "can't diff @$old_gid \"$filename\"; not\
-                present in that generation" $::SHORT_WAIT
-        return
-    }
-    set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
-    set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
-    set delta [diff::diff $old_data $new_data]
-    set delta [diff::contextualize $delta]
-    diff::diff_text $delta $Text
+    gui_actions::diff $StoreFilename $Text [callback set_status_info] \
+        $new_gid $old_gid $filename
 }
 
 oo::define App method on_tab_changed {} {
@@ -609,17 +568,4 @@ oo::define App method on_help {} {
 
 oo::define App method on_about {} { gui_about::show_modal }
 
-oo::define App method on_quit {} {
-    set ini [ini::open $ConfigFilename -encoding utf-8 w]
-    try {
-        ini::set $ini $::SECT_WINDOW $::KEY_GEOMETRY [wm geometry .]
-        ini::set $ini $::SECT_WINDOW $::KEY_FONTSIZE \
-            [font configure Mono -size]
-        ini::set $ini $::SECT_WINDOW $::KEY_FONTFAMILY \
-            [font configure Mono -family]
-        ini::commit $ini
-    } finally {
-        ::ini::close $ini
-    }
-    exit
-}
+oo::define App method on_quit {} { gui_actions::on_quit $ConfigFilename }

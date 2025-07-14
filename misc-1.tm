@@ -38,3 +38,21 @@ proc misc::ignore {filename ignores} {
 proc misc::valid_file name {
     expr {![string match {.*} [file tail $name]] && [file size $name]}
 }
+
+proc misc::human_size {value {suffix B} {dp 0}} {
+    if {!$value} {
+        return "$value $suffix"
+    }
+    set factor 1
+    if {$value < 0} {
+        set factor -1
+        set value [expr {$value * $factor}]
+    }
+
+    set log_n [expr {int(log($value) / log(1024))}]
+    set prefix [lindex [list "" "Ki" "Mi" "Gi" "Ti" "Pi" "Ei" "Zi" "Yi"] \
+        $log_n]
+    set value [expr {$value / (pow(1024, $log_n))}]
+    set value [expr {$value * $factor}]
+    return "[format %.${dp}f $value] ${prefix}${suffix}"
+}

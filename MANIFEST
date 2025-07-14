@@ -14,6 +14,7 @@
 store # GUI
 gui-1.tm
 gui_app-1.tm
+gui_actions-1.tm
 gui_about-1.tm
 gui_misc-1.tm
 gui_globals-1.tm # VERSION

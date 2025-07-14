@@ -5,6 +5,7 @@ nagelfar.sh \
     | grep -v Bad.option.-striped.to..ttk::treeview. \
     | grep -v Variable.*is.never.read \
     | grep -v Found.constant.*which.is.also.a.variable \
+    | grep -v Suspicious.variable.name...my.varname \
     | grep -v test_store.tcl.*Found.constant..filename
 echo --- Tests ---
 ./test_store.tcl

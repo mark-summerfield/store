@@ -6,6 +6,7 @@ package require gui_globals
 package require gui_misc
 package require inifile
 package require lambda 1
+package require misc
 
 oo::class create App {
     variable ShowState
@@ -56,9 +57,7 @@ oo::define App method display {} {
     if {$StoreFilename ne ""} {
         wm title . "Store — [file dirname $StoreFilename]"
         set widget $FilenameTree
-        my populate_file_tree
-        my populate_generation_tree
-        my on_files_tab
+        my populate
     } else {
         wm title . Store
     }
@@ -66,6 +65,12 @@ oo::define App method display {} {
     raise .
     focus $widget
     after 50 [lambda {} { .panes sashpos 0 [winfo width .controlsFrame] }]
+}
+
+oo::define App method populate {} {
+    my populate_file_tree
+    my populate_generation_tree
+    my on_files_tab
 }
 
 oo::define App method make_widgets {} {
@@ -437,6 +442,10 @@ oo::define App method diff {new_gid old_gid filename} {
         [callback set_status_info] $new_gid $old_gid $filename
 }
 
+oo::define App method reporter {message} {
+    my set_status_info $message $::SHORT_WAIT
+}
+
 oo::define App method on_tab_changed {} {
     if {[$Tabs index [$Tabs select]]} {
         my on_generations_tab
@@ -488,23 +497,83 @@ oo::define App method on_generations_tab {} {
 }
 
 oo::define App method on_open {} {
-    puts "TODO on_open" ;# TODO
+    set dirname [tk_chooseDirectory -initialdir . \
+                 -title "[tk appname] — Choose Store Folder to Open" \
+                 -mustexist true -parent .]
+    if {$dirname ne ""} {
+        cd $dirname
+        set StoreFilename [file normalize .[file tail $dirname].str]
+        wm title . "Store — [file dirname $StoreFilename]"
+        my populate
+        my set_status_info "Read '$StoreFilename'"
+        my report_status
+    }
 }
 
 oo::define App method on_add {} {
-    puts "TODO on_add" ;# TODO
+    set str [Store new $StoreFilename [callback set_status_info]]
+    try {
+        set names [$str addable]
+        if {[llength $names]} {
+            set n [$str add {*}$names]
+            lassign [misc::n_s $n] n s
+            my set_status_info "added $n file$s" $::SHORT_WAIT
+            my report_status
+        } else {
+            my set_status_info "none to add" $::SHORT_WAIT
+        }
+    } finally {
+        $str close
+    }
 }
 
 oo::define App method on_update {} {
-    puts "TODO on_update" ;# TODO
+    set str [Store new $StoreFilename [callback set_status_info]]
+    try {
+        if {[$str have_updates]} {
+            $str update ""
+            my set_status_info updated $::SHORT_WAIT
+            my report_status
+        } else {
+            my set_status_info "none to update" $::SHORT_WAIT
+        }
+    } finally {
+        $str close
+    }
 }
 
 oo::define App method on_extract {} {
-    puts "TODO on_extract" ;# TODO
+    lassign [my get_selected] ok gid filename
+    if {$ok} {
+        set str [Store new $StoreFilename [callback set_status_info]]
+        try {
+            $str extract $gid $filename
+        } finally {
+            $str close
+        }
+    } else {
+        my set_status_info "no file selected for extraction" $::SHORT_WAIT
+    }
 }
 
 oo::define App method on_copy_to {} {
-    puts "TODO on_copy_to" ;# TODO
+    set str [Store new $StoreFilename [callback set_status_info]]
+    try {
+        set gid [$str current_generation]
+        if {$gid} {
+            set dirname [tk_chooseDirectory -initialdir . \
+                         -title "[tk appname] — Choose Folder to Copy To" \
+                         -mustexist false -parent .]
+            if {$dirname ne ""} {
+                $str copy $gid $dirname
+                my set_status_info "copied @$gid to $dirname" $::SHORT_WAIT
+            }
+        } else {
+            my set_status_info "no generation to copy" $::SHORT_WAIT
+        }
+    } finally {
+        $str close
+    }
 }
 
 oo::define App method on_ignores {} {
@@ -512,7 +581,14 @@ oo::define App method on_ignores {} {
 }
 
 oo::define App method on_clean {} {
-    puts "TODO on_clean" ;# TODO
+    set str [Store new $StoreFilename [callback set_status_info]]
+    try {
+        $str clean
+        my set_status_info cleaned $::SHORT_WAIT
+        my report_status
+    } finally {
+        $str close
+    }
 }
 
 oo::define App method on_purge {} {

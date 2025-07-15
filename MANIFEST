@@ -1,10 +1,5 @@
-# TODO on_add
-# TODO on_update
-# TODO on_extract
-# TODO on_clean
 # TODO on_purge
-# TODO on_copy_to
-# TODO on_open
+# TODO on_ignores
 # TODO on_find
 
 store # GUI

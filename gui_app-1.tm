@@ -17,6 +17,7 @@ oo::class create App {
     variable FilenameTree
     variable GenerationTree
     variable Text
+    variable FindEntry
     variable StatusInfoLabel
     variable StatusAddableLabel
     variable StatusUpdatableLabel
@@ -71,6 +72,15 @@ oo::define App method populate {} {
     my populate_file_tree
     my populate_generation_tree
     my on_files_tab
+    if {$StoreFilename ne ""} {
+        set str [Store new $StoreFilename [callback set_status_info]]
+        try {
+            .controlsFrame.showFrame.diffGenSpinbox set \
+                [$str current_generation]
+        } finally {
+            $str close
+        }
+    }
 }
 
 oo::define App method make_widgets {} {
@@ -130,7 +140,7 @@ oo::define App method make_controls {} {
     .controlsFrame.showFrame.diffGenSpinbox set 0
     ttk::frame .controlsFrame.findFrame -relief groove 
     ttk::label .controlsFrame.findFrame.findLabel -text Find: -underline 2
-    ttk::entry .controlsFrame.findFrame.findEntry -width 15
+    set FindEntry [ttk::entry .controlsFrame.findFrame.findEntry -width 15]
     ttk::button .controlsFrame.aboutButton -text About -underline 1 \
         -compound left -command [callback on_about] \
         -image [gui_misc::icon about.svg $::ICON_SIZE]
@@ -187,7 +197,7 @@ oo::define App method make_files_tree {} {
     $FilenameTree configure -show tree -selectmode browse
     ttk::scrollbar .panes.tabs.filenameTreeFrame.scrolly -orient vertical \
         -command {.panes.tabs.filenameTreeFrame.filenameTree yview}
-    my set_tree_tags $FilenameTree
+    gui_misc::set_tree_tags $FilenameTree
     grid .panes.tabs.filenameTreeFrame.filenameTree -row 0 -column 0 \
         -sticky news
     grid .panes.tabs.filenameTreeFrame.scrolly -row 0 -column 1 -sticky ns
@@ -224,14 +234,8 @@ oo::define App method make_generations_tree {} {
     grid rowconfigure .panes.tabs.generationTreeFrame 0 -weight 1
     autoscroll::autoscroll .panes.tabs.generationTreeFrame.scrolly
     autoscroll::autoscroll .panes.tabs.generationTreeFrame.scrollx
-    my set_tree_tags $GenerationTree
+    gui_misc::set_tree_tags $GenerationTree
     return $generationTreeFrame
-}
-
-oo::define App method set_tree_tags {tree} {
-    $tree tag configure parent -foreground blue
-    $tree tag configure untracked -foreground red
-    $tree tag configure generation -foreground green
 }
 
 oo::define App method make_status_bar {} {
@@ -313,7 +317,7 @@ oo::define App method set_status_info {{text ""} {timeout 0}} {
 oo::define App method report_status {} {
     if {[file exists $StoreFilename]} {
         catch { ;# if the timeout coincides with other db action we skip
-            set str [Store new $StoreFilename]
+            set str [Store new $StoreFilename [callback set_status_info]]
             try {
                 set names [$str addable]
                 if {[llength $names]} {
@@ -353,49 +357,63 @@ oo::define App method report_status {} {
 }
 
 oo::define App method populate_file_tree {} {
+    lassign [my get_selected_from_files] sel_gid sel_filename
     $FilenameTree delete [$FilenameTree children {}]
     set prev_name ""
     set parent {}
-    set str [Store new $StoreFilename]
+    set str [Store new $StoreFilename [callback set_status_info]]
     try {
+        set updatable [$str updatable]
         foreach {name gid} [$str history {}] {
             if {$name ne $prev_name} {
                 set prev_name $name
-                set tag [expr {[$str untracked $name] ? "untracked" \
-                                                      : "parent"}]
+                if {[lsearch -exact $updatable $name] != -1} {
+                    set tag updatable
+                } else {
+                    set tag [expr {[$str untracked $name] ? "untracked" \
+                                                          : "parent"}]
+                }
                 set parent [$FilenameTree insert {} end -text $name \
                             -tags $tag]
             }
             $FilenameTree insert $parent end -text @$gid -tags generation
         }
+        my select_files_tree_item $sel_gid $sel_filename
     } finally {
         $str close
     }
 }
 
 oo::define App method populate_generation_tree {} {
+    lassign [my get_selected_from_generations] ok sel_gid sel_filename
     $GenerationTree delete [$GenerationTree children {}]
     set prev_gid ""
     set parent {}
-    set str [Store new $StoreFilename]
+    set str [Store new $StoreFilename [callback set_status_info]]
     try {
+        set updatable [$str updatable]
         foreach {gid created message filename} [$str generations true] {
             if {$gid ne $prev_gid} {
                 set prev_gid $gid
                 set parent [$GenerationTree insert {} end -text @$gid \
                     -tags parent -values [list $created $message]]
             }
-            set tag [expr {[$str untracked $filename] ? "untracked" \
-                                                      : "generation"}]
+            if {[lsearch -exact $updatable $filename] != -1} {
+                set tag updatable
+            } else {
+                set tag [expr {[$str untracked $filename] \
+                                ? "untracked" : "generation"}]
+            }
             $GenerationTree insert $parent end -text $filename -tags $tag
         }
+        if {$ok} { my select_generations_tree_item $sel_gid $sel_filename }
     } finally {
         $str close
     }
 }
 
 oo::define App method show_file {gid filename} {
-    set str [Store new $StoreFilename]
+    set str [Store new $StoreFilename [callback set_status_info]]
     try {
         if {!$gid} { set gid [$str current_generation] }
         lassign [$str get $gid $filename] _ data
@@ -409,32 +427,75 @@ oo::define App method show_file {gid filename} {
 oo::define App method get_selected {} {
     set ok false
     if {[$Tabs  select] eq ".panes.tabs.filenameTreeFrame"} {
-        set item [$FilenameTree selection]
-        set txt [$FilenameTree item $item -text]
-        if {[string match {@*} $txt]} {
-            set gid [string range $txt 1 end]
-            set filename [$FilenameTree item [$FilenameTree parent $item] \
-                    -text]
-        } else {
-            set gid 0
-            set filename $txt
-        }
+        lassign [my get_selected_from_files] gid filename
         set ok true
     } else {
-        set item [$GenerationTree selection]
-        set txt [$GenerationTree item $item -text]
-        if {[string match {@*} $txt]} {
-            set gid [string range $txt 1 end]
-            set filename "" ;# no filename specified
-        } else {
-            set gid [$GenerationTree item [$GenerationTree parent $item] \
-                    -text]
-            set gid [string range $gid 1 end]
-            set filename $txt
-            set ok true
-        }
+        lassign [my get_selected_from_generations] ok gid filename
     }
     return [list $ok $gid $filename]
+}
+
+oo::define App method get_selected_from_files {} {
+    set item [$FilenameTree selection]
+    set txt [$FilenameTree item $item -text]
+    if {[string match {@*} $txt]} {
+        set gid [string range $txt 1 end]
+        set filename [$FilenameTree item [$FilenameTree parent $item] -text]
+    } else {
+        set gid 0
+        set filename $txt
+    }
+    return [list $gid $filename]
+}
+
+oo::define App method get_selected_from_generations {} {
+    set ok false
+    set item [$GenerationTree selection]
+    set txt [$GenerationTree item $item -text]
+    if {[string match {@*} $txt]} {
+        set gid [string range $txt 1 end]
+        set filename "" ;# no filename specified
+    } else {
+        set gid [$GenerationTree item [$GenerationTree parent $item] -text]
+        set gid [string range $gid 1 end]
+        set filename $txt
+        set ok true
+    }
+    return [list $ok $gid $filename]
+}
+
+oo::define App method select_files_tree_item {gid filename} {
+    foreach item [$FilenameTree children {}] {
+        set txt [$FilenameTree item $item -text]
+        if {$txt eq $filename} {
+            foreach child [$FilenameTree children $item] {
+                set txt [$FilenameTree item $child -text]
+                if {$txt eq "@$gid"} {
+                    set item $child
+                    break
+                }
+            }
+            $FilenameTree selection set $item
+            $FilenameTree see $item
+        }
+    }
+}
+
+oo::define App method select_generations_tree_item {gid filename} {
+    foreach item [$GenerationTree children {}] {
+        set txt [$GenerationTree item $item -text]
+        if {$txt eq "@$gid"} {
+            foreach child [$GenerationTree children $item] {
+                set txt [$GenerationTree item $child -text]
+                if {$txt eq $filename} {
+                    set item $child
+                    break
+                }
+            }
+            $GenerationTree selection set $item
+            $GenerationTree see $item
+        }
+    }
 }
 
 oo::define App method diff {new_gid old_gid filename} {
@@ -534,6 +595,7 @@ oo::define App method on_update {} {
             $str update ""
             my set_status_info updated $::SHORT_WAIT
             my report_status
+            my populate
         } else {
             my set_status_info "none to update" $::SHORT_WAIT
         }
@@ -592,7 +654,26 @@ oo::define App method on_clean {} {
 }
 
 oo::define App method on_purge {} {
-    puts "TODO on_purge" ;# TODO prompt yes/no first!
+    lassign [my get_selected] ok gid filename
+    if {!$ok} {
+        my set_status_info "Select a file purge" $::SHORT_WAIT
+    } else {
+        if {[tk_messageBox -title "[tk appname] — Purge" \
+                   -message "Permanently delete '$filename' from the\
+                            Store?" \
+                   -icon question -type yesno -default no] eq "yes"} {
+            set str [Store new $StoreFilename [callback set_status_info]]
+            try {
+                set n [$str purge $filename]
+                lassign [misc::n_s $n] n s
+                my set_status_info "purged $n version$s" $::SHORT_WAIT
+                my report_status
+                my populate
+            } finally {
+                $str close
+            }
+        }
+    }
 }
 
 oo::define App method on_show_asis {} {
@@ -637,7 +718,22 @@ oo::define App method on_in_context {} {
 }
 
 oo::define App method on_find {} {
-    puts "TODO on_find" ;# TODO
+    set what [$FindEntry get]
+    set offset [string length $what]
+    if {$offset} {
+        set pos [$Text search -nocase $what \
+                    "[$Text index insert] + 1 chars"]
+        if {$pos eq ""} {
+            my set_status_info "no (more) '$what' found" $::SHORT_WAIT
+        } else {
+            $Text mark set insert $pos
+            $Text tag remove sel {*}[$Text tag ranges sel]
+            $Text tag add sel $pos "$pos + $offset chars"
+            $Text see $pos
+        }
+    } else {
+        my set_status_info "nothing to find" $::SHORT_WAIT
+    }
 }
 
 oo::define App method on_about {} { gui_about::show_modal }

@@ -46,6 +46,13 @@ proc gui_misc::make_text_frame {} {
     list $textFrame $txt
 }
 
+proc gui_misc::set_tree_tags tree {
+    $tree tag configure parent -foreground blue
+    $tree tag configure untracked -foreground gray
+    $tree tag configure generation -foreground green
+    $tree tag configure updatable -foreground red
+}
+
 proc gui_misc::open_webpage url {
     if {[tk windowingsystem] eq "win32"} {
         set cmd [list {*}[auto_execok start] {}]

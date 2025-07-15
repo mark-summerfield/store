@@ -134,7 +134,7 @@ oo::define Store method UpdateOne {gid filename} {
 oo::define Store method FindMatch {gid filename data} {
     set gid [$Db eval {
         SELECT gid FROM Files
-        WHERE filename = :filename AND kind IN ('U', 'Z') AND data = :data
+        WHERE filename = :filename AND kind != 'S' AND data = :data
               AND gid != :gid
         ORDER BY gid DESC LIMIT 1
     }]
@@ -284,7 +284,7 @@ oo::define Store method history {{filename ""}} {
     if {$filename ne ""} {
         return [$Db eval {
             SELECT filename, gid FROM Files
-            WHERE filename = :filename AND kind in ('U', 'Z')
+            WHERE filename = :filename AND kind != 'S'
             ORDER BY gid DESC}]
     }
     $Db eval {SELECT filename, gid FROM HistoryByFilename}
@@ -292,7 +292,7 @@ oo::define Store method history {{filename ""}} {
 
 oo::define Store method gids_for_filename {filename} {
     $Db eval {SELECT '@' || gid FROM Files
-              WHERE filename = :filename AND kind in ('U', 'Z')
+              WHERE filename = :filename AND kind != 'S'
               ORDER BY gid DESC}
 }
 
@@ -308,7 +308,7 @@ oo::define Store method find_data_gid {gid filename} {
 
 oo::define Store method find_gid_for_untracked {filename} {
     set gid [$Db eval {SELECT gid FROM Files WHERE filename = :filename
-                       AND kind IN ('U', 'Z') ORDER BY gid DESC LIMIT 1}]
+                       AND kind != 'S' ORDER BY gid DESC LIMIT 1}]
     expr {$gid eq "" ? 0 : $gid}
 }
 

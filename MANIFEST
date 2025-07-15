@@ -1,3 +1,10 @@
+# TODO
+#
+# str
+#   - add support for str G|gui
+#   - if successful do ln -s str store and if the user runs store have
+#     str check if {[string match *store $::argv0]} then launch gui
+#
 # TODO on_ignores: need modal dialog with list of ignores
 #   |list box: i.e., a ttk::treeview |
 #    &Add [pattern to add] &Delete'selected' Close<Escape>;

@@ -45,13 +45,13 @@ CREATE VIEW EmptyGenerations AS
         SELECT gid FROM Files WHERE kind != 'S');
 
 CREATE VIEW HistoryByFilename AS
-    SELECT filename, gid FROM Files WHERE kind in ('U', 'Z')
+    SELECT filename, gid FROM Files WHERE kind != 'S'
         ORDER BY LOWER(filename), gid DESC;
 
 CREATE VIEW HistoryByGeneration AS
     SELECT Generations.gid, DATETIME(created) AS created, message, filename
         FROM Generations, Files
-        WHERE Generations.gid = Files.gid AND kind in ('U', 'Z')
+        WHERE Generations.gid = Files.gid AND kind != 'S'
         ORDER BY Generations.gid DESC, LOWER(filename);
 
 CREATE VIEW Untracked AS

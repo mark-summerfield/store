@@ -1,4 +1,10 @@
-# TODO on_ignores
+# TODO on_ignores: need modal dialog with list of ignores
+#   |list box: i.e., a ttk::treeview |
+#    &Add [pattern to add] &Delete'selected' Close<Escape>;
+#   see Gravitate's options_form
+#
+# TODO replace tk_messageBox with my own modal dialog that returns yes|no;
+#   see ignores_form (or Gravitate's options_form)
 
 store # GUI
 gui-1.tm

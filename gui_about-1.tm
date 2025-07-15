@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require gui_misc
+package require misc
 
 namespace eval gui_about {}
 
@@ -15,14 +16,14 @@ proc gui_about::make_widgets {} {
     tk::toplevel .about
     wm title .about "[tk appname] — About"
     wm resizable .about false false
-    set height 15
+    set height 16
     tk::text .about.text -width 50 -height $height -wrap word \
         -background "#F0F0F0" -spacing3 $::VGAP
     populate_about_text
     .about.text configure -state disabled
-    ttk::button .about.ok_button -text OK -compound left \
-        -image [gui_misc::icon ok.svg $::ICON_SIZE] \
-        -command { gui_about::on_close } -underline 0 
+    ttk::button .about.ok_button -text Close -compound left \
+        -image [gui_misc::icon close.svg $::ICON_SIZE] \
+        -command { gui_about::on_close }
 }
 
 
@@ -33,7 +34,6 @@ proc gui_about::make_layout {} {
 
 
 proc gui_about::make_bindings {} {
-    bind .about <Alt-o> { gui_about::on_close }
     bind .about <Escape> { gui_about::on_close }
     bind .about <Return> { gui_about::on_close }
     .about.text tag bind url <Double-1> { gui_about::on_click_url @%x,%y }
@@ -81,6 +81,7 @@ proc gui_about::populate_about_text {} {
     .about.text insert end "License: GPLv3.\n" {center green}
     .about.text insert end "[string repeat " " 60]\n" {center hr}
     .about.text insert end "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
+    .about.text insert end "[misc::sqlite_version]\n" center
     if {$distro != ""} { .about.text insert end "$distro\n" center }
     .about.text insert end "$::tcl_platform(os) $::tcl_platform(osVersion)\
         ($::tcl_platform(machine))\n" center

@@ -6,8 +6,6 @@
 # TODO on_copy_to
 # TODO on_open
 # TODO on_find
-# TODO tooltips for buttons etc.
-# TODO do simple per-language syntax highlighting (e.g., keywords)
 
 store # GUI
 gui-1.tm

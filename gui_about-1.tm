@@ -11,6 +11,7 @@ proc gui_about::show_modal {} {
     make_layout
     make_bindings
     gui_misc::prepare_form .about { gui_about::on_close }
+    gui_misc::show_modal .about
 }
 
 proc gui_about::make_widgets {} {
@@ -22,7 +23,7 @@ proc gui_about::make_widgets {} {
         -background "#F0F0F0" -spacing3 $::VGAP
     populate_about_text
     .about.text configure -state disabled
-    ttk::button .about.ok_button -text Close -compound left \
+    ttk::button .about.close_button -text Close -compound left \
         -image [gui_misc::icon close.svg $::ICON_SIZE] \
         -command { gui_about::on_close }
 }
@@ -30,7 +31,7 @@ proc gui_about::make_widgets {} {
 
 proc gui_about::make_layout {} {
     grid .about.text -sticky nsew -pady $::PAD
-    grid .about.ok_button -pady $::PAD
+    grid .about.close_button -pady $::PAD
 }
 
 
@@ -45,7 +46,7 @@ proc gui_about::on_click_url index {
     set indexes [.about.text tag prevrange url $index]
     set url [string trim [.about.text get {*}$indexes]]
     if {$url ne ""} {
-        if {![string match -nocase http?://* $url]} {
+        if {![string match -nocase http*://* $url]} {
             set url [string cat http:// $url]
         }
         gui_misc::open_webpage $url
@@ -53,10 +54,7 @@ proc gui_about::on_click_url index {
 }
 
 
-proc gui_about::on_close {} {
-    grab release .about
-    destroy .about
-}
+proc gui_about::on_close {} { gui_misc::destroy_form .about }
 
 
 proc gui_about::populate_about_text {} {

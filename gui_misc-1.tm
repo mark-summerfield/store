@@ -25,12 +25,31 @@ proc gui_misc::prepare_form {window on_close {modal true} {x 0} {y 0}} {
     }
     wm geometry $window "+$x+$y"
     wm protocol $window WM_DELETE_WINDOW $on_close
-    if {$modal} {
-        grab $window ;# caller must call: grab release $window
-    }
-    wm deiconify $window
-    raise $window
-    focus $window
+}
+
+proc gui_misc::show_modal {form {focus_widget ""}} {
+    wm deiconify $form
+    raise $form
+    focus $form
+    if {$focus_widget ne ""} { focus $focus_widget }
+    catch { grab set $form }
+    catch { tkwait visibility $form }
+}
+
+proc gui_misc::show_modeless form {
+    wm deiconify $form
+    raise $form
+    focus $form
+}
+
+proc gui_misc::destroy_form form {
+    grab release $form
+    destroy $form
+}
+
+proc gui_misc::hide_form form {
+    wm withdraw $form
+    grab release $form
 }
 
 proc gui_misc::make_text_frame {} {

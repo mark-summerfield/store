@@ -1,7 +1,3 @@
-# TODO on_ignores: need modeless smart dialog with list of ignores
-#   |list box: i.e., a ttk::treeview |
-#    &Add [pattern to add] &Delete'selected' Close<Escape>;
-#
 # TODO replace tk_messageBox with my own modal dialog that returns yes|no;
 #   see Gravitate's options_form
 
@@ -15,6 +11,7 @@ cli_globals-1.tm
 gui-1.tm
 gui_app-1.tm
 gui_actions-1.tm
+gui_ignores-1.tm
 gui_about-1.tm
 gui_misc-1.tm
 gui_globals-1.tm

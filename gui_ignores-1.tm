@@ -1,0 +1,152 @@
+# Copyright © 2025 Mark Summerfield. All rights reserved.
+
+package require gui_misc
+package require lambda 1
+package require misc
+package require store
+
+namespace eval gui_ignores {
+    variable StoreFilename
+}
+
+proc gui_ignores::show_modeless store_filename {
+    if {![winfo exists .ignoresForm]} {
+        toplevel .ignoresForm
+        wm title .ignoresForm "[tk appname] — Ignores"
+        wm attributes .ignoresForm -topmost 1
+        make_widgets
+        make_layout
+        make_bindings
+        wm minsize .ignoresForm 480 320
+        set on_close [lambda {} {gui_misc::hide_form .ignoresForm}]
+        gui_misc::prepare_form .ignoresForm $on_close false
+        populate $store_filename
+    }
+    gui_misc::show_modeless .ignoresForm
+    set_focus
+}
+
+proc gui_ignores::set_focus {} {
+    set ignoresList .ignoresForm.ignoresListFrame.ignoresList
+    focus $ignoresList
+    if {![llength [$ignoresList selection]]} {
+        set first [lindex [$ignoresList children {}] 0]
+        $ignoresList see $first
+        $ignoresList selection set $first
+        $ignoresList focus $first
+    }
+}
+
+proc gui_ignores::make_widgets {} {
+    ttk::frame .ignoresForm.ignoresListFrame
+    ttk::treeview .ignoresForm.ignoresListFrame.ignoresList -striped true \
+        -yscrollcommand {.ignoresForm.ignoresListFrame.scrolly set}
+    .ignoresForm.ignoresListFrame.ignoresList configure -show tree \
+        -selectmode browse
+    ttk::scrollbar .ignoresForm.ignoresListFrame.scrolly -orient vertical \
+        -command {.ignoresForm.ignoresListFrame.ignoresList yview}
+    ttk::frame .ignoresForm.controlsFrame
+    ttk::button .ignoresForm.controlsFrame.addButton -text Add: \
+        -compound left -image [gui_misc::icon list-add.svg $::ICON_SIZE] \
+        -command { gui_ignores::on_add } -underline 0
+    ttk::entry .ignoresForm.controlsFrame.addEntry -width 12
+    ttk::button .ignoresForm.controlsFrame.deleteButton -text Delete \
+        -compound left \
+        -image [gui_misc::icon list-remove.svg $::ICON_SIZE] \
+        -command { gui_ignores::on_delete } -underline 0
+    ttk::button .ignoresForm.controlsFrame.closeButton -text Close \
+        -compound left -image [gui_misc::icon close.svg $::ICON_SIZE] \
+        -command { gui_ignores::on_close }
+}
+
+
+proc gui_ignores::make_layout {} {
+    set opts "-padx $::PAD -pady $::PAD"
+    grid .ignoresForm.ignoresListFrame -row 0 -column 0 -sticky news
+    grid .ignoresForm.ignoresListFrame.ignoresList -row 0 -column 0 \
+        -sticky news
+    grid .ignoresForm.ignoresListFrame.scrolly -row 0 -column 1 -sticky ns
+    grid columnconfigure .ignoresForm.ignoresListFrame 0 -weight 9
+    grid rowconfigure .ignoresForm.ignoresListFrame 0 -weight 1
+    autoscroll::autoscroll .ignoresForm.ignoresListFrame.scrolly
+    grid .ignoresForm.controlsFrame -row 0 -column 1 -sticky ns
+    pack .ignoresForm.controlsFrame.addButton -side top {*}$opts
+    pack .ignoresForm.controlsFrame.addEntry -side top -fill x {*}$opts
+    pack .ignoresForm.controlsFrame.deleteButton -side top {*}$opts
+    pack .ignoresForm.controlsFrame.closeButton -side bottom {*}$opts
+    grid rowconfigure .ignoresForm 0 -weight 1
+    grid columnconfigure .ignoresForm 0 -weight 1
+}
+
+
+proc gui_ignores::make_bindings {} {
+    bind .ignoresForm.controlsFrame.addEntry <Return> {
+        gui_ignores::on_add
+    }
+    bind .ignoresForm <Alt-a> { gui_ignores::on_add }
+    bind .ignoresForm <Alt-d> { gui_ignores::on_delete }
+    bind .ignoresForm <Escape> { gui_ignores::on_close }
+}
+
+proc gui_ignores::populate {{store_filename ""}} {
+    if {$store_filename ne ""} {
+        set ::gui_ignores::StoreFilename $store_filename
+    }
+    if {[winfo exists .ignoresForm]} {
+        set ignoresList .ignoresForm.ignoresListFrame.ignoresList
+        $ignoresList delete [$ignoresList children {}]
+        set str [Store new $::gui_ignores::StoreFilename]
+        try {
+            foreach ignore [$str ignores] {
+                $ignoresList insert {} end -text $ignore
+            }
+        } finally {
+            $str close
+        }
+    }
+}
+
+proc gui_ignores::on_add {} {
+    if {[winfo exists .ignoresForm]} {
+        set txt [.ignoresForm.controlsFrame.addEntry get]
+        if {$txt eq ""} {
+            focus .ignoresForm.controlsFrame.addEntry
+        } else {
+            set str [Store new $::gui_ignores::StoreFilename]
+            try {
+                $str ignore $txt
+                populate
+            } finally {
+                $str close
+            }
+        }
+    }
+}
+
+proc gui_ignores::on_delete {} {
+    if {[winfo exists .ignoresForm]} {
+        set ignoresList .ignoresForm.ignoresListFrame.ignoresList
+        set item [$ignoresList selection]
+        if {$item ne {}} {
+            set index [expr {[$ignoresList index $item] - 1}]
+            set str [Store new $::gui_ignores::StoreFilename]
+            try {
+                $str unignore [$ignoresList item $item -text]
+                populate
+            } finally {
+                $str close
+            }
+            if {$index < 0 && ![llength [$ignoresList selection]]} {
+                set index 0
+            }
+            if {$index >= 0} {
+                set item [lindex [$ignoresList children {}] $index]
+                $ignoresList see $item
+                $ignoresList selection set $item
+                $ignoresList focus $item
+            }
+        }
+    }
+}
+
+proc gui_ignores::on_close {} { gui_misc::hide_form .ignoresForm }

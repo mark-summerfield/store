@@ -10,8 +10,8 @@ oo::class create FileData {
     variable Data ""
 }
 
-oo::define FileData constructor {{gid 0} {filename ""} {kind ""} \
-        {usize 0} {zsize 0} {pgid 0} {data ""}} {
+oo::define FileData constructor {{gid 0} {filename ""} {kind ""} {usize 0} \
+        {zsize 0} {pgid 0} {data ""}} {
     set Gid $gid 
     set Filename $filename 
     set Kind $kind 

@@ -3,6 +3,7 @@
 package require gui_about
 package require gui_actions
 package require gui_globals
+package require gui_ignores
 package require gui_misc
 package require inifile
 package require lambda 1
@@ -568,6 +569,7 @@ oo::define App method on_open {} {
         my populate
         my set_status_info "Read '$StoreFilename'"
         my report_status
+        gui_ignores::populate $StoreFilename
     }
 }
 
@@ -580,6 +582,7 @@ oo::define App method on_add {} {
             lassign [misc::n_s $n] n s
             my set_status_info "added $n file$s" $::SHORT_WAIT
             my report_status
+            my populate
         } else {
             my set_status_info "none to add" $::SHORT_WAIT
         }
@@ -639,7 +642,7 @@ oo::define App method on_copy_to {} {
 }
 
 oo::define App method on_ignores {} {
-    puts "TODO on_ignores" ;# TODO
+    gui_ignores::show_modeless $StoreFilename
 }
 
 oo::define App method on_clean {} {
@@ -731,8 +734,11 @@ oo::define App method on_find {} {
             if {$indexes ne ""} { $Text tag remove sel {*}$indexes }
             $Text tag add sel $pos "$pos + $offset chars"
             $Text see $pos
+            set lino [expr {int($pos)}]
+            my set_status_info "found '$what' on line $lino" $::SHORT_WAIT
         }
     } else {
+        focus $FindEntry
         my set_status_info "nothing to find" $::SHORT_WAIT
     }
 }

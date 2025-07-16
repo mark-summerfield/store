@@ -1,5 +1,5 @@
 # TODO replace tk_messageBox with my own modal dialog that returns yes|no;
-#   see Gravitate's options_form
+#   copy gui_about-1.tm and/or see Gravitate's options_form
 
 str
 
@@ -32,7 +32,11 @@ README.md
 
 st.sh
 
-# — Unhinted —
+# NOTE Could add to find frame:
+#   [ ] Case Sensitive
+#   [ ] Whole Words
+
+# NOTE Unhinted
 # Files
 # Generations
 # Open Store
@@ -50,10 +54,5 @@ st.sh
 # Find
 # About
 # Quit
-
-# NOTE 
-# Could add to find frame:
-#   [ ] Case Sensitive
-#   [ ] Whole Words
 
 # vim: syn=yaml

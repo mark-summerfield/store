@@ -122,17 +122,20 @@ proc cli::usage {} {
     puts [unmark [textutil::indent [textutil::adjust \
         "Prints the generation’s filenames to stdout." \
         -strictlength true -length $width2] "  "]]
-    puts [unmark "^H% ~or% ^history% \[filename\]"]
-    puts [unmark [textutil::indent [textutil::adjust \
-        "Prints the given file’s generations, or all the files’
-        generations if no file specified, where a change has occurred,
-        to stdout." \
-        -strictlength true -length $width2] "  "]]
     puts [unmark "^g% ~or% ^generations% \[full\]"]
     puts [unmark [textutil::indent [textutil::adjust \
         "Prints all the generations (number, created, message), and if
         \[full\] specified as ^-f% ^or% ^--full%, all their filenames, to
         stdout." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^G% ~or% ^gui%"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Launches the GUI." -strictlength true -length $width2] "  "]]
+    puts [unmark "^H% ~or% ^history% \[filename\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Prints the given file’s generations, or all the files’
+        generations if no file specified, where a change has occurred,
+        to stdout." \
         -strictlength true -length $width2] "  "]]
     puts [unmark "^i% ~or% ^ignore% <filename1|dirname1|glob1\
         \[… filenameN|dirnameN|globN\]>"]

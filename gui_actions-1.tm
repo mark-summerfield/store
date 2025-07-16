@@ -6,6 +6,7 @@ namespace eval gui_actions {}
 
 proc gui_actions::diff {store_filename txt in_context set_status_info \
                         new_gid old_gid filename} {
+    puts "@$new_gid → @$old_gid"
     set str [Store new $store_filename]
     try {
         if {$new_gid} {

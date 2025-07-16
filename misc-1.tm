@@ -39,7 +39,7 @@ proc misc::valid_file name {
     expr {![string match {.*} [file tail $name]] && [file size $name]}
 }
 
-proc misc::human_size {value {suffix B} {dp 0}} {
+proc misc::human_size {value {suffix B}} {
     if {!$value} {
         return "$value $suffix"
     }
@@ -54,5 +54,6 @@ proc misc::human_size {value {suffix B} {dp 0}} {
         $log_n]
     set value [expr {$value / (pow(1024, $log_n))}]
     set value [expr {$value * $factor}]
+    set dp [expr {$log_n < 2 ? 0 : 1}]
     return "[format %.${dp}f $value] ${prefix}${suffix}"
 }

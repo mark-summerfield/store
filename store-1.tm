@@ -350,7 +350,7 @@ oo::define Store method is_same_on_disk {filename} {
 }
 
 oo::define Store method addable {} {
-    set candidates [my candidates_from_given [glob * */*]]
+    set candidates [my candidates_from_given [glob -type f * */*]]
     set gid [my current_generation]
     lsort -unique [lmap name $candidates { ;# drop already stored files
         expr {[my find_data_gid $gid $name] ? [continue] : $name}

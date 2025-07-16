@@ -8,8 +8,8 @@ namespace eval gui {}
 
 proc gui::main {} {
     wishinit
-    set configFilename [read_config]
     tk appname Store
+    set configFilename [read_config]
     set app [App new $configFilename]
     $app show
 }

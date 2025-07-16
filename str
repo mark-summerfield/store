@@ -8,6 +8,10 @@ if {![catch {file readlink [info script]} name]} {
 }
 tcl::tm::path add $APPPATH
 
-package require cli
-
-cli::main
+if {[string match {*str} $::argv0]} {
+    package require cli
+    cli::main
+} else {
+    package require gui
+    gui::main
+}

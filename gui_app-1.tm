@@ -727,7 +727,8 @@ oo::define App method on_find {} {
             my set_status_info "no (more) '$what' found" $::SHORT_WAIT
         } else {
             $Text mark set insert $pos
-            $Text tag remove sel {*}[$Text tag ranges sel]
+            set indexes [$Text tag ranges sel]
+            if {$indexes ne ""} { $Text tag remove sel {*}$indexes }
             $Text tag add sel $pos "$pos + $offset chars"
             $Text see $pos
         }

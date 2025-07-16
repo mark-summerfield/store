@@ -3,6 +3,7 @@
 package require cli_actions
 package require cli_globals
 package require cli_misc
+package require store
 package require textutil
 
 namespace eval cli {}
@@ -28,6 +29,7 @@ proc cli::main {} {
         f - filenames { cli_actions::filenames $reporter $storefile $rest }
         g - generations { cli_actions::generations $reporter $storefile \
                           $rest }
+        G - gui { package require gui ; gui::main }
         h - help - -h - --help { usage } 
         H - history { cli_actions::history $reporter $storefile $rest}
         i - ignore { cli_actions::ignore $reporter $storefile $rest }

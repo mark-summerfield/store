@@ -1,7 +1,5 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-const VERSION 0.6.0
-
 set VERBOSE 1 ;# 0 → quiet; 1 → filtered; 2 → full
 
 # See: https://en.wikipedia.org/wiki/ANSI_escape_code

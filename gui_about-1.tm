@@ -2,6 +2,7 @@
 
 package require gui_misc
 package require misc
+package require store
 
 namespace eval gui_about {}
 

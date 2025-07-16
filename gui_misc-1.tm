@@ -38,6 +38,7 @@ proc gui_misc::make_text_frame {} {
     set txt [text .textFrame.text -wrap word \
         -yscrollcommand {.textFrame.scrolly set} -font Mono]
     bindtags $txt {$txt Ntext . all}
+    $txt tag configure sel -selectbackground yellow
     ttk::scrollbar .textFrame.scrolly -orient vertical \
         -command {.textFrame.text yview}
     pack .textFrame.scrolly -side right -fill y -expand true

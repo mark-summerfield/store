@@ -32,4 +32,28 @@ README.md
 
 st.sh
 
+# — Unhinted —
+# Files
+# Generations
+# Open Store
+# Add
+# Update
+# Extract
+# &Copy To
+# &Ignores
+# Clean
+# Purge
+# Show as-is
+# &Diff with Disk
+# Diff to Gen
+# In Context
+# Find
+# About
+# Quit
+
+# NOTE 
+# Could add to find frame:
+#   [ ] Case Sensitive
+#   [ ] Whole Words
+
 # vim: syn=yaml

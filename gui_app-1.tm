@@ -126,14 +126,14 @@ oo::define App method make_controls {} {
         -text "Show As-Is" -underline 0 -value asis \
         -variable [my varname ShowState] -command [callback on_show_asis]
     ttk::radiobutton .controlsFrame.showFrame.diffWithDiskRadio \
-        -text "Diff with Disk" -underline 5 -value disk \
+        -text "Diff with Disk" -underline 0 -value disk \
         -variable [my varname ShowState] \
         -command [callback on_show_diff_with_disk]
     ttk::radiobutton .controlsFrame.showFrame.diffToRadio \
-        -text "Diff to Gen.:" -underline 0 -value generation \
+        -text "Diff to Gen.:" -underline 5 -value generation \
         -variable [my varname ShowState] -command [callback on_show_diff_to]
     ttk::checkbutton .controlsFrame.showFrame.inContextCheck \
-        -text "In Context" -underline 6 -onvalue true -offvalue false \
+        -text "In Context" -underline 8 -onvalue true -offvalue false \
         -variable [my varname InContext] -command [callback on_in_context]
     ttk::label .controlsFrame.showFrame.diffLabel -text @
     ttk::spinbox .controlsFrame.showFrame.diffGenSpinbox -format %.0f \
@@ -290,10 +290,7 @@ oo::define App method make_bindings {} {
     bind . <Alt-a> [callback on_add]
     bind . <Alt-b> [callback on_about]
     bind . <Alt-c> [callback on_copy_to]
-    bind . <Alt-d> {
-        .controlsFrame.showFrame.diffToRadio invoke
-        focus .controlsFrame.showFrame.diffGenSpinbox
-    }
+    bind . <Alt-d> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
     bind . <Alt-e> [callback on_extract]
     bind . <Alt-i> [callback on_ignores]
     bind . <Alt-l> [callback on_clean]
@@ -302,9 +299,12 @@ oo::define App method make_bindings {} {
     bind . <Alt-p> [callback on_purge]
     bind . <Alt-q> [callback on_quit]
     bind . <Alt-s> {.controlsFrame.showFrame.asIsRadio invoke}
-    bind . <Alt-t> {.controlsFrame.showFrame.inContextCheck invoke}
+    bind . <Alt-t> {
+        .controlsFrame.showFrame.diffToRadio invoke
+        focus .controlsFrame.showFrame.diffGenSpinbox
+    }
     bind . <Alt-u> [callback on_update]
-    bind . <Alt-w> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
+    bind . <Alt-x> {.controlsFrame.showFrame.inContextCheck invoke}
 }    
 
 oo::define App method set_status_info {{text ""} {timeout 0}} {

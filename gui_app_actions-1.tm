@@ -4,6 +4,7 @@ package require gui_about
 package require gui_actions
 package require gui_ignores
 package require misc
+package require yes_no_box
 
 oo::define App method on_tab_changed {} {
     if {[$Tabs index [$Tabs select]]} {
@@ -64,7 +65,7 @@ oo::define App method on_open {} {
         set StoreFilename [file normalize .[file tail $dirname].str]
         wm title . "Store — [file dirname $StoreFilename]"
         my populate
-        my set_status_info "Read '$StoreFilename'"
+        my set_status_info "Read \"$StoreFilename\""
         my report_status
         gui_ignores::populate $StoreFilename
     }
@@ -158,10 +159,9 @@ oo::define App method on_purge {} {
     if {!$ok} {
         my set_status_info "Select a file purge" $::SHORT_WAIT
     } else {
-        if {[tk_messageBox -title "[tk appname] — Purge" \
-                   -message "Permanently delete '$filename' from the\
-                            Store?" \
-                   -icon question -type yesno -default no] eq "yes"} {
+        if {[yes_no_box::show_modal "[tk appname] — Purge" \
+                "Permanently delete \"$filename\" from the Store?\n
+                This cannot be undone!" no] eq "yes"} {
             set str [Store new $StoreFilename [callback set_status_info]]
             try {
                 set n [$str purge $filename]
@@ -224,7 +224,7 @@ oo::define App method on_find {} {
         set pos [$Text search -nocase $what \
                     "[$Text index insert] + 1 chars"]
         if {$pos eq ""} {
-            my set_status_info "no (more) '$what' found" $::SHORT_WAIT
+            my set_status_info "no (more) \"$what\" found" $::SHORT_WAIT
         } else {
             $Text mark set insert $pos
             set indexes [$Text tag ranges sel]
@@ -232,7 +232,7 @@ oo::define App method on_find {} {
             $Text tag add sel $pos "$pos + $offset chars"
             $Text see $pos
             set lino [expr {int($pos)}]
-            my set_status_info "found '$what' on line $lino" $::SHORT_WAIT
+            my set_status_info "found \"$what\" on line $lino" $::SHORT_WAIT
         }
     } else {
         focus $FindEntry

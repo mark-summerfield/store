@@ -1,8 +1,3 @@
-# TODO read ttk::treeview docs to see if I can get rid of indent for
-#	ignores list
-# TODO replace tk_messageBox with my own modal dialog that returns yes|no;
-#	copy gui_about-1.tm and/or see Gravitate's options_form
-
 str
 
 cli-1.tm
@@ -21,6 +16,7 @@ gui_misc-1.tm
 gui_globals-1.tm
 
 form-1.tm
+yes_no_box-1.tm
 
 store-1.tm # VERSION
 filedata-1.tm

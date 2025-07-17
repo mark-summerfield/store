@@ -39,10 +39,11 @@ proc gui_ignores::set_focus {} {
 
 proc gui_ignores::make_widgets {} {
     ttk::frame .ignoresForm.ignoresListFrame
-    ttk::treeview .ignoresForm.ignoresListFrame.ignoresList -striped true \
-        -yscrollcommand {.ignoresForm.ignoresListFrame.scrolly set}
-    .ignoresForm.ignoresListFrame.ignoresList configure -show tree \
-        -selectmode browse
+    set ignoresList [ttk::treeview \
+        .ignoresForm.ignoresListFrame.ignoresList -striped true \
+        -yscrollcommand {.ignoresForm.ignoresListFrame.scrolly set}]
+    $ignoresList configure -show tree -selectmode browse
+    $ignoresList column #0 -anchor w -stretch true
     ttk::scrollbar .ignoresForm.ignoresListFrame.scrolly -orient vertical \
         -command {.ignoresForm.ignoresListFrame.ignoresList yview}
     ttk::frame .ignoresForm.controlsFrame

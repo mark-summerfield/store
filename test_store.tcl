@@ -31,7 +31,7 @@ proc test1 {} {
             set ok false
         }
         if {[$str filename] ne $filename} {
-            puts "FAIL: expected '$filename'; got '[str filename]'"
+            puts "FAIL: expected \"$filename\"; got \"[str filename]\""
             set ok false
         }
     } finally {
@@ -142,7 +142,7 @@ proc test4 {} {
     try {
         if {[$str to_string] ne "Store \"/tmp/test4.db\""} {
             puts "FAIL: expected 'Store \"/tmp/test4.db\"'; got\
-                '[$str to_string]'"
+                \"[$str to_string]\""
             set ok false
         }
         catch { $str update "should cause error" } err_message

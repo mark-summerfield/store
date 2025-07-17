@@ -160,7 +160,7 @@ oo::define App method make_generations_tree {} {
 
 oo::define App method make_status_bar {} {
     if {$StoreFilename ne ""} {
-        set message "Read '$StoreFilename'"
+        set message "Read \"$StoreFilename\""
         set ms $::MEDIUM_WAIT
     } else {
         set message "Click Open Store… to choose a store"

@@ -71,7 +71,7 @@ proc cli::version {} {
 proc cli::usage {} {
     set width [cli_misc::width]
     set width2 [incr width -2]
-    puts [unmark "^usage: %^str% <command> …\n"]
+    puts [unmark "~usage: %^str% <command> …\n"]
     puts [unmark [textutil::adjust \
         "Stores generational copies of specified files (excluding those
         explicitly ignored) in .~dirname%.str.

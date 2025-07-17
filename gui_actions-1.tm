@@ -6,7 +6,6 @@ namespace eval gui_actions {}
 
 proc gui_actions::diff {store_filename txt in_context set_status_info \
                         new_gid old_gid filename} {
-    puts "@$new_gid → @$old_gid"
     set str [Store new $store_filename]
     try {
         if {$new_gid} {
@@ -48,7 +47,7 @@ proc gui_actions::on_quit config_filename {
             [font configure Mono -family]
         ini::commit $ini
     } finally {
-        ::ini::close $ini
+        ini::close $ini
     }
     exit
 }

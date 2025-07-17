@@ -1,6 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require gui_misc
+package require form
 package require lambda 1
 package require misc
 package require store
@@ -18,11 +18,11 @@ proc gui_ignores::show_modeless store_filename {
         make_layout
         make_bindings
         wm minsize .ignoresForm 480 320
-        set on_close [lambda {} {gui_misc::hide_form .ignoresForm}]
-        gui_misc::prepare_form .ignoresForm $on_close false
+        set on_close [lambda {} {form::hide .ignoresForm}]
+        form::prepare .ignoresForm $on_close false
         populate $store_filename
     }
-    gui_misc::show_modeless .ignoresForm
+    form::show_modeless .ignoresForm
     set_focus
 }
 
@@ -47,15 +47,15 @@ proc gui_ignores::make_widgets {} {
         -command {.ignoresForm.ignoresListFrame.ignoresList yview}
     ttk::frame .ignoresForm.controlsFrame
     ttk::button .ignoresForm.controlsFrame.addButton -text Add: \
-        -compound left -image [gui_misc::icon list-add.svg $::ICON_SIZE] \
+        -compound left -image [form::icon list-add.svg $::ICON_SIZE] \
         -command { gui_ignores::on_add } -underline 0
     ttk::entry .ignoresForm.controlsFrame.addEntry -width 12
     ttk::button .ignoresForm.controlsFrame.deleteButton -text Delete \
         -compound left \
-        -image [gui_misc::icon list-remove.svg $::ICON_SIZE] \
+        -image [form::icon list-remove.svg $::ICON_SIZE] \
         -command { gui_ignores::on_delete } -underline 0
     ttk::button .ignoresForm.controlsFrame.closeButton -text Close \
-        -compound left -image [gui_misc::icon close.svg $::ICON_SIZE] \
+        -compound left -image [form::icon close.svg $::ICON_SIZE] \
         -command { gui_ignores::on_close }
 }
 
@@ -149,4 +149,4 @@ proc gui_ignores::on_delete {} {
     }
 }
 
-proc gui_ignores::on_close {} { gui_misc::hide_form .ignoresForm }
+proc gui_ignores::on_close {} { form::hide .ignoresForm }

@@ -1,5 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require form
 package require gui_misc
 package require misc
 package require store
@@ -10,8 +11,8 @@ proc gui_about::show_modal {} {
     make_widgets
     make_layout
     make_bindings
-    gui_misc::prepare_form .about { gui_about::on_close }
-    gui_misc::show_modal .about
+    form::prepare .about { gui_about::on_close }
+    form::show_modal .about
 }
 
 proc gui_about::make_widgets {} {
@@ -24,7 +25,7 @@ proc gui_about::make_widgets {} {
     populate_about_text
     .about.text configure -state disabled
     ttk::button .about.close_button -text Close -compound left \
-        -image [gui_misc::icon close.svg $::ICON_SIZE] \
+        -image [form::icon close.svg $::ICON_SIZE] \
         -command { gui_about::on_close }
 }
 
@@ -54,13 +55,13 @@ proc gui_about::on_click_url index {
 }
 
 
-proc gui_about::on_close {} { gui_misc::destroy_form .about }
+proc gui_about::on_close {} { form::delete .about }
 
 
 proc gui_about::populate_about_text {} {
     add_text_tags .about.text
     set img [.about.text image create end -align center \
-             -image [gui_misc::icon store.svg 64]]
+             -image [form::icon store.svg 64]]
     .about.text tag add spaceabove $img
     .about.text tag add center $img
     .about.text insert end "\nStore $::VERSION\n" {center title}

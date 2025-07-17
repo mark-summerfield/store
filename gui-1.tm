@@ -1,7 +1,11 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require gui_app
+package require gui_app_actions
+package require gui_app_make
+package require gui_globals
 package require gui_misc
+package require inifile
 package require store
 
 namespace eval gui {}
@@ -47,7 +51,7 @@ proc gui::read_config {} {
                           $::KEY_FONTSIZE $size]
             }
         } finally {
-            ::ini::close $ini
+            ini::close $ini
         }
     }
     font create Mono -family $family -size $size

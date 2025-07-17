@@ -1,7 +1,5 @@
 # TODO read ttk::treeview docs to see if I can get rid of indent for
 #	ignores list
-# TODO refactor some gui_misc-1.tm functions into a more generic form-1.tm
-#	module
 # TODO replace tk_messageBox with my own modal dialog that returns yes|no;
 #	copy gui_about-1.tm and/or see Gravitate's options_form
 
@@ -14,11 +12,15 @@ cli_globals-1.tm
 
 gui-1.tm
 gui_app-1.tm
+gui_app_make-1.tm
+gui_app_actions-1.tm
 gui_actions-1.tm
 gui_ignores-1.tm
 gui_about-1.tm
 gui_misc-1.tm
 gui_globals-1.tm
+
+form-1.tm
 
 store-1.tm # VERSION
 filedata-1.tm
@@ -39,24 +41,5 @@ st.sh
 # NOTE Could add to find frame:
 #   [ ] Case Sensitive
 #   [ ] Whole Words
-
-# NOTE Unhinted
-# Files
-# Generations
-# Open Store
-# Add
-# Update
-# Extract
-# &Copy To
-# &Ignores
-# Clean
-# Purge
-# Show as-is
-# &Diff with Disk
-# Diff to Gen
-# In Context
-# Find
-# About
-# Quit
 
 # vim: syn=yaml

@@ -5,53 +5,6 @@ package require ntext 1
 
 namespace eval gui_misc {}
 
-proc gui_misc::icon {svg {width 0}} {
-    if {!$width} {
-        return [image create photo -file $::APPPATH/images/$svg]
-    }
-    image create photo -file $::APPPATH/images/$svg \
-        -format "svg -scaletowidth $width"
-}
-
-proc gui_misc::prepare_form {window on_close {modal true} {x 0} {y 0}} {
-    wm withdraw $window
-    if {$modal} {
-        wm transient $window .
-    }
-    set parent [winfo parent $window]
-    if {!($x && $y)} {
-        set x [expr {[winfo x $parent] + [winfo width $parent] / 3}]
-        set y [expr {[winfo y $parent] + [winfo height $parent] / 3}]
-    }
-    wm geometry $window "+$x+$y"
-    wm protocol $window WM_DELETE_WINDOW $on_close
-}
-
-proc gui_misc::show_modal {form {focus_widget ""}} {
-    wm deiconify $form
-    raise $form
-    focus $form
-    if {$focus_widget ne ""} { focus $focus_widget }
-    catch { grab set $form }
-    catch { tkwait visibility $form }
-}
-
-proc gui_misc::show_modeless form {
-    wm deiconify $form
-    raise $form
-    focus $form
-}
-
-proc gui_misc::destroy_form form {
-    grab release $form
-    destroy $form
-}
-
-proc gui_misc::hide_form form {
-    wm withdraw $form
-    grab release $form
-}
-
 proc gui_misc::make_text_frame {} {
     set textFrame [ttk::frame .textFrame]
     set txt [text .textFrame.text -wrap word \

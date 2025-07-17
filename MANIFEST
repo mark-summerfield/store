@@ -1,3 +1,7 @@
+# TODO
+# if gui status throws then set size label's bg orange;
+#   else to its default
+
 str
 
 cli-1.tm

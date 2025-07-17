@@ -42,7 +42,9 @@ proc gui_ignores::make_widgets {} {
     set ignoresList [ttk::treeview \
         .ignoresForm.ignoresListFrame.ignoresList -striped true \
         -yscrollcommand {.ignoresForm.ignoresListFrame.scrolly set}]
-    $ignoresList configure -show tree -selectmode browse
+    ttk::style configure List.Treeview.Item -indicatorsize 0
+    $ignoresList configure -show tree -selectmode browse \
+        -style List.Treeview
     $ignoresList column #0 -anchor w -stretch true
     ttk::scrollbar .ignoresForm.ignoresListFrame.scrolly -orient vertical \
         -command {.ignoresForm.ignoresListFrame.ignoresList yview}

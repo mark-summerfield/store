@@ -89,7 +89,7 @@ proc cli_actions::status {reporter storefile rest} {
             cli_misc::info [join $yes_messages "\n"] true
         }
         if {$::VERBOSE && [llength $no_messages]} {
-            cli_misc::info [join $no_messages "\n"]
+            cli_misc::info [join $no_messages " • "]
         }
     } finally {
         $str close

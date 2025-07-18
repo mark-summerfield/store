@@ -121,11 +121,11 @@ oo::define App method report_status {} {
             } finally {
                 $str close
             }
-            $StatusSizeLabel configure -text [misc::human_size \
-                                                [file size $StoreFilename]]
+            $StatusSizeLabel configure -background "" \
+                -text [misc::human_size [file size $StoreFilename]]
         }
     } else {
-        $StatusSizeLabel configure -text ""
+        $StatusSizeLabel configure -text "" -background orange
     }
     after $::STATUS_WAIT [callback report_status]
 }

@@ -68,6 +68,7 @@ oo::define App method on_open {} {
         my set_status_info "Read \"$StoreFilename\""
         my report_status
         gui_ignores::populate $StoreFilename
+        my update_ui
     }
 }
 

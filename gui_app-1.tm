@@ -59,10 +59,28 @@ oo::define App method display {} {
     } else {
         wm title . Store
     }
+    my update_ui
     wm deiconify .
     raise .
     focus $widget
     after 50 [lambda {} { .panes sashpos 0 [winfo width .controlsFrame] }]
+}
+
+oo::define App method update_ui {} {
+    set disabled [expr {$StoreFilename eq "" ? "disabled" : "!disabled"}]
+    foreach widget [list .controlsFrame.addButton \
+        .controlsFrame.updateButton .controlsFrame.extractButton \
+        .controlsFrame.copyToButton .controlsFrame.ignoresButton \
+        .controlsFrame.cleanButton .controlsFrame.purgeButton \
+        .controlsFrame.showFrame.asIsRadio \
+        .controlsFrame.showFrame.diffWithDiskRadio \
+        .controlsFrame.showFrame.diffToRadio \
+        .controlsFrame.showFrame.inContextCheck \
+        .controlsFrame.showFrame.diffLabel \
+        .controlsFrame.showFrame.diffGenSpinbox \
+        .controlsFrame.findFrame.findLabel $FindEntry] {
+        $widget state $disabled
+    }
 }
 
 oo::define App method populate {} {
@@ -201,8 +219,7 @@ oo::define App method show_file {gid filename} {
 oo::define App method get_selected {} {
     set ok false
     if {[$Tabs  select] eq ".panes.tabs.filenameTreeFrame"} {
-        lassign [my get_selected_from_files] gid filename
-        set ok true
+        lassign [my get_selected_from_files] ok gid filename
     } else {
         lassign [my get_selected_from_generations] ok gid filename
     }
@@ -211,6 +228,7 @@ oo::define App method get_selected {} {
 
 oo::define App method get_selected_from_files {} {
     set item [$FilenameTree selection]
+    if {$item eq ""} { return [list false] }
     set txt [$FilenameTree item $item -text]
     if {[string match {@*} $txt]} {
         set gid [string range $txt 1 end]
@@ -219,12 +237,13 @@ oo::define App method get_selected_from_files {} {
         set gid 0
         set filename $txt
     }
-    return [list $gid $filename]
+    return [list true $gid $filename]
 }
 
 oo::define App method get_selected_from_generations {} {
     set ok false
     set item [$GenerationTree selection]
+    if {$item eq ""} { return [list false] }
     set txt [$GenerationTree item $item -text]
     if {[string match {@*} $txt]} {
         set gid [string range $txt 1 end]

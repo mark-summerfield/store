@@ -34,7 +34,7 @@ proc gui_misc::open_webpage url {
     }
     try {
         exec {*}$cmd $url &
-    } trap CHILDSTATUS {err} {
+    } on error {err} {
         puts "failed to open $url: $err"
     }
 }

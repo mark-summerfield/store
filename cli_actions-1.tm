@@ -100,8 +100,7 @@ proc cli_actions::copy {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str dirname
     try {
         $str copy $gid $dirname
-    } trap {} {message} {
-        $str close
+    } on error {message} {
         cli_misc::warn $message
     } finally {
         $str close

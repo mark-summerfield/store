@@ -13,7 +13,7 @@ proc cli::main {} {
     if {!$::argc} {
         if {[file exists $storefile]} {
             cli_actions::status "" $storefile {}
-            exit 0
+            exit
         } else {
             usage
         }
@@ -41,7 +41,11 @@ proc cli::main {} {
         u - update { cli_actions::update $reporter $storefile $rest }
         U - unignore { cli_actions::unignore $reporter $storefile $rest }
         v - version - -v - --version { version }
-        default { cli_misc::warn "unrecognized command: \"$command\"" }
+        default {
+            if {$command ne ""} {
+                cli_misc::warn "unrecognized command: \"$command\""
+            }
+        }
     }
 }
 

@@ -74,7 +74,7 @@ proc cli::version {} {
 
 proc cli::usage {} {
     set width [cli_misc::width]
-    set width2 [incr width -2]
+    set width2 [expr {$width - 2}]
     puts [unmark "~usage: %^str% <command> …\n"]
     puts [unmark [textutil::adjust \
         "Stores generational copies of specified files (excluding those

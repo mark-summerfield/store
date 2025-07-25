@@ -117,7 +117,7 @@ proc diff::contextualize delta {
             "+" { lappend result $line }
             " " {
                     set first $i
-                    set last [incr i]
+                    set last [expr {$i + 1}]
                     while {$last < [llength $delta]} {
                         set line [lindex $delta $last]
                         set action [string index $line 0]

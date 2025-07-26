@@ -6,7 +6,8 @@
 #   	    tag TEXT NOT NULL,
 #   	    FOREIGN KEY(gid) REFERENCES Generations(gid)
 #   	  );
-#   	. INSERT INTO Tags SELECT gid, message AS tag FROM Generations;
+#   	. INSERT INTO Tags SELECT gid, message AS tag FROM Generations
+#	    WHERE message IS NOT NULL AND LENGTH(message) > 0;
 #   	. ALTER TABLE Generations DROP COLUMN message;
 #   	. PRAGMA USER_VERSION 2;
 #   . Add to Store clean method (after deleting files):

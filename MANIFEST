@@ -33,6 +33,7 @@
 #   . Implement Tags add/edit/remove dialog v. similar to Ignores dialog
 #   . Use https://core.tcl-lang.org/tklib/doc/trunk/embedded/md/tklib/files/modules/history/tklib_history.md
 #   for Find text entry
+#   . create new screenshot
 #
 # NOTE use textutil::{chop,tail} where appropriate:
 #	look for "string index" & "string trim"

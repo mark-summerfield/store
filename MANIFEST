@@ -1,9 +1,6 @@
 # TODO
-# - store
-#   . Implement Tags add/edit/remove dialog v. similar to Ignores dialog
-#
-# NOTE use textutil::{chop,tail} where appropriate:
-#	look for "string index" & "string trim"
+# - store: Implement Tags add/edit/remove dialog
+#   (v. similar to Ignores dialog)
 
 str
 
@@ -38,7 +35,6 @@ sql/create.sql
 sql/insert.sql
 sql/upgrade1to2.sql
 
-# TODO add installation instructions once I can built a stand-alone binary
 README.md
 
 st.sh

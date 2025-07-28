@@ -98,6 +98,23 @@ or
 
 where `store` is a soft link to `str`.
 
+## Installation
+
+Unpack anywhere convenient and either put the folder in your `PATH` or add
+soft links to `str` and `store`.
+
+The GUI `store` reads `~/.wishinit.tcl` if present. Mine contains:
+
+    tk scaling 1.67
+    option add *tearOff 0
+    option add *insertOffTime 0
+    ttk::style configure . -insertofftime 0
+    ttk::style theme use clam
+
+The GUI `store` maintains a configuration file in `~/.config/Store.str`,
+(e.g., to save/restore the window size and position) and default font for
+showing files.
+
 ## License
 
 GPL-3

@@ -1,7 +1,5 @@
 # TODO
 # - str:
-#   . make sure history & generations print tags instead of (defunct)
-#	messages
 #   . change cli::usage to cli::usage {{full false}}
 #   . -H | --help-full → usage true (prints as now)
 #   . -h | --help → usage (i.e., false; prints shortened usage)

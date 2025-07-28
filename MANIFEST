@@ -1,6 +1,16 @@
 # TODO
-# - store: Implement Tags add/edit/remove dialog
-#   (v. similar to Ignores dialog)
+# - gui: Implement Tags add/edit/remove dialog
+#   Show Generations (*) &All ( ) &Untagged ( ) &Tagged
+#   &Generation @[ 0^v] Tag [                        ]
+#	[&Save] [Close]
+# TODO
+# - store: implement
+#   . store method restore {gid filename}
+#	* move file to tempdir
+#	* extract filename (as filename.ext, _not_ filename@gid.ext)
+#   .cli: r or restore [@gid] <filename>
+#   .gui: &More → ... &Restore… &Clean &Purge
+#	&Restore… yes_no_box
 
 str
 

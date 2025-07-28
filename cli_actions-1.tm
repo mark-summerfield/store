@@ -294,6 +294,25 @@ proc cli_actions::clean {reporter storefile rest} {
     }
 }
 
+proc cli_actions::tag {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+    try {
+        $str tag $gid $rest
+    } finally {
+        $str close
+    }
+}
+
+proc cli_actions::untag {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+    try {
+        $str untag $gid
+    } finally {
+        $str close
+    }
+}
+
+
 proc cli_actions::untracked {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     try {

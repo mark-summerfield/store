@@ -69,9 +69,7 @@ oo::define App method display {} {
 oo::define App method update_ui {} {
     set disabled [expr {$StoreFilename eq "" ? "disabled" : "!disabled"}]
     foreach widget [list .controlsFrame.addButton \
-        .controlsFrame.updateButton .controlsFrame.extractButton \
-        .controlsFrame.copyToButton .controlsFrame.ignoresButton \
-        .controlsFrame.cleanButton .controlsFrame.purgeButton \
+        .controlsFrame.moreButton \
         .controlsFrame.showFrame.asIsRadio \
         .controlsFrame.showFrame.diffWithDiskRadio \
         .controlsFrame.showFrame.diffToRadio \
@@ -205,6 +203,9 @@ oo::define App method populate_generation_tree {} {
 }
 
 oo::define App method show_file {gid filename} {
+    if {$ShowState ne "asis"} { 
+        set ShowState asis
+    }
     set str [Store new $StoreFilename [callback set_status_info]]
     try {
         if {!$gid} { set gid [$str current_generation] }

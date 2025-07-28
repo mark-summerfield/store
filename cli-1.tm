@@ -31,15 +31,18 @@ proc cli::main {} {
                           $rest }
         G - gui { package require gui ; gui::main }
         h - help - -h - --help { usage } 
+        help-full - --help-full { usage_full }
         H - history { cli_actions::history $reporter $storefile $rest}
         i - ignore { cli_actions::ignore $reporter $storefile $rest }
         I - ignores { cli_actions::ignores $reporter $storefile }
         p - print { cli_actions::print $reporter $storefile $rest }
         purge { cli_actions::purge $reporter $storefile $rest }
         s - status { cli_actions::status $reporter $storefile $rest }
+        t - tag { cli_actions::tag $reporter $storefile $rest }
         T - untracked { cli_actions::untracked $reporter $storefile $rest }
-        u - update { cli_actions::update $reporter $storefile $rest }
         U - unignore { cli_actions::unignore $reporter $storefile $rest }
+        u - update { cli_actions::update $reporter $storefile $rest }
+        untag { cli_actions::untag $reporter $storefile $rest }
         v - version - -v - --version { version }
         default {
             if {$command ne ""} {
@@ -75,6 +78,95 @@ proc cli::version {} {
 proc cli::usage {} {
     set width [cli_misc::width]
     set width2 [expr {$width - 2}]
+    set indent "     "
+    puts [unmark "~usage: %^str% <command> …\n"]
+    puts [unmark [textutil::adjust \
+        "Stores generational copies of specified files (excluding those
+        explicitly ignored) in .~dirname%.str.
+        (For a GUI run ^store%.)" \
+        -strictlength true -length $width]]
+    puts ""
+    puts [unmark [textutil::indent [textutil::adjust "^s% ~or% ^status%\
+        \[verbose\] — show store’s status" -strictlength true \
+        -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^u% ~or% ^update%\
+        \[verbose\] \[tag\] — creates a new generation" \
+        -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^a% ~or% ^add%\
+        \[verbose\] \[filename1|dirname1 … filenameN|dirnameN\] — adds\
+        new files" -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^e% ~or% ^extract%\
+        \[verbose\] \[@gid\] <filename1 \[… filenameN\]> — extracts\
+        specified files" -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^p% ~or% ^print%\
+        \[@gid\] <filename> — prints file to stdout" -strictlength true \
+        -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^c% ~or% ^copy%\
+        \[verbose\] \[@gid\] <dirname> — copies generation to a new\
+        folder" -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^d% ~or% ^diff%\
+        \[verbose] <@gid1> \[@gid2\] <filename> — compares twos\
+        generations of the file" -strictlength true -length $width] \
+        $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^f% ~or% ^filenames%\
+        \[@gid\] — prints the tracked files" -strictlength true \
+        -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^g% ~or%\
+        ^generations% \[^-f% ~or% ^--full%\] — prints the generations" \
+        -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^G% ~or% ^gui%\
+        — starts the GUI" -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^H% ~or% ^history%\
+        \[filename\] — prints the file’s history" -strictlength true \
+        -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^i% ~or% ^ignore%\
+        <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN\]> — adds\
+        to the ignores" -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^I% ~or% ^ignores%\
+        — prints theignores" -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^U% ~or% ^unignore%\
+        <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN\]>\
+        — removes from the ignores" -strictlength true -length $width] \
+        $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^t% ~or% ^tag%\
+        \[@gid\] <tag> — tag the given or current genration" \
+        -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^untag%\
+        \[@gid\] — untag the given or current genration" \
+        -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^T% ~or%\
+        ^untracked% — prints anyuntracked files" -strictlength true \
+        -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^C% ~or% ^clean%\
+        — deletes empty generations" -strictlength true -length $width] \
+        $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^purge% <filename>\
+        — purges the file" -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^h% ~or% ^help%\
+        ~or% ^-h% ~or% ^--help% — shows this usage message" \
+        -strictlength true -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^help-full% ~or%\
+        ^--help-full% — shows detailed usage" -strictlength true \
+        -length $width] $indent 1]]
+    puts [unmark [textutil::indent [textutil::adjust "^v% ~or% ^version%\
+        ~or% ^-v% ~or% ^--version% — prints the version" \
+        -strictlength true -length $width] $indent 1]]
+    puts ""
+    puts [unmark [textutil::indent [textutil::adjust \
+        "• @gid — @-prefixed generation number, (e.g., @28), or current is\
+        assumed" -strictlength true -length $width2] "  " 1]]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "• glob — use quotes to avoid shell expansion (e.g., '*.o')." \
+        -strictlength true -length $width2] "  " 1]]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "• verbose — ^-v% ~or% ^--verbose% full, ~or% ^-q% ~or%\
+        ^--quiet% silent; default filtered." -strictlength true \
+        -length $width2] "  " 1]]
+}
+
+proc cli::usage_full {} {
+    set width [cli_misc::width]
+    set width2 [expr {$width - 2}]
     puts [unmark "~usage: %^str% <command> …\n"]
     puts [unmark [textutil::adjust \
         "Stores generational copies of specified files (excluding those
@@ -86,7 +178,7 @@ proc cli::usage {} {
         "Status reports any unstored unignored nonempty files and whether
         updates or cleaning are needed. (Default action for store.)" \
         -strictlength true -length $width2] "  "]]
-    puts [unmark "^u% ~or% ^update% \[verbose\] \[message\]"]
+    puts [unmark "^u% ~or% ^update% \[verbose\] \[tag\]"]
     puts [unmark [textutil::indent [textutil::adjust \
         "Updates all the files in the store by creating a new generation
         and storing all those that have changed." \
@@ -124,17 +216,17 @@ proc cli::usage {} {
             -strictlength true -length $width2] "  "]]
     puts [unmark "^f% ~or% ^filenames% \[@gid\]"]
     puts [unmark [textutil::indent [textutil::adjust \
-        "Prints the generation’s filenames to stdout." \
+        "Prints the tracked files filenames to stdout." \
         -strictlength true -length $width2] "  "]]
     puts [unmark "^g% ~or% ^generations% \[full\]"]
     puts [unmark [textutil::indent [textutil::adjust \
-        "Prints all the generations (number, created, message), and if
+        "Prints all the generations (number, created, tag), and if
         \[full\] specified as ^-f% ^or% ^--full%, all their filenames, to
         stdout." \
         -strictlength true -length $width2] "  "]]
     puts [unmark "^G% ~or% ^gui%"]
     puts [unmark [textutil::indent [textutil::adjust \
-        "Launches the GUI." -strictlength true -length $width2] "  "]]
+        "Starts the GUI." -strictlength true -length $width2] "  "]]
     puts [unmark "^H% ~or% ^history% \[filename\]"]
     puts [unmark [textutil::indent [textutil::adjust \
         "Prints the given file’s generations, or all the files’
@@ -156,6 +248,14 @@ proc cli::usage {} {
         "Unignores the given filenames, folders, and globs by removing them
         from the ignore list." \
         -strictlength true -length $width2] "  "]]
+    puts [unmark "^t% ~or% ^tag% \[@gid\] <tag>"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Tag the given or current generation with the given tag." \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^untag% \[@gid\]"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Untag the given or current generation." -strictlength true \
+        -length $width2] "  "]]
     puts [unmark "^T% ~or% ^untracked%"]
     puts [unmark [textutil::indent [textutil::adjust \
         "Lists any untracked files." \
@@ -172,7 +272,11 @@ proc cli::usage {} {
         -strictlength true -length $width2] "  "]]
     puts [unmark "^h% ~or% ^help% ~or% ^-h% ~or% ^--help%"]
     puts [unmark [textutil::indent [textutil::adjust \
-        "Show this usage message and exit. (Default action if no store.)" \
+        "Show short usage message and exit. (Default action if no store.)" \
+        -strictlength true -length $width2] "  "]]
+    puts [unmark "^help-full% ~or% ^--help-full%"]
+    puts [unmark [textutil::indent [textutil::adjust \
+        "Show this usage message and exit." \
         -strictlength true -length $width2] "  "]]
     puts [unmark "^v% ~or% ^version% ~or% ^-v% ~or% ^--version%"]
     puts [unmark [textutil::indent [textutil::adjust \

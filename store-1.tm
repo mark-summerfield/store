@@ -5,7 +5,7 @@ package require lambda 1
 package require misc
 package require sqlite3 3
 
-const VERSION 1.0.0
+const VERSION 1.1.0
 
 oo::class create Store {
     variable Filename
@@ -86,7 +86,7 @@ oo::define Store method tag {{gid 0} {tag ""}} {
 }
 
 # removes a tag for the given or current gid
-oo::define Store method tag {{gid 0} {tag ""}} {
+oo::define Store method untag {{gid 0}} {
     if {!$gid} { set gid [my current_generation] }
     $Db eval {UPDATE Generations SET tag = NULL WHERE gid = :gid}
 }

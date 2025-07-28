@@ -140,6 +140,11 @@ oo::define App method on_copy_to {} {
     }
 }
 
+oo::define App method on_tags {} {
+    puts "TODO on_tags"
+    # gui_ignores::show_modeless $StoreFilename
+}
+
 oo::define App method on_ignores {} {
     gui_ignores::show_modeless $StoreFilename
 }

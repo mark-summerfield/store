@@ -1,20 +1,6 @@
 # TODO
-# - str:
-#   . change cli::usage to cli::usage {{full false}}
-#   . -H | --help-full → usage true (prints as now)
-#   . -h | --help → usage (i.e., false; prints shortened usage)
-#   . t | tag [@gid] tag-text (replaces if exists; otherwise adds)
-#   . deltag <@gid>
-#
 # - store
-#   . Whenever a new file is chosen in the tree invoke Show As-Is
-#   . Add &More button with:
-#     &Tags… *new* | &Ignores… | [sep] | &Clean | &Purge… | [sep] | &About
-#   . Delete Ignores, Clean, Purge, & About buttons
 #   . Implement Tags add/edit/remove dialog v. similar to Ignores dialog
-#   . Use https://core.tcl-lang.org/tklib/doc/trunk/embedded/md/tklib/files/modules/history/tklib_history.md
-#   for Find text entry
-#   . create new screenshot
 #
 # NOTE use textutil::{chop,tail} where appropriate:
 #	look for "string index" & "string trim"
@@ -45,6 +31,7 @@ diff-1.tm
 misc-1.tm
 
 test_store.tcl
+test_diff.tcl
 
 sql/prepare.sql
 sql/create.sql
@@ -59,5 +46,6 @@ st.sh
 # NOTE Could add to find frame:
 #   [ ] Case Sensitive
 #   [ ] Whole Words
+# NOTE Could change Find ttk:entry to ttk::combobox & keep history
 
 # vim: syn=yaml

@@ -31,15 +31,26 @@ oo::define App method make_controls {} {
     ttk::button .controlsFrame.copyToButton -text {Copy To…} -underline 0 \
         -compound left -command [callback on_copy_to] \
         -image [form::icon folder-new.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.ignoresButton -text Ignores… -underline 0 \
-        -compound left -command [callback on_ignores] \
+    ttk::menubutton .controlsFrame.moreButton -text More -underline 0
+    menu .controlsFrame.moreButton.menu
+    .controlsFrame.moreButton.menu add command -label Tags… \
+        -underline 0 -compound left -command [callback on_tags] \
+        -image [form::icon bookmark-new.svg $::ICON_SIZE]
+    .controlsFrame.moreButton.menu add command -label Ignores… \
+        -underline 0 -compound left -command [callback on_ignores] \
         -image [form::icon document-properties.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.cleanButton -text Clean -underline 1 \
+    .controlsFrame.moreButton.menu add separator
+    .controlsFrame.moreButton.menu add command -label Clean -underline 0 \
         -compound left -command [callback on_clean] \
         -image [form::icon edit-clear.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.purgeButton -text Purge… -underline 0 \
+    .controlsFrame.moreButton.menu add command -label Purge… -underline 0 \
         -compound left -command [callback on_purge] \
         -image [form::icon edit-cut.svg $::ICON_SIZE]
+    .controlsFrame.moreButton.menu add separator
+    .controlsFrame.moreButton.menu add command -label About -underline 0 \
+        -compound left -command [callback on_about] \
+        -image [form::icon about.svg $::ICON_SIZE]
+    .controlsFrame.moreButton configure -menu .controlsFrame.moreButton.menu
     ttk::frame .controlsFrame.showFrame -relief groove 
     ttk::radiobutton .controlsFrame.showFrame.asIsRadio \
         -text "Show As-Is" -underline 0 -value asis \
@@ -52,7 +63,7 @@ oo::define App method make_controls {} {
         -text "Diff to Gen.:" -underline 5 -value generation \
         -variable [my varname ShowState] -command [callback on_show_diff_to]
     ttk::checkbutton .controlsFrame.showFrame.inContextCheck \
-        -text "In Context" -underline 8 -onvalue true -offvalue false \
+        -text "In Context" -underline 0 -onvalue true -offvalue false \
         -variable [my varname InContext] -command [callback on_in_context]
     ttk::label .controlsFrame.showFrame.diffLabel -text @
     ttk::spinbox .controlsFrame.showFrame.diffGenSpinbox -format %.0f \
@@ -61,9 +72,6 @@ oo::define App method make_controls {} {
     ttk::frame .controlsFrame.findFrame -relief groove 
     ttk::label .controlsFrame.findFrame.findLabel -text Find: -underline 2
     set FindEntry [ttk::entry .controlsFrame.findFrame.findEntry -width 15]
-    ttk::button .controlsFrame.aboutButton -text About -underline 1 \
-        -compound left -command [callback on_about] \
-        -image [form::icon about.svg $::ICON_SIZE]
     ttk::button .controlsFrame.quitButton -text Quit -underline 0 \
         -compound left -command [callback on_quit] \
         -image [form::icon quit.svg $::ICON_SIZE]
@@ -76,9 +84,8 @@ oo::define App method layout_controls {} {
     pack .controlsFrame.updateButton -side top {*}$opts
     pack .controlsFrame.extractButton -side top {*}$opts
     pack .controlsFrame.copyToButton -side top {*}$opts
-    pack .controlsFrame.ignoresButton -side top {*}$opts
-    pack .controlsFrame.cleanButton -side top {*}$opts
-    pack .controlsFrame.purgeButton -side top {*}$opts
+    pack .controlsFrame.moreButton -side top -ipadx [expr {$::PAD * 2}] \
+        {*}$opts
     pack .controlsFrame.showFrame -side top -fill x {*}$opts
     grid .controlsFrame.showFrame.asIsRadio -row 0 -column 0 -columnspan 2 \
         -sticky w {*}$opts
@@ -98,7 +105,6 @@ oo::define App method layout_controls {} {
     grid .controlsFrame.findFrame.findEntry -row 1 -column 0 -sticky w \
         {*}$opts
     pack .controlsFrame.quitButton -side bottom {*}$opts
-    pack .controlsFrame.aboutButton -side bottom {*}$opts
 }
 
 oo::define App method make_tabs {} {
@@ -217,11 +223,14 @@ oo::define App method make_bindings {} {
     bind . <Alt-c> [callback on_copy_to]
     bind . <Alt-d> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
     bind . <Alt-e> [callback on_extract]
-    bind . <Alt-i> [callback on_ignores]
-    bind . <Alt-l> [callback on_clean]
+    bind . <Alt-i> {.controlsFrame.showFrame.inContextCheck invoke}
+    bind . <Alt-m> {
+        tk_popup .controlsFrame.moreButton.menu \
+            [winfo rootx .controlsFrame.moreButton] \
+            [expr {[winfo rooty .controlsFrame.moreButton] + 30}]
+    }
     bind . <Alt-n> {focus .controlsFrame.findFrame.findEntry}
     bind . <Alt-o> [callback on_open]
-    bind . <Alt-p> [callback on_purge]
     bind . <Alt-q> [callback on_quit]
     bind . <Alt-s> {.controlsFrame.showFrame.asIsRadio invoke}
     bind . <Alt-t> {
@@ -229,24 +238,20 @@ oo::define App method make_bindings {} {
         focus .controlsFrame.showFrame.diffGenSpinbox
     }
     bind . <Alt-u> [callback on_update]
-    bind . <Alt-x> {.controlsFrame.showFrame.inContextCheck invoke}
 }    
 
 # — Copy/paste into Minicalc for keyboard accelerators —
-# Files
+# &Files
 # Generations
 # Open Store
 # Add
 # Update
 # Extract
-# &Copy To
-# &Ignores
-# Clean
-# Purge
+# Copy To
+# &More
 # Show as-is
-# &Diff with Disk
+# Diff with Disk
 # Diff to Gen
 # In Context
 # Find
-# About
 # Quit

@@ -1,21 +1,4 @@
 # TODO
-# - Database
-#   . put in upgradeto2.sql:
-#	. CREATE TABLE Tags (
-#   	    gid INTEGER PRIMARY KEY NOT NULL,
-#   	    tag TEXT NOT NULL,
-#   	    FOREIGN KEY(gid) REFERENCES Generations(gid)
-#   	  );
-#   	. INSERT INTO Tags SELECT gid, message AS tag FROM Generations
-#	    WHERE message IS NOT NULL AND LENGTH(message) > 0;
-#   	. ALTER TABLE Generations DROP COLUMN message;
-#   	. PRAGMA USER_VERSION 2;
-#   . Add to Store clean method (after deleting files):
-#      DELETE FROM Tags WHERE gid NOT IN (SELECT gid FROM Files);
-#   . change the Store constructor to read PRAGMA USER_VERSION & iff 1
-#       execute upgradeto2.sql (which contains all the above)
-#   . change Store VERSION to 1.2.0
-#
 # - str:
 #   . make sure history & generations print tags instead of (defunct)
 #	messages
@@ -68,6 +51,7 @@ test_store.tcl
 sql/prepare.sql
 sql/create.sql
 sql/insert.sql
+sql/upgrade1to2.sql
 
 # TODO add installation instructions once I can built a stand-alone binary
 README.md

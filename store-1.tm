@@ -23,8 +23,13 @@ oo::define Store constructor {filename {reporter ""}} {
     set exists [file isfile $Filename]
     sqlite3 $Db $Filename
     $Db eval [readFile $::APPPATH/sql/prepare.sql] 
-    if {!$exists} {
-        $Db transaction {
+    $Db transaction {
+        if {$exists} {
+            set user_version [$Db eval {PRAGMA USER_VERSION}]
+            if {$user_version == 1} {
+                $Db eval [readFile $::APPPATH/sql/upgrade1to2.sql] 
+            }
+        } else {
             $Db eval [readFile $::APPPATH/sql/create.sql] 
             $Db eval [readFile $::APPPATH/sql/insert.sql] 
         }
@@ -56,23 +61,39 @@ oo::define Store method add {args} {
     set filenames [lsort -nocase \
         [lsort -unique [list {*}[my filenames] {*}$args]]]
     {*}$Reporter "adding/updating"
-    my Update "adding/updating" {*}$filenames
+    my Update "" {*}$filenames
 }
 
 # if at least one prev generation exists, creates new generation with
 # 'U' or 'Z' or 'S' for every file present in the current generation that
 # hasn't been deleted and returns the number updated (which could be 0);
 # must only be used after at least one call to add
-oo::define Store method update {message} {
+oo::define Store method update {tag} {
     set gid [my current_generation]
     if {!$gid} { error "can only update an existing nonempty store" }
-    if {$message ne ""} { {*}$Reporter "updating \"$message\"" }
-    my Update $message {*}[my filenames $gid]
+    if {$tag ne ""} { {*}$Reporter "updating with tag \"$tag\"" }
+    my Update $tag {*}[my filenames $gid]
+}
+
+# gets or sets a tag for the given or current gid
+oo::define Store method tag {{gid 0} {tag ""}} {
+    if {!$gid} { set gid [my current_generation] }
+    if {$tag ne ""} {
+        $Db eval {UPDATE Generations SET tag = :tag WHERE gid = :gid}
+    } else {
+        return [$Db eval {SELECT tag FROM Generations WHERE gid = :gid}]
+    }
+}
+
+# removes a tag for the given or current gid
+oo::define Store method tag {{gid 0} {tag ""}} {
+    if {!$gid} { set gid [my current_generation] }
+    $Db eval {UPDATE Generations SET tag = NULL WHERE gid = :gid}
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file —
 # providing it still exists
-oo::define Store method Update {message args} {
+oo::define Store method Update {tag args} {
     set filenames [list]
     foreach filename $args {
         if {[file isfile $filename]} {
@@ -88,7 +109,7 @@ oo::define Store method Update {message args} {
         return 0
     }
     $Db transaction {
-        $Db eval {INSERT INTO Generations (message) VALUES (:message)}
+        $Db eval {INSERT INTO Generations (tag) VALUES (:tag)}
         set gid [$Db last_insert_rowid]
         {*}$Reporter "created @$gid"
         set n 0
@@ -168,13 +189,13 @@ oo::define Store method unignore {args} {
     }
 }
 
-# lists all generations (gid, created, message)
+# lists all generations (gid, created) or full (gid, created, tag)
 oo::define Store method generations {{full false}} {
     if {$full} {
-        return [$Db eval {SELECT gid, created, message, filename
+        return [$Db eval {SELECT gid, created, tag, filename
                           FROM HistoryByGeneration}]
     }
-    $Db eval {SELECT gid, created, message FROM ViewGenerations}
+    $Db eval {SELECT gid, created, tag FROM ViewGenerations}
 }
 
 # returns a list of the current or given gid's filenames

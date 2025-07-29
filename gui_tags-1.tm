@@ -25,8 +25,7 @@ proc gui_tags::show_modal {store_filename refresh} {
         form::prepare .tagsForm $on_close false
         populate $store_filename
     }
-    form::show_modal .tagsForm
-    after idle {focus .tagsForm.tagEntry}
+    form::show_modal .tagsForm .tagsForm.tagEntry
 }
 
 proc gui_tags::make_widgets {} {

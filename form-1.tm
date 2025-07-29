@@ -27,15 +27,15 @@ proc form::prepare {window on_close {modal true} {x 0} {y 0}} {
 proc form::show_modal {form {focus_widget ""}} {
     wm deiconify $form
     raise $form
-    focus $form
-    if {$focus_widget ne ""} { focus $focus_widget }
     grab set $form
+    after idle [list focus $form]
+    if {$focus_widget ne ""} { after idle [list focus $focus_widget] }
 }
 
 proc form::show_modeless form {
     wm deiconify $form
     raise $form
-    focus $form
+    after idle [list focus $form]
 }
 
 proc form::delete form {

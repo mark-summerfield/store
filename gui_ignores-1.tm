@@ -22,14 +22,12 @@ proc gui_ignores::show_modal {store_filename refresh} {
         populate $store_filename
     }
     .ignoresForm.controlsFrame.addEntry delete 0 end
-    form::show_modal .ignoresForm
-    after idle gui_ignores::set_focus
+    form::show_modal .ignoresForm .ignoresForm.ignoresListFrame.ignoresList
+    on_show
 }
 
-proc gui_ignores::set_focus {} {
-    focus .ignoresForm
+proc gui_ignores::on_show {} {
     set ignoresList .ignoresForm.ignoresListFrame.ignoresList
-    focus $ignoresList
     if {![llength [$ignoresList selection]]} {
         set first [lindex [$ignoresList children {}] 0]
         $ignoresList see $first

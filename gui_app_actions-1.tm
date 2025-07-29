@@ -3,6 +3,7 @@
 package require gui_about
 package require gui_actions
 package require gui_ignores
+package require gui_tags
 package require misc
 package require yes_no_box
 
@@ -141,12 +142,11 @@ oo::define App method on_copy_to {} {
 }
 
 oo::define App method on_tags {} {
-    puts "TODO on_tags"
-    # gui_ignores::show_modeless $StoreFilename
+    gui_tags::show_modal $StoreFilename [callback refresh]
 }
 
 oo::define App method on_ignores {} {
-    gui_ignores::show_modeless $StoreFilename
+    gui_ignores::show_modal $StoreFilename [callback report_status]
 }
 
 oo::define App method on_clean {} {

@@ -226,8 +226,9 @@ oo::define App method make_bindings {} {
     bind . <Alt-i> {.controlsFrame.showFrame.inContextCheck invoke}
     bind . <Alt-m> {
         tk_popup .controlsFrame.moreButton.menu \
-            [winfo rootx .controlsFrame.moreButton] \
-            [expr {[winfo rooty .controlsFrame.moreButton] + 30}]
+            [expr {[winfo rootx .controlsFrame.moreButton]}] \
+            [expr {[winfo rooty .controlsFrame.moreButton] + \
+                   [winfo height .controlsFrame.moreButton]}]
     }
     bind . <Alt-n> {focus .controlsFrame.findFrame.findEntry}
     bind . <Alt-o> [callback on_open]

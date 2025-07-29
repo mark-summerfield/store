@@ -5,15 +5,14 @@ package require lambda 1
 package require misc
 package require store
 
-namespace eval gui_ignores {
-    variable StoreFilename
-}
+namespace eval gui_ignores {}
 
-proc gui_ignores::show_modeless store_filename {
+proc gui_ignores::show_modal {store_filename refresh} {
+    set ::gui_ignores::Refresh $refresh
     if {![winfo exists .ignoresForm]} {
         toplevel .ignoresForm
         wm title .ignoresForm "[tk appname] — Ignores"
-        wm attributes .ignoresForm -topmost 1
+        wm attributes .ignoresForm -topmost true
         make_widgets
         make_layout
         make_bindings
@@ -22,11 +21,13 @@ proc gui_ignores::show_modeless store_filename {
         form::prepare .ignoresForm $on_close false
         populate $store_filename
     }
-    form::show_modeless .ignoresForm
-    set_focus
+    .ignoresForm.controlsFrame.addEntry delete 0 end
+    form::show_modal .ignoresForm
+    after idle gui_ignores::set_focus
 }
 
 proc gui_ignores::set_focus {} {
+    focus .ignoresForm
     set ignoresList .ignoresForm.ignoresListFrame.ignoresList
     focus $ignoresList
     if {![llength [$ignoresList selection]]} {
@@ -152,4 +153,7 @@ proc gui_ignores::on_delete {} {
     }
 }
 
-proc gui_ignores::on_close {} { form::hide .ignoresForm }
+proc gui_ignores::on_close {} {
+    form::hide .ignoresForm
+    {*}$::gui_ignores::Refresh
+}

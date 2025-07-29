@@ -29,8 +29,7 @@ proc form::show_modal {form {focus_widget ""}} {
     raise $form
     focus $form
     if {$focus_widget ne ""} { focus $focus_widget }
-    catch { grab set $form }
-    catch { tkwait visibility $form }
+    grab set $form
 }
 
 proc form::show_modeless form {
@@ -45,6 +44,6 @@ proc form::delete form {
 }
 
 proc form::hide form {
-    wm withdraw $form
     grab release $form
+    wm withdraw $form
 }

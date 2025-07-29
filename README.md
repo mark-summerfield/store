@@ -115,6 +115,9 @@ The GUI `store` maintains a configuration file in `~/.config/Store.str`,
 (e.g., to save/restore the window size and position) and default font for
 showing files.
 
+The command line `str` tool depends on Tcl 9 and the Tcllib; the GUI `store`
+tool depends on Tcl 9, Tk 9, the Tcllib, and the Tklib.
+
 ## License
 
 GPL-3

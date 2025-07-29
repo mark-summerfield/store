@@ -81,6 +81,11 @@ oo::define App method update_ui {} {
     }
 }
 
+oo::define App method refresh {} {
+    my populate
+    my report_status
+}
+
 oo::define App method populate {} {
     my populate_file_tree
     my populate_generation_tree

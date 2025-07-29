@@ -214,14 +214,14 @@ proc test5 {} {
 
 const MESSAGES1 {adding/updating
 created @1
-added "cli-1.tm"
-added "sql/create.sql"
-added "sql/prepare.sql"
-added "store-1.tm"
+added   "cli-1.tm"
+added   "sql/create.sql"
+added   "sql/prepare.sql"
+added   "store-1.tm"
 adding/updating
 created @2
 same as @1 "cli-1.tm"
-added "README.md"
+added   "README.md"
 same as @1 "sql/create.sql"
 same as @1 "sql/prepare.sql"
 same as @1 "store-1.tm"

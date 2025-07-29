@@ -1,9 +1,4 @@
 # TODO
-# - gui: Implement Tags add/edit/remove dialog
-#   Show Generations (*) &All ( ) &Untagged ( ) &Tagged
-#   &Generation @[ 0^v] Tag [                        ]
-#	[&Save] [Close]
-# TODO
 # - store: implement
 #   . store method restore {gid filename}
 #	* move file to tempdir
@@ -25,6 +20,7 @@ gui_app_make-1.tm
 gui_app_actions-1.tm
 gui_actions-1.tm
 gui_ignores-1.tm
+gui_tags-1.tm
 gui_about-1.tm
 gui_misc-1.tm
 gui_globals-1.tm

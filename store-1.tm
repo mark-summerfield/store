@@ -75,13 +75,17 @@ oo::define Store method update {tag} {
     my Update $tag {*}[my filenames $gid]
 }
 
-# gets or sets a tag for the given or current gid
+# gets or sets or deletes (if tag is "-") a tag for the given or current gid
 oo::define Store method tag {{gid 0} {tag ""}} {
     if {!$gid} { set gid [my current_generation] }
-    if {$tag ne ""} {
+    if {$tag eq "-"} {
+        $Db eval {UPDATE Generations SET tag = NULL WHERE gid = :gid}
+    } elseif {$tag ne ""} {
         $Db eval {UPDATE Generations SET tag = :tag WHERE gid = :gid}
     } else {
-        return [$Db eval {SELECT tag FROM Generations WHERE gid = :gid}]
+        set tag [$Db eval {SELECT tag FROM Generations WHERE gid = :gid}]
+        if {![llength $tag]} { return "" }
+        return [lindex $tag 0]
     }
 }
 
@@ -145,7 +149,7 @@ oo::define Store method UpdateOne {gid filename} {
                                              WHERE filename = :filename)}]
         $Db eval $sql
     }
-    set action [expr {$updated ? "updated" : "added"}]
+    set action [expr {$updated ? "updated" : "added  "}]
     switch $kind {
         S { {*}$Reporter "same as @$pgid \"$filename\"" }
         Z -
@@ -161,7 +165,8 @@ oo::define Store method FindMatch {gid filename data} {
               AND gid != :gid
         ORDER BY gid DESC LIMIT 1
     }]
-    expr {$gid eq "" ? 0 : $gid}
+    if {![llength $gid]} { return 0 }
+    return [lindex $gid 0]
 }
 
 # returns the filenames, dirnames, and globs to ignore
@@ -187,6 +192,16 @@ oo::define Store method unignore {args} {
             $Db eval {DELETE FROM Ignores WHERE pattern = :pattern}
         }
     }
+}
+
+# lists gid's: filters are: all, untagged, tagged
+oo::define Store method gids {{filter all}} {
+    switch $filter {
+        all {set where ""}
+        untagged {set where " WHERE tag IS NULL OR LENGTH(tag) = 0"}
+        tagged {set where " WHERE tag IS NOT NULL AND LENGTH(tag) > 0"}
+    }
+    $Db eval "SELECT gid FROM Generations$where ORDER BY gid DESC"
 }
 
 # lists all generations (gid, created) or full (gid, created, tag)

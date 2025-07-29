@@ -31,7 +31,7 @@ proc cli::main {} {
                           $rest }
         G - gui { package require gui ; gui::main }
         h - help - -h - --help { usage } 
-        help-full - --help-full { usage_full }
+        help-full - --help-full - full-help - --full-help { usage_full }
         H - history { cli_actions::history $reporter $storefile $rest}
         i - ignore { cli_actions::ignore $reporter $storefile $rest }
         I - ignores { cli_actions::ignores $reporter $storefile }
@@ -123,19 +123,19 @@ proc cli::usage {} {
         <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN\]> — adds\
         to the ignores" -strictlength true -length $width] $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^I% ~or% ^ignores%\
-        — prints theignores" -strictlength true -length $width] $indent 1]]
+        — prints the ignores" -strictlength true -length $width] $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^U% ~or% ^unignore%\
         <filename1|dirname1|glob1 \[… filenameN|dirnameN|globN\]>\
         — removes from the ignores" -strictlength true -length $width] \
         $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^t% ~or% ^tag%\
-        \[@gid\] <tag> — tag the given or current genration" \
+        \[@gid\] <tag> — tag the given or current generation" \
         -strictlength true -length $width] $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^untag%\
-        \[@gid\] — untag the given or current genration" \
+        \[@gid\] — untag the given or current generation" \
         -strictlength true -length $width] $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^T% ~or%\
-        ^untracked% — prints anyuntracked files" -strictlength true \
+        ^untracked% — prints any untracked files" -strictlength true \
         -length $width] $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^C% ~or% ^clean%\
         — deletes empty generations" -strictlength true -length $width] \
@@ -146,8 +146,8 @@ proc cli::usage {} {
         ~or% ^-h% ~or% ^--help% — shows this usage message" \
         -strictlength true -length $width] $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^help-full% ~or%\
-        ^--help-full% — shows detailed usage" -strictlength true \
-        -length $width] $indent 1]]
+        ^--help-full% ~or% ^full-help% ~or% ^--full-help% — shows \
+        detailed usage" -strictlength true -length $width] $indent 1]]
     puts [unmark [textutil::indent [textutil::adjust "^v% ~or% ^version%\
         ~or% ^-v% ~or% ^--version% — prints the version" \
         -strictlength true -length $width] $indent 1]]
@@ -274,7 +274,8 @@ proc cli::usage_full {} {
     puts [unmark [textutil::indent [textutil::adjust \
         "Show short usage message and exit. (Default action if no store.)" \
         -strictlength true -length $width2] "  "]]
-    puts [unmark "^help-full% ~or% ^--help-full%"]
+    puts [unmark "^help-full% ~or% ^--help-full% ~or% ^full-help% ~or%\
+        ^--full-help%"]
     puts [unmark [textutil::indent [textutil::adjust \
         "Show this usage message and exit." \
         -strictlength true -length $width2] "  "]]

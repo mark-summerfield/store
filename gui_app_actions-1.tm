@@ -73,7 +73,7 @@ oo::define App method on_open {} {
     }
 }
 
-oo::define App method on_add {} {
+oo::define App method on_add_addable {} {
     set str [Store new $StoreFilename [callback set_status_info]]
     try {
         set names [$str addable]
@@ -160,10 +160,31 @@ oo::define App method on_clean {} {
     }
 }
 
+oo::define App method on_restore {} {
+    lassign [my get_selected] ok gid filename
+    if {!$ok} {
+        my set_status_info "Select a file to restore" $::SHORT_WAIT
+    } else {
+        if {[yes_no_box::show_modal "[tk appname] — Restore" \
+                "Restore \"$filename\" from the Store\noverwriting the\
+                disk version?\nThis cannot be undone!" no] eq "yes"} {
+            set str [Store new $StoreFilename [callback set_status_info]]
+            try {
+                set n [$str restore $filename]
+                my set_status_info "restored $filename" $::SHORT_WAIT
+                my report_status
+                my populate
+            } finally {
+                $str close
+            }
+        }
+    }
+}
+
 oo::define App method on_purge {} {
     lassign [my get_selected] ok gid filename
     if {!$ok} {
-        my set_status_info "Select a file purge" $::SHORT_WAIT
+        my set_status_info "Select a file to purge" $::SHORT_WAIT
     } else {
         if {[yes_no_box::show_modal "[tk appname] — Purge" \
                 "Permanently delete \"$filename\" from the Store?\n

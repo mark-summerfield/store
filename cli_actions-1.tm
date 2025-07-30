@@ -324,6 +324,15 @@ proc cli_actions::untracked {reporter storefile rest} {
     }
 }
 
+proc cli_actions::restore {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] _ str rest
+    try {
+        $str restore {*}$rest
+    } finally {
+        $str close
+    }
+}
+
 proc cli_actions::purge {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
     try {

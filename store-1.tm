@@ -1,11 +1,12 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require filedata
+package require fileutil 1
 package require lambda 1
 package require misc
 package require sqlite3 3
 
-const VERSION 1.1.0
+const VERSION 1.2.0
 
 oo::class create Store {
     variable Filename
@@ -273,6 +274,17 @@ oo::define Store method extract {{gid 0} args} {
     set filenames [expr {[llength $args] ? $args : [my filenames $gid]}]
     foreach filename $filenames {
         my ExtractOne extracted $gid $filename $filename
+    }
+}
+
+# extracts the given file from the current generation overwriting the
+# original
+oo::define Store method restore {args} {
+    set gid [my current_generation]
+    set tempdir [fileutil::tempdir]
+    foreach filename $args {
+        catch { file rename $filename [file join $tempdir $filename] }
+        my ExtractOne restored $gid $filename $filename
     }
 }
 

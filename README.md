@@ -5,6 +5,27 @@ An easy-to-use and simple alternative to a version control system.
 There is a single application, `str` which can be used as a command line
 tool or as a GUI application.
 
+## GUI — store
+
+![Screenshot](images/screenshot.png)
+
+This provides the same facilities as the command line but can be much more
+convenient for viewing and diffing previous generations of files.
+
+Run the GUI using:
+
+    str G
+
+or
+
+    str gui
+
+or
+
+    store
+
+where `store` is a soft link to `str`.
+
 ## Command Line — str
 
 Add files:
@@ -76,27 +97,6 @@ complicated, making it ideal for small personal projects where you just want
 to save regular “generations” of your changes and be able to look back in
 time.
 
-
-## GUI — store
-
-![Screenshot](images/screenshot.png)
-
-This provides the same facilities as the command line but can be much more
-convenient for viewing and diffing previous generations of files.
-
-Run the GUI using:
-
-    str G
-
-or
-
-    str gui
-
-or
-
-    store
-
-where `store` is a soft link to `str`.
 
 ## Installation
 

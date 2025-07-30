@@ -38,6 +38,7 @@ proc cli::main {} {
         I - ignores { cli_actions::ignores $reporter $storefile }
         p - print { cli_actions::print $reporter $storefile $rest }
         purge { cli_actions::purge $reporter $storefile $rest }
+        restore { cli_actions::restore $reporter $storefile $rest }
         s - status { cli_actions::status $reporter $storefile $rest }
         t - tag { cli_actions::tag $reporter $storefile $rest }
         T - untracked { cli_actions::untracked $reporter $storefile $rest }
@@ -112,6 +113,8 @@ proc cli::usage {} {
         generation"
     say1 "^untag% \[@gid\] — untag the given or current generation"
     say1 "^T% ~or% ^untracked% — prints any untracked files"
+    say1 "^restore% <filename1 \[… filenameN\]> — restores the specified\
+        files"
     say1 "^C% ~or% ^clean% — deletes empty generations"
     say1 "^purge% <filename> — purges the file"
     say1 "^h% ~or% ^help% ~or% ^-h% ~or% ^--help% — shows this usage\
@@ -193,6 +196,9 @@ proc cli::usage_full {} {
     say2 "Untag the given or current generation."
     puts [unmark "^T% ~or% ^untracked%"]
     say2 "Lists any untracked files."
+    puts [unmark "^restore% <filename1 \[… filenameN\]>"]
+    say2 "Restores the specified files extracting them from the current
+        generation and overwriting their namesakes on disk."
     puts [unmark "^C% ~or% ^clean%"]
     say2 "Cleans, i.e., deletes, every “empty” generation that has no
         changes."

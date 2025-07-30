@@ -13,14 +13,13 @@ oo::define App method make_widgets {} {
     my layout_controls
 }    
 
-# TODO add tooltips…
 oo::define App method make_controls {} {
     set controlsFrame [ttk::frame .controlsFrame]
-    ttk::button .controlsFrame.openButton -text {Open Store…} \
+    ttk::button .controlsFrame.openButton -text "Open Store…" \
         -underline 0 -compound left -command [callback on_open] \
         -image [form::icon document-open.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.addButton -text Add -underline 0 \
-        -compound left -command [callback on_add] \
+    ttk::button .controlsFrame.addButton -text "Add Addable" -underline 0 \
+        -compound left -command [callback on_add_addable] \
         -image [form::icon document-save-as.svg $::ICON_SIZE]
     ttk::button .controlsFrame.updateButton -text Update -underline 0 \
         -compound left -command [callback on_update] \
@@ -28,7 +27,7 @@ oo::define App method make_controls {} {
     ttk::button .controlsFrame.extractButton -text Extract -underline 0 \
         -compound left -command [callback on_extract] \
         -image [form::icon edit-copy.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.copyToButton -text {Copy To…} -underline 0 \
+    ttk::button .controlsFrame.copyToButton -text "Copy To…" -underline 0 \
         -compound left -command [callback on_copy_to] \
         -image [form::icon folder-new.svg $::ICON_SIZE]
     ttk::menubutton .controlsFrame.moreButton -text More -underline 0
@@ -40,6 +39,9 @@ oo::define App method make_controls {} {
         -underline 0 -compound left -command [callback on_ignores] \
         -image [form::icon document-properties.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add separator
+    .controlsFrame.moreButton.menu add command -label Restore… \
+        -underline 0 -compound left -command [callback on_restore] \
+        -image [form::icon edit-undo.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add command -label Clean -underline 0 \
         -compound left -command [callback on_clean] \
         -image [form::icon edit-clear.svg $::ICON_SIZE]
@@ -218,7 +220,7 @@ oo::define App method make_bindings {} {
     bind . <Escape> [callback on_quit]
     bind . <KP_Enter> [callback on_find]
     bind . <F3> [callback on_find]
-    bind . <Alt-a> [callback on_add]
+    bind . <Alt-a> [callback on_add_addable]
     bind . <Alt-b> [callback on_about]
     bind . <Alt-c> [callback on_copy_to]
     bind . <Alt-d> {.controlsFrame.showFrame.diffWithDiskRadio invoke}

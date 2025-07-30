@@ -79,7 +79,7 @@ oo::define App method on_add_file {} {
     set filename [tk_getOpenFile -initialdir . \
                  -title "[tk appname] — Choose a File to Add" -parent .]
     if {$filename ne ""} {
-        set filename [fileutil::relative [file normalize .] $filename]
+        set filename [fileutil::relative [pwd] $filename]
         set str [Store new $StoreFilename [callback set_status_info]]
         try {
             $str add $filename

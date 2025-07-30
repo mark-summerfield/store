@@ -114,7 +114,7 @@ proc cli::usage {} {
     say1 "^untag% \[@gid\] — untag the given or current generation"
     say1 "^T% ~or% ^untracked% — prints any untracked files"
     say1 "^restore% <filename1 \[… filenameN\]> — restores the specified\
-        files"
+        files overwriting those on disk"
     say1 "^C% ~or% ^clean% — deletes empty generations"
     say1 "^purge% <filename> — purges the file"
     say1 "^h% ~or% ^help% ~or% ^-h% ~or% ^--help% — shows this usage\

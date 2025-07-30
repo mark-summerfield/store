@@ -1,5 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require fileutil 1
 package require gui_about
 package require gui_actions
 package require gui_ignores
@@ -70,6 +71,24 @@ oo::define App method on_open {} {
         my report_status
         gui_ignores::populate $StoreFilename
         my update_ui
+    }
+}
+
+oo::define App method on_add_file {} {
+    puts on_add_file
+    set filename [tk_getOpenFile -initialdir . \
+                 -title "[tk appname] — Choose a File to Add" -parent .]
+    if {$filename ne ""} {
+        set filename [fileutil::relative [file normalize .] $filename]
+        set str [Store new $StoreFilename [callback set_status_info]]
+        try {
+            $str add $filename
+            my set_status_info "added $filename" $::SHORT_WAIT
+            my report_status
+            my populate
+        } finally {
+            $str close
+        }
     }
 }
 

@@ -39,6 +39,10 @@ oo::define App method make_controls {} {
         -underline 0 -compound left -command [callback on_ignores] \
         -image [form::icon document-properties.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add separator
+    .controlsFrame.moreButton.menu add command -label "Add File…" \
+        -underline 0 -compound left -command [callback on_add_file] \
+        -image [form::icon document-new.svg $::ICON_SIZE]
+    .controlsFrame.moreButton.menu add separator
     .controlsFrame.moreButton.menu add command -label Restore… \
         -underline 0 -compound left -command [callback on_restore] \
         -image [form::icon edit-undo.svg $::ICON_SIZE]
@@ -49,7 +53,7 @@ oo::define App method make_controls {} {
         -compound left -command [callback on_purge] \
         -image [form::icon edit-cut.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add separator
-    .controlsFrame.moreButton.menu add command -label About -underline 0 \
+    .controlsFrame.moreButton.menu add command -label About -underline 1 \
         -compound left -command [callback on_about] \
         -image [form::icon about.svg $::ICON_SIZE]
     .controlsFrame.moreButton configure -menu .controlsFrame.moreButton.menu

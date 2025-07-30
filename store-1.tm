@@ -80,6 +80,8 @@ oo::define Store method tag {{gid 0} {tag ""}} {
     if {!$gid} { set gid [my current_generation] }
     if {$tag eq "-"} {
         $Db eval {UPDATE Generations SET tag = NULL WHERE gid = :gid}
+    } elseif {[string is integer -strict $tag]} {
+        error "tags may not be integers; got $tag"
     } elseif {$tag ne ""} {
         $Db eval {UPDATE Generations SET tag = :tag WHERE gid = :gid}
     } else {

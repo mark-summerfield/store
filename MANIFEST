@@ -3,7 +3,7 @@
 #   . store method restore {gid filename}
 #	* move file to tempdir
 #	* extract filename (as filename.ext, _not_ filename@gid.ext)
-#   .cli: r or restore [@gid] <filename>
+#   .cli: restore [@gid] <filename> # no 'r' (like purge has no short one)
 #   .gui: &More → ... &Restore… &Clean &Purge
 #	&Restore… yes_no_box
 

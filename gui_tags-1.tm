@@ -45,14 +45,16 @@ proc gui_tags::make_widgets {} {
     ttk::label .tagsForm.tagLabel -text Tag: -underline 0
     ttk::style configure TagSaved.TEntry -fieldbackground white
     ttk::style configure TagUnsaved.TEntry -fieldbackground #FFDDE2
-    ttk::entry .tagsForm.tagEntry -width 20 -textvariable ::gui_tags::Tag \
+    ttk::style configure TagInvalid.TEntry -fieldbackground #FFDDE2 \
+        -foreground red
+    ttk::entry .tagsForm.tagEntry -textvariable ::gui_tags::Tag \
         -style TagSaved.TEntry
     ttk::button .tagsForm.saveButton -text Save -underline 0 \
         -compound left -image [form::icon document-save.svg $::ICON_SIZE] \
-        -command { gui_tags::on_save }
+        -command gui_tags::on_save
     ttk::button .tagsForm.closeButton -text Close \
         -compound left -image [form::icon close.svg $::ICON_SIZE] \
-        -command { gui_tags::on_close }
+        -command gui_tags::on_close
 }
 
 
@@ -136,7 +138,10 @@ proc gui_tags::on_tag_changed args {
 }
 
 proc gui_tags::on_entry_changed {} {
-    if {$::gui_tags::Tag eq $::gui_tags::OldTag} {
+    if {[string is integer -strict $::gui_tags::Tag]} {
+        .tagsForm.tagEntry configure -style TagInvalid.TEntry
+        .tagsForm.saveButton state disabled
+    } elseif {$::gui_tags::Tag eq $::gui_tags::OldTag} {
         .tagsForm.tagEntry configure -style TagSaved.TEntry
         .tagsForm.saveButton state disabled
     } else {

@@ -23,7 +23,7 @@ proc gui_actions::diff {store_filename txt in_context set_status_info \
         }
         lassign [$str get $old_gid $filename] gid old_data
     } finally {
-        $str close
+        $str destroy
     }
     if {!$gid} {
         {*}$set_status_info "can't diff @$old_gid \"$filename\"; not\

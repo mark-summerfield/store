@@ -87,7 +87,7 @@ oo::define App method on_add_file {} {
             my report_status
             my populate
         } finally {
-            $str close
+            $str destroy
         }
     }
 }
@@ -106,7 +106,7 @@ oo::define App method on_add_addable {} {
             my set_status_info "none to add" $::SHORT_WAIT
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -122,7 +122,7 @@ oo::define App method on_update {} {
             my set_status_info "none to update" $::SHORT_WAIT
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -133,7 +133,7 @@ oo::define App method on_extract {} {
         try {
             $str extract $gid $filename
         } finally {
-            $str close
+            $str destroy
         }
     } else {
         my set_status_info "no file selected for extraction" $::SHORT_WAIT
@@ -156,7 +156,7 @@ oo::define App method on_copy_to {} {
             my set_status_info "no generation to copy" $::SHORT_WAIT
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -175,7 +175,7 @@ oo::define App method on_clean {} {
         my set_status_info cleaned $::SHORT_WAIT
         my report_status
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -194,7 +194,7 @@ oo::define App method on_restore {} {
                 my report_status
                 my populate
             } finally {
-                $str close
+                $str destroy
             }
         }
     }
@@ -216,7 +216,7 @@ oo::define App method on_purge {} {
                 my report_status
                 my populate
             } finally {
-                $str close
+                $str destroy
             }
         }
     }

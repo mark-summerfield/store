@@ -12,7 +12,6 @@ proc gui_ignores::show_modal {store_filename refresh} {
     if {![winfo exists .ignoresForm]} {
         toplevel .ignoresForm
         wm title .ignoresForm "[tk appname] — Ignores"
-        wm attributes .ignoresForm -topmost true
         make_widgets
         make_layout
         make_bindings
@@ -103,7 +102,7 @@ proc gui_ignores::populate {{store_filename ""}} {
                 $ignoresList insert {} end -text $ignore
             }
         } finally {
-            $str close
+            $str destroy
         }
     }
 }
@@ -119,7 +118,7 @@ proc gui_ignores::on_add {} {
                 $str ignore $txt
                 populate
             } finally {
-                $str close
+                $str destroy
             }
         }
     }
@@ -136,7 +135,7 @@ proc gui_ignores::on_delete {} {
                 $str unignore [$ignoresList item $item -text]
                 populate
             } finally {
-                $str close
+                $str destroy
             }
             if {$index < 0 && ![llength [$ignoresList selection]]} {
                 set index 0

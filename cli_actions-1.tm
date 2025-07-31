@@ -19,7 +19,7 @@ proc cli_actions::add {reporter storefile rest} {
             $str add {*}$names
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -39,7 +39,7 @@ proc cli_actions::update {reporter storefile rest} {
                 true
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -48,7 +48,7 @@ proc cli_actions::extract {reporter storefile rest} {
     try {
         $str extract $gid {*}$rest
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -92,7 +92,7 @@ proc cli_actions::status {reporter storefile rest} {
             cli_misc::info [join $no_messages " • "]
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -103,7 +103,7 @@ proc cli_actions::copy {reporter storefile rest} {
     } on error {message} {
         cli_misc::warn $message
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -129,7 +129,7 @@ proc cli_actions::print {reporter storefile rest} {
             }
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -182,7 +182,7 @@ proc cli_actions::diff {reporter storefile rest} {
         set delta [diff::colorize $delta]
         puts [join $delta \n]
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -205,7 +205,7 @@ proc cli_actions::filenames {reporter storefile rest} {
             cli_misc::info "$filename$tracked"
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -229,7 +229,7 @@ proc cli_actions::generations {reporter storefile rest} {
             }
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -252,7 +252,7 @@ proc cli_actions::history {reporter storefile rest} {
         }
         puts ""
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -261,7 +261,7 @@ proc cli_actions::ignore {reporter storefile rest} {
     try {
         $str ignore {*}$patterns
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -272,7 +272,7 @@ proc cli_actions::ignores {reporter storefile} {
             cli_misc::info $pattern
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -281,7 +281,7 @@ proc cli_actions::unignore {reporter storefile rest} {
     try {
         $str unignore {*}$patterns
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -290,7 +290,7 @@ proc cli_actions::clean {reporter storefile rest} {
     try {
         $str clean
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -299,7 +299,7 @@ proc cli_actions::tag {reporter storefile rest} {
     try {
         $str tag $gid $rest
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -308,7 +308,7 @@ proc cli_actions::untag {reporter storefile rest} {
     try {
         $str untag $gid
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -320,7 +320,7 @@ proc cli_actions::untracked {reporter storefile rest} {
             cli_misc::info $name
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -329,7 +329,7 @@ proc cli_actions::restore {reporter storefile rest} {
     try {
         $str restore {*}$rest
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -343,7 +343,7 @@ proc cli_actions::purge {reporter storefile rest} {
             cli_misc::info "purged $n version$s"
         }
     } finally {
-        $str close
+        $str destroy
     }
 }
 

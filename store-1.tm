@@ -37,17 +37,10 @@ oo::define Store constructor {filename {reporter ""}} {
     }
 }
 
-oo::define Store destructor { my close }
-
-oo::define Store method close {} {
-    if {![my is_closed]} {
-        $Db eval {VACUUM;}
-        $Db close
-        set Db {}
-    }
+oo::define Store destructor {
+    $Db eval {VACUUM;}
+    $Db close
 }
-
-oo::define Store method is_closed {} { catch {$Db version} }
 
 oo::define Store method filename {} { return $Filename }
 

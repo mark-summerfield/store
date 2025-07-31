@@ -21,10 +21,6 @@ proc test1 {} {
     }
     set str [Store new $filename]
     try {
-        if {[$str is_closed]} {
-            puts "FAIL: expected store to be open"
-            set ok false
-        }
         set gid [$str current_generation]
         if {$gid != 0} {
             puts "FAIL: expected no current generation; got $gid"

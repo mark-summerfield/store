@@ -16,7 +16,6 @@ proc gui_tags::show_modal {store_filename refresh} {
         trace add variable ::gui_tags::Tag write ::gui_tags::on_tag_changed 
         toplevel .tagsForm
         wm title .tagsForm "[tk appname] — Tags"
-        wm attributes .tagsForm -topmost true
         make_widgets
         make_layout
         make_bindings
@@ -107,7 +106,7 @@ proc gui_tags::populate {{store_filename ""}} {
             lassign [misc::n_s [llength $gids]] n s
             .tagsForm.generationsLabel configure -text "Generation$s ($n):"
         } finally {
-            $str close
+            $str destroy
         }
         on_generation_changed
     }
@@ -124,7 +123,7 @@ proc gui_tags::on_generation_changed {} {
         try {
             set tag [$str tag $gid]
         } finally {
-            $str close
+            $str destroy
         }
         .tagsForm.tagEntry delete 0 end
         if {$tag ne ""} { .tagsForm.tagEntry insert 0 $tag }
@@ -159,7 +158,7 @@ proc gui_tags::on_save {} {
         try {
             $str tag $gid [expr {$tag eq "" ? "-" : $tag}]
         } finally {
-            $str close
+            $str destroy
         }
         set ::gui_tags::OldTag $tag
         on_entry_changed

@@ -12,9 +12,11 @@ proc form::icon {svg {width 0}} {
 
 proc form::prepare {window on_close {modal true} {x 0} {y 0}} {
     wm withdraw $window
+    wm attributes $window -type dialog
     if {$modal} {
         wm transient $window .
     }
+    wm group $window .
     set parent [winfo parent $window]
     if {!($x && $y)} {
         set x [expr {[winfo x $parent] + [winfo width $parent] / 3}]

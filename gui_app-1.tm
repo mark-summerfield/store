@@ -96,7 +96,7 @@ oo::define App method populate {} {
             .controlsFrame.showFrame.diffGenSpinbox set \
                 [$str current_generation]
         } finally {
-            $str close
+            $str destroy
         }
     }
 }
@@ -140,7 +140,7 @@ oo::define App method report_status {} {
                         -foreground green
                 }
             } finally {
-                $str close
+                $str destroy
             }
             $StatusSizeLabel configure -background "" \
                 -text [misc::human_size [file size $StoreFilename]]
@@ -175,7 +175,7 @@ oo::define App method populate_file_tree {} {
         }
         my select_files_tree_item $sel_gid $sel_filename
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -203,7 +203,7 @@ oo::define App method populate_generation_tree {} {
         }
         if {$ok} { my select_generations_tree_item $sel_gid $sel_filename }
     } finally {
-        $str close
+        $str destroy
     }
 }
 
@@ -216,7 +216,7 @@ oo::define App method show_file {gid filename} {
         if {!$gid} { set gid [$str current_generation] }
         lassign [$str get $gid $filename] _ data
     } finally {
-        $str close
+        $str destroy
     }
     $Text delete 1.0 end
     $Text insert end [encoding convertfrom -profile replace utf-8 $data]

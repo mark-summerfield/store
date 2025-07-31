@@ -61,9 +61,9 @@ oo::define App method display {} {
     }
     my update_ui
     wm deiconify .
-    raise .
-    focus $widget
-    after 50 [lambda {} { .panes sashpos 0 [winfo width .controlsFrame] }]
+    after idle { raise .}
+    after idle [list focus $widget]
+    after 50 {.panes sashpos 0 [winfo width .controlsFrame]}
 }
 
 oo::define App method update_ui {} {

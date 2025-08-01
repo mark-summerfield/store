@@ -69,7 +69,9 @@ oo::define App method display {} {
 oo::define App method update_ui {} {
     set disabled [expr {$StoreFilename eq "" ? "disabled" : "!disabled"}]
     foreach widget [list .controlsFrame.addButton \
-        .controlsFrame.moreButton \
+        .controlsFrame.updateButton \
+        .controlsFrame.extractButton \
+        .controlsFrame.copyToButton \
         .controlsFrame.showFrame.asIsRadio \
         .controlsFrame.showFrame.diffWithDiskRadio \
         .controlsFrame.showFrame.diffToRadio \
@@ -78,6 +80,10 @@ oo::define App method update_ui {} {
         .controlsFrame.showFrame.diffGenSpinbox \
         .controlsFrame.findFrame.findLabel $FindEntry] {
         $widget state $disabled
+    }
+    set state [expr {$StoreFilename eq "" ? "disabled" : "normal"}]
+    foreach i {0 1 3 5 6 7} {
+        .controlsFrame.moreButton.menu entryconfigure $i -state $state
     }
 }
 

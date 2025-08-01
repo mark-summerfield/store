@@ -48,10 +48,11 @@ proc gui_tags::make_widgets {} {
         -foreground red
     ttk::entry .tagsForm.tagEntry -textvariable ::gui_tags::Tag \
         -style TagSaved.TEntry
-    ttk::button .tagsForm.saveButton -text Save -underline 0 \
+    ttk::frame .tagsForm.frame
+    ttk::button .tagsForm.frame.saveButton -text Save -underline 0 \
         -compound left -image [form::icon document-save.svg $::ICON_SIZE] \
         -command gui_tags::on_save
-    ttk::button .tagsForm.closeButton -text Close \
+    ttk::button .tagsForm.frame.closeButton -text Close \
         -compound left -image [form::icon close.svg $::ICON_SIZE] \
         -command gui_tags::on_close
 }
@@ -71,10 +72,9 @@ proc gui_tags::make_layout {} {
         {*}$opts
     grid .tagsForm.tagEntry -row 2 -column 2 -columnspan 3 -sticky we \
         {*}$opts
-    grid .tagsForm.saveButton -row 3 -column 0 -columnspan 2 -sticky e \
-        {*}$opts
-    grid .tagsForm.closeButton -row 3 -column 2 -columnspan 2 -sticky w \
-        {*}$opts
+    grid .tagsForm.frame -row 3 -column 0 -columnspan 4
+    grid .tagsForm.frame.saveButton -row 0 -column 0 {*}$opts
+    grid .tagsForm.frame.closeButton -row 0 -column 1 {*}$opts
 }
 
 
@@ -139,13 +139,13 @@ proc gui_tags::on_tag_changed args {
 proc gui_tags::on_entry_changed {} {
     if {[string is integer -strict $::gui_tags::Tag]} {
         .tagsForm.tagEntry configure -style TagInvalid.TEntry
-        .tagsForm.saveButton state disabled
+        .tagsForm.frame.saveButton state disabled
     } elseif {$::gui_tags::Tag eq $::gui_tags::OldTag} {
         .tagsForm.tagEntry configure -style TagSaved.TEntry
-        .tagsForm.saveButton state disabled
+        .tagsForm.frame.saveButton state disabled
     } else {
         .tagsForm.tagEntry configure -style TagUnsaved.TEntry
-        .tagsForm.saveButton state !disabled
+        .tagsForm.frame.saveButton state !disabled
     }
     return true
 }

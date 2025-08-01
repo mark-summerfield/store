@@ -172,8 +172,8 @@ proc cli_actions::diff {reporter storefile rest} {
             cli_misc::info "no differences $message"
             return
         }
-        set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
-        set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
+        set old_data [split [encoding convertfrom utf-8 $old_data] \n]
+        set new_data [split [encoding convertfrom utf-8 $new_data] \n]
         cli_misc::info "diff of $message"
         set delta [diff::diff $old_data $new_data]
         if {!$::VERBOSE} {

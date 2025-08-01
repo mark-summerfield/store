@@ -30,8 +30,8 @@ proc gui_actions::diff {store_filename txt in_context set_status_info \
                 present in that generation" $::SHORT_WAIT
         return
     }
-    set old_data [split [encoding convertfrom utf-8 $old_data] "\n"]
-    set new_data [split [encoding convertfrom utf-8 $new_data] "\n"]
+    set old_data [split [encoding convertfrom utf-8 $old_data] \n]
+    set new_data [split [encoding convertfrom utf-8 $new_data] \n]
     set delta [diff::diff $old_data $new_data]
     if {$in_context} { set delta [diff::contextualize $delta] }
     diff::diff_text $delta $txt

@@ -110,8 +110,8 @@ proc gui_add::on_add {} {
         }
         set str [Store new $::gui_add::StoreFilename]
         try {
+            if {[llength $ignores]} { $str ignore {*}$ignores }
             if {[llength $addable]} { $str add {*}$addable }
-            if {[llength $ignores]} { $str ignore {*}ignores }
         } finally {
             $str destroy
         }

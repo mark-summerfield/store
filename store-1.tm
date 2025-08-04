@@ -6,7 +6,7 @@ package require lambda 1
 package require misc
 package require sqlite3 3
 
-const VERSION 1.2.0
+const VERSION 1.3.0
 
 oo::class create Store {
     variable Filename

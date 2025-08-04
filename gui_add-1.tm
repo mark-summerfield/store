@@ -18,8 +18,8 @@ proc gui_add::show_modal {store_filename refresh names} {
         wm minsize .addForm 480 320
         set on_close [lambda {} {form::hide .addForm}]
         form::prepare .addForm $on_close false
-        populate $store_filename $names
     }
+    populate $store_filename $names
     form::show_modal .addForm .addForm.addListFrame.addList
 }
 

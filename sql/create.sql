@@ -49,7 +49,7 @@ CREATE VIEW HistoryByFilename AS
         ORDER BY LOWER(filename), gid DESC;
 
 CREATE VIEW HistoryByGeneration AS
-   SELECT gid, DATETIME(created) AS created, filename, tag
+   SELECT Generations.gid, DATETIME(created) AS created, filename, tag
        FROM Generations, Files
        WHERE Generations.gid = Files.gid AND kind != 'S'
        ORDER BY Generations.gid DESC, LOWER(filename);

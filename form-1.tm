@@ -28,7 +28,6 @@ proc form::prepare {window on_close {modal true} {x 0} {y 0}} {
 
 proc form::show_modal {form {focus_widget ""}} {
     wm deiconify $form
-    raise $form
     grab set $form
     raise $form
     update

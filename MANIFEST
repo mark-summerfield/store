@@ -10,6 +10,7 @@ gui_app-1.tm
 gui_app_make-1.tm
 gui_app_actions-1.tm
 gui_actions-1.tm
+gui_add-1.tm
 gui_ignores-1.tm
 gui_tags-1.tm
 gui_about-1.tm

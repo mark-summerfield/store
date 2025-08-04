@@ -18,7 +18,7 @@ oo::define App method make_controls {} {
     ttk::button .controlsFrame.openButton -text "Open Store…" \
         -underline 0 -compound left -command [callback on_open] \
         -image [form::icon document-open.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.addButton -text "Add Addable" -underline 0 \
+    ttk::button .controlsFrame.addButton -text "Add Addable…" -underline 0 \
         -compound left -command [callback on_add_addable] \
         -image [form::icon document-save-as.svg $::ICON_SIZE]
     ttk::button .controlsFrame.updateButton -text Update -underline 0 \

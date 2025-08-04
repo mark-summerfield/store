@@ -3,6 +3,7 @@
 package require fileutil 1
 package require gui_about
 package require gui_actions
+package require gui_add
 package require gui_ignores
 package require gui_tags
 package require misc
@@ -93,20 +94,17 @@ oo::define App method on_add_file {} {
 }
 
 oo::define App method on_add_addable {} {
+    set names [list]
     set str [Store new $StoreFilename [callback set_status_info]]
     try {
         set names [$str addable]
-        if {[llength $names]} {
-            set n [$str add {*}$names]
-            lassign [misc::n_s $n] n s
-            my set_status_info "added $n file$s" $::SHORT_WAIT
-            my report_status
-            my populate
-        } else {
-            my set_status_info "none to add" $::SHORT_WAIT
-        }
     } finally {
         $str destroy
+    }
+    if {[llength $names]} {
+        gui_add::show_modal $StoreFilename [callback refresh] $names
+    } else {
+        my set_status_info "none to add" $::SHORT_WAIT
     }
 }
 

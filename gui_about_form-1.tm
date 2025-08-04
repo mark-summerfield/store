@@ -5,17 +5,17 @@ package require gui_misc
 package require misc
 package require store
 
-namespace eval gui_about {}
+namespace eval gui_about_form {}
 
-proc gui_about::show_modal {} {
+proc gui_about_form::show_modal {} {
     make_widgets
     make_layout
     make_bindings
-    form::prepare .about { gui_about::on_close }
+    form::prepare .about { gui_about_form::on_close }
     form::show_modal .about
 }
 
-proc gui_about::make_widgets {} {
+proc gui_about_form::make_widgets {} {
     tk::toplevel .about
     wm title .about "[tk appname] — About"
     wm resizable .about false false
@@ -26,24 +26,26 @@ proc gui_about::make_widgets {} {
     .about.text configure -state disabled
     ttk::button .about.close_button -text Close -compound left \
         -image [form::icon close.svg $::ICON_SIZE] \
-        -command { gui_about::on_close }
+        -command { gui_about_form::on_close }
 }
 
 
-proc gui_about::make_layout {} {
+proc gui_about_form::make_layout {} {
     grid .about.text -sticky nsew -pady $::PAD
     grid .about.close_button -pady $::PAD
 }
 
 
-proc gui_about::make_bindings {} {
-    bind .about <Escape> { gui_about::on_close }
-    bind .about <Return> { gui_about::on_close }
-    .about.text tag bind url <Double-1> { gui_about::on_click_url @%x,%y }
+proc gui_about_form::make_bindings {} {
+    bind .about <Escape> { gui_about_form::on_close }
+    bind .about <Return> { gui_about_form::on_close }
+    .about.text tag bind url <Double-1> {
+        gui_about_form::on_click_url @%x,%y
+    }
 }
 
 
-proc gui_about::on_click_url index {
+proc gui_about_form::on_click_url index {
     set indexes [.about.text tag prevrange url $index]
     set url [string trim [.about.text get {*}$indexes]]
     if {$url ne ""} {
@@ -55,10 +57,10 @@ proc gui_about::on_click_url index {
 }
 
 
-proc gui_about::on_close {} { form::delete .about }
+proc gui_about_form::on_close {} { form::delete .about }
 
 
-proc gui_about::populate_about_text {} {
+proc gui_about_form::populate_about_text {} {
     add_text_tags .about.text
     set img [.about.text image create end -align center \
              -image [form::icon store.svg 64]]
@@ -87,7 +89,7 @@ proc gui_about::populate_about_text {} {
         ($::tcl_platform(machine))\n" center
 }
 
-proc gui_about::add_text_tags txt {
+proc gui_about_form::add_text_tags txt {
     set margin 12
     $txt configure -font TkTextFont
     $txt tag configure spaceabove -spacing1 [expr {$::VGAP * 2}]

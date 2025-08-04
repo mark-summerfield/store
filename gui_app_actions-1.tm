@@ -1,11 +1,11 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require fileutil 1
-package require gui_about
+package require gui_about_form
 package require gui_actions
-package require gui_add
-package require gui_ignores
-package require gui_tags
+package require gui_add_form
+package require gui_ignores_form
+package require gui_tags_form
 package require misc
 package require yes_no_box
 
@@ -70,7 +70,7 @@ oo::define App method on_open {} {
         my populate
         my set_status_info "Read \"$StoreFilename\""
         my report_status
-        gui_ignores::populate $StoreFilename
+        gui_ignores_form::populate $StoreFilename
         my update_ui
     }
 }
@@ -102,7 +102,7 @@ oo::define App method on_add_addable {} {
         $str destroy
     }
     if {[llength $names]} {
-        gui_add::show_modal $StoreFilename [callback refresh] $names
+        gui_add_form::show_modal $StoreFilename [callback refresh] $names
     } else {
         my set_status_info "none to add" $::SHORT_WAIT
     }
@@ -159,11 +159,11 @@ oo::define App method on_copy_to {} {
 }
 
 oo::define App method on_tags {} {
-    gui_tags::show_modal $StoreFilename [callback refresh]
+    gui_tags_form::show_modal $StoreFilename [callback refresh]
 }
 
 oo::define App method on_ignores {} {
-    gui_ignores::show_modal $StoreFilename [callback report_status]
+    gui_ignores_form::show_modal $StoreFilename [callback report_status]
 }
 
 oo::define App method on_clean {} {
@@ -284,6 +284,6 @@ oo::define App method on_find {} {
     }
 }
 
-oo::define App method on_about {} { gui_about::show_modal }
+oo::define App method on_about {} { gui_about_form::show_modal }
 
 oo::define App method on_quit {} { gui_actions::on_quit $ConfigFilename }

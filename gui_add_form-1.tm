@@ -5,10 +5,10 @@ package require lambda 1
 package require misc
 package require store
 
-namespace eval gui_add {}
+namespace eval gui_add_form {}
 
-proc gui_add::show_modal {store_filename refresh names} {
-    set ::gui_add::Refresh $refresh
+proc gui_add_form::show_modal {store_filename refresh names} {
+    set ::gui_add_form::Refresh $refresh
     if {![winfo exists .addForm]} {
         toplevel .addForm
         wm title .addForm "[tk appname] — Add Addable"
@@ -23,7 +23,7 @@ proc gui_add::show_modal {store_filename refresh names} {
     form::show_modal .addForm .addForm.addListFrame.addList
 }
 
-proc gui_add::make_widgets {} {
+proc gui_add_form::make_widgets {} {
     ttk::frame .addForm.addListFrame
     set addList [ttk::treeview \
         .addForm.addListFrame.addList -striped true \
@@ -36,17 +36,17 @@ proc gui_add::make_widgets {} {
     ttk::frame .addForm.controlsFrame
     ttk::button .addForm.controlsFrame.addButton -text Add \
         -compound left -image [form::icon list-add.svg $::ICON_SIZE] \
-        -command { gui_add::on_add } -underline 0
+        -command { gui_add_form::on_add } -underline 0
     ttk::label .addForm.controlsFrame.addLabel -text "All selected\
         files will be added;\nall unselected files will be ignored." \
         -wraplength 100p
     ttk::button .addForm.controlsFrame.closeButton -text Cancel \
         -compound left -image [form::icon close.svg $::ICON_SIZE] \
-        -command { gui_add::on_close }
+        -command { gui_add_form::on_close }
 }
 
 
-proc gui_add::make_layout {} {
+proc gui_add_form::make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
     grid .addForm.addListFrame -row 0 -column 0 -sticky news
     grid .addForm.addListFrame.addList -row 0 -column 0 \
@@ -64,20 +64,20 @@ proc gui_add::make_layout {} {
 }
 
 
-proc gui_add::make_bindings {} {
-    bind .addForm <Alt-a> { gui_add::on_add }
-    bind .addForm <Escape> { gui_add::on_close }
+proc gui_add_form::make_bindings {} {
+    bind .addForm <Alt-a> { gui_add_form::on_add }
+    bind .addForm <Escape> { gui_add_form::on_close }
 }
 
-proc gui_add::populate {{store_filename ""} {names ""}} {
+proc gui_add_form::populate {{store_filename ""} {names ""}} {
     if {$store_filename ne ""} {
-        set ::gui_add::StoreFilename $store_filename
+        set ::gui_add_form::StoreFilename $store_filename
     }
     if {[winfo exists .addForm]} {
         set addList .addForm.addListFrame.addList
         $addList delete [$addList children {}]
         if {![llength $names]} {
-            set str [Store new $::gui_add::StoreFilename]
+            set str [Store new $::gui_add_form::StoreFilename]
             try {
                 set names [$str addable]
             } finally {
@@ -91,7 +91,7 @@ proc gui_add::populate {{store_filename ""} {names ""}} {
     }
 }
 
-proc gui_add::on_add {} {
+proc gui_add_form::on_add {} {
     if {[winfo exists .addForm]} {
         set addList .addForm.addListFrame.addList
         set seen [dict create]
@@ -108,7 +108,7 @@ proc gui_add::on_add {} {
                 lappend ignores $name
             }
         }
-        set str [Store new $::gui_add::StoreFilename]
+        set str [Store new $::gui_add_form::StoreFilename]
         try {
             if {[llength $ignores]} { $str ignore {*}$ignores }
             if {[llength $addable]} { $str add {*}$addable }
@@ -119,7 +119,7 @@ proc gui_add::on_add {} {
     }
 }
 
-proc gui_add::on_close {} {
+proc gui_add_form::on_close {} {
     form::hide .addForm
-    {*}$::gui_add::Refresh
+    {*}$::gui_add_form::Refresh
 }

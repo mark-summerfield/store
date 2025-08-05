@@ -39,16 +39,13 @@ proc gui::read_config {} {
     if {[file exists $filename] && [file size $filename]} {
         set ini [ini::open $filename -encoding utf-8 r]
         try {
-            if {[ini::exists $ini $::SECT_WINDOW]} {
-                set geometry [ini::value $ini $::SECT_WINDOW \
-                              $::KEY_GEOMETRY ""]
+            if {[ini::exists $ini Window]} {
+                set geometry [ini::value $ini Window Geometry ""]
                 if {$geometry ne ""} {
                     wm geometry . $geometry
                 }
-                set family [ini::value $ini $::SECT_WINDOW \
-                            $::KEY_FONTFAMILY $family]
-                set size [ini::value $ini $::SECT_WINDOW \
-                          $::KEY_FONTSIZE $size]
+                set family [ini::value $ini Window FontFamily $family]
+                set size [ini::value $ini Window FontSize $size]
             }
         } finally {
             ini::close $ini

@@ -91,13 +91,15 @@ proc gui_about_form::populate_about_text {} {
 }
 
 proc gui_about_form::add_text_tags txt {
+    font create H1 -family [font configure TkTextFont -family] \
+        -size [expr {3 + [font configure TkTextFont -size]}]
     set margin 12
     $txt configure -font TkTextFont
     $txt tag configure spaceabove -spacing1 [expr {$::VGAP * 2}]
     $txt tag configure margins -lmargin1 $margin -lmargin2 $margin \
         -rmargin $margin
     $txt tag configure center -justify center
-    $txt tag configure title -foreground navy -font h1
+    $txt tag configure title -foreground navy -font H1
     $txt tag configure navy -foreground navy
     $txt tag configure green -foreground darkgreen
     $txt tag configure bold -font bold

@@ -25,37 +25,3 @@ proc gui_misc::set_tree_tags tree {
     $tree tag configure generation -foreground green
     $tree tag configure updatable -foreground red
 }
-
-proc gui_misc::open_webpage url {
-    if {[tk windowingsystem] eq "win32"} {
-        set cmd [list {*}[auto_execok start] {}]
-    } else {
-        set cmd [auto_execok xdg-open]
-    }
-    try {
-        exec {*}$cmd $url &
-    } on error {err} {
-        puts "failed to open $url: $err"
-    }
-}
-
-proc gui_misc::get_ini_filename {} {
-    set name [string totitle [tk appname]].ini
-    set home [file home]
-    if {[tk windowingsystem] eq "win32"} {
-        set names [list [file join $home $name] $::APPPATH/$name]
-        set index 0
-    } else {
-        set names [list [file join $home .config/$name] \
-                        [file join $home .$name] $::APPPATH/$name]
-        set index [expr {[file isdirectory \
-                            [file join $home .config]] ? 0 : 1}]
-    }
-    foreach name $names {
-        set name [file normalize $name]
-        if {[file exists $name]} {
-            return $name
-        }
-    }
-    lindex $names $index
-}

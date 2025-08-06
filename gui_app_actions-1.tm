@@ -6,7 +6,7 @@ package require gui_actions
 package require gui_add_form
 package require gui_ignores_form
 package require gui_tags_form
-package require misc
+package require ui
 package require yes_no_box
 
 oo::define App method on_tab_changed {} {
@@ -209,7 +209,7 @@ oo::define App method on_purge {} {
             set str [Store new $StoreFilename [callback set_status_info]]
             try {
                 set n [$str purge $filename]
-                lassign [misc::n_s $n] n s
+                lassign [ui::n_s $n] n s
                 my set_status_info "purged $n version$s" $::SHORT_WAIT
                 my report_status
                 my populate

@@ -4,6 +4,7 @@ package require form
 package require gui_misc
 package require misc
 package require store
+package require ui
 
 namespace eval gui_about_form {}
 
@@ -25,7 +26,7 @@ proc gui_about_form::make_widgets {} {
     populate_about_text
     .about.text configure -state disabled
     ttk::button .about.close_button -text Close -compound left \
-        -image [form::icon close.svg $::ICON_SIZE] \
+        -image [ui::icon close.svg $::ICON_SIZE] \
         -command { gui_about_form::on_close }
 }
 
@@ -52,7 +53,7 @@ proc gui_about_form::on_click_url index {
         if {![string match -nocase http*://* $url]} {
             set url [string cat http:// $url]
         }
-        gui_misc::open_webpage $url
+        ui::open_webpage $url
     }
 }
 
@@ -63,7 +64,7 @@ proc gui_about_form::on_close {} { form::delete .about }
 proc gui_about_form::populate_about_text {} {
     add_text_tags .about.text
     set img [.about.text image create end -align center \
-             -image [form::icon store.svg 64]]
+             -image [ui::icon store.svg 64]]
     .about.text tag add spaceabove $img
     .about.text tag add center $img
     .about.text insert end "\nStore $::VERSION\n" {center title}

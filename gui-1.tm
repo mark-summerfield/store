@@ -6,34 +6,20 @@ package require gui_app_make
 package require gui_globals
 package require gui_misc
 package require inifile
-package require store
+package require ui
 
 namespace eval gui {}
 
 proc gui::main {} {
-    wishinit
+    ui::wishinit
     tk appname Store
     set configFilename [read_config]
     set app [App new $configFilename]
     $app show
 }
 
-proc gui::wishinit {} {
-    catch {
-        set fh [open [file join [file home] .wishinit.tcl]]
-        set raw [read $fh]
-        close $fh
-        eval $raw
-    }
-    set ::LINEHEIGHT [expr {[font metrics font -linespace] * 1.0125}]
-    ttk::style configure Treeview -rowheight $::LINEHEIGHT
-    ttk::style configure TCheckbutton -indicatorsize \
-        [expr {$::LINEHEIGHT * 0.75}]
-    set ::ICON_SIZE [expr {max(24, round(16 * [tk scaling]))}]
-}
-
 proc gui::read_config {} {
-    set filename [gui_misc::get_ini_filename]
+    set filename [ui::get_ini_filename]
     set family Courier
     set size [expr {1 + [font configure TkDefaultFont -size]}]
     if {[file exists $filename] && [file size $filename]} {

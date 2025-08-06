@@ -2,6 +2,7 @@
 
 package require form
 package require gui_misc
+package require ui
 
 oo::define App method make_widgets {} {
     set panes [ttk::panedwindow .panes -orient horizontal]
@@ -17,45 +18,45 @@ oo::define App method make_controls {} {
     set controlsFrame [ttk::frame .controlsFrame]
     ttk::button .controlsFrame.openButton -text "Open Store…" \
         -underline 0 -compound left -command [callback on_open] \
-        -image [form::icon document-open.svg $::ICON_SIZE]
+        -image [ui::icon document-open.svg $::ICON_SIZE]
     ttk::button .controlsFrame.addButton -text "Add Addable…" -underline 0 \
         -compound left -command [callback on_add_addable] \
-        -image [form::icon document-save-as.svg $::ICON_SIZE]
+        -image [ui::icon document-save-as.svg $::ICON_SIZE]
     ttk::button .controlsFrame.updateButton -text Update -underline 0 \
         -compound left -command [callback on_update] \
-        -image [form::icon document-save.svg $::ICON_SIZE]
+        -image [ui::icon document-save.svg $::ICON_SIZE]
     ttk::button .controlsFrame.extractButton -text Extract -underline 0 \
         -compound left -command [callback on_extract] \
-        -image [form::icon edit-copy.svg $::ICON_SIZE]
+        -image [ui::icon edit-copy.svg $::ICON_SIZE]
     ttk::button .controlsFrame.copyToButton -text "Copy To…" -underline 0 \
         -compound left -command [callback on_copy_to] \
-        -image [form::icon folder-new.svg $::ICON_SIZE]
+        -image [ui::icon folder-new.svg $::ICON_SIZE]
     ttk::menubutton .controlsFrame.moreButton -text More -underline 0
     menu .controlsFrame.moreButton.menu
     .controlsFrame.moreButton.menu add command -label Tags… \
         -underline 0 -compound left -command [callback on_tags] \
-        -image [form::icon bookmark-new.svg $::ICON_SIZE]
+        -image [ui::icon bookmark-new.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add command -label Ignores… \
         -underline 0 -compound left -command [callback on_ignores] \
-        -image [form::icon document-properties.svg $::ICON_SIZE]
+        -image [ui::icon document-properties.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add separator
     .controlsFrame.moreButton.menu add command -label "Add File…" \
         -underline 0 -compound left -command [callback on_add_file] \
-        -image [form::icon document-new.svg $::ICON_SIZE]
+        -image [ui::icon document-new.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add separator
     .controlsFrame.moreButton.menu add command -label Restore… \
         -underline 0 -compound left -command [callback on_restore] \
-        -image [form::icon edit-undo.svg $::ICON_SIZE]
+        -image [ui::icon edit-undo.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add command -label Clean -underline 0 \
         -compound left -command [callback on_clean] \
-        -image [form::icon edit-clear.svg $::ICON_SIZE]
+        -image [ui::icon edit-clear.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add command -label Purge… -underline 0 \
         -compound left -command [callback on_purge] \
-        -image [form::icon edit-cut.svg $::ICON_SIZE]
+        -image [ui::icon edit-cut.svg $::ICON_SIZE]
     .controlsFrame.moreButton.menu add separator
     .controlsFrame.moreButton.menu add command -label About -underline 1 \
         -compound left -command [callback on_about] \
-        -image [form::icon about.svg $::ICON_SIZE]
+        -image [ui::icon about.svg $::ICON_SIZE]
     .controlsFrame.moreButton configure -menu .controlsFrame.moreButton.menu
     ttk::frame .controlsFrame.showFrame -relief groove 
     ttk::radiobutton .controlsFrame.showFrame.asIsRadio \
@@ -80,7 +81,7 @@ oo::define App method make_controls {} {
     set FindEntry [ttk::entry .controlsFrame.findFrame.findEntry -width 15]
     ttk::button .controlsFrame.quitButton -text Quit -underline 0 \
         -compound left -command [callback on_quit] \
-        -image [form::icon quit.svg $::ICON_SIZE]
+        -image [ui::icon quit.svg $::ICON_SIZE]
 }
 
 oo::define App method layout_controls {} {

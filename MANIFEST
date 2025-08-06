@@ -17,13 +17,15 @@ gui_about_form-1.tm
 gui_misc-1.tm
 gui_globals-1.tm
 
-form-1.tm
-yes_no_box-1.tm
-
 store-1.tm # VERSION
 filedata-1.tm
 diff-1.tm
 misc-1.tm
+
+# “Universal”
+form-1.tm
+ui-1.tm
+yes_no_box-1.tm
 
 test_store.tcl
 test_diff.tcl

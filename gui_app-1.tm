@@ -3,7 +3,7 @@
 package require form
 package require gui_actions
 package require lambda 1
-package require misc
+package require ui
 
 oo::class create App {
     variable ShowState
@@ -45,7 +45,7 @@ oo::define App method prepare {} {
     wm withdraw .
     wm title . [tk appname]
     wm iconname . [tk appname]
-    wm iconphoto . -default [form::icon store.svg]
+    wm iconphoto . -default [ui::icon store.svg]
     wm minsize . 640 480
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
@@ -123,7 +123,7 @@ oo::define App method report_status {} {
             try {
                 set names [$str addable]
                 if {[llength $names]} {
-                    lassign [misc::n_s [llength $names]] n s
+                    lassign [ui::n_s [llength $names]] n s
                     $StatusAddableLabel configure -text "$n addable" \
                         -foreground red
                 } else {
@@ -132,7 +132,7 @@ oo::define App method report_status {} {
                 }
                 set names [$str updatable]
                 if {[llength $names]} {
-                    lassign [misc::n_s [llength $names]] n s
+                    lassign [ui::n_s [llength $names]] n s
                     $StatusUpdatableLabel configure -text "$n to update" \
                         -foreground red
                 } else {
@@ -150,7 +150,7 @@ oo::define App method report_status {} {
                 $str destroy
             }
             $StatusSizeLabel configure -background "" \
-                -text [misc::human_size [file size $StoreFilename]]
+                -text [ui::human_size [file size $StoreFilename]]
         }
     } else {
         $StatusSizeLabel configure -text "" -background orange

@@ -2,8 +2,8 @@
 
 package require form
 package require lambda 1
-package require misc
 package require store
+package require ui
 
 namespace eval gui_tags_form {}
 
@@ -51,10 +51,10 @@ proc gui_tags_form::make_widgets {} {
         -style TagSaved.TEntry
     ttk::frame .tagsForm.frame
     ttk::button .tagsForm.frame.saveButton -text Save -underline 0 \
-        -compound left -image [form::icon document-save.svg $::ICON_SIZE] \
+        -compound left -image [ui::icon document-save.svg $::ICON_SIZE] \
         -command gui_tags_form::on_save
     ttk::button .tagsForm.frame.closeButton -text Close \
-        -compound left -image [form::icon close.svg $::ICON_SIZE] \
+        -compound left -image [ui::icon close.svg $::ICON_SIZE] \
         -command gui_tags_form::on_close
 }
 
@@ -104,7 +104,7 @@ proc gui_tags_form::populate {{store_filename ""}} {
             if {[llength $gids]} {
                 .tagsForm.generationsCombobox set [lindex $gids 0]
             }
-            lassign [misc::n_s [llength $gids]] n s
+            lassign [ui::n_s [llength $gids]] n s
             .tagsForm.generationsLabel configure -text "Generation$s ($n):"
         } finally {
             $str destroy

@@ -2,8 +2,8 @@
 
 package require form
 package require lambda 1
-package require misc
 package require store
+package require ui
 
 namespace eval gui_ignores_form {}
 
@@ -48,15 +48,15 @@ proc gui_ignores_form::make_widgets {} {
         -command {.ignoresForm.ignoresListFrame.ignoresList yview}
     ttk::frame .ignoresForm.controlsFrame
     ttk::button .ignoresForm.controlsFrame.addButton -text Add: \
-        -compound left -image [form::icon list-add.svg $::ICON_SIZE] \
+        -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \
         -command { gui_ignores_form::on_add } -underline 0
     ttk::entry .ignoresForm.controlsFrame.addEntry -width 12
     ttk::button .ignoresForm.controlsFrame.deleteButton -text Delete \
         -compound left \
-        -image [form::icon list-remove.svg $::ICON_SIZE] \
+        -image [ui::icon list-remove.svg $::ICON_SIZE] \
         -command { gui_ignores_form::on_delete } -underline 0
     ttk::button .ignoresForm.controlsFrame.closeButton -text Close \
-        -compound left -image [form::icon close.svg $::ICON_SIZE] \
+        -compound left -image [ui::icon close.svg $::ICON_SIZE] \
         -command { gui_ignores_form::on_close }
 }
 

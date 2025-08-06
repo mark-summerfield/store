@@ -2,14 +2,6 @@
 
 namespace eval form {}
 
-proc form::icon {svg {width 0}} {
-    if {!$width} {
-        return [image create photo -file $::APPPATH/images/$svg]
-    }
-    image create photo -file $::APPPATH/images/$svg \
-        -format "svg -scaletowidth $width"
-}
-
 proc form::prepare {window on_close {modal true} {x 0} {y 0}} {
     wm withdraw $window
     wm attributes $window -type dialog

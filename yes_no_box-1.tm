@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require form
+package require ui
 
 namespace eval yes_no_box {
     variable Reply
@@ -28,13 +29,13 @@ proc yes_no_box::make_widgets {title body_text} {
     wm title .yesno $title
     ttk::label .yesno.label -text $body_text -anchor center -compound left \
         -padding $::PAD \
-        -image [form::icon help.svg [expr {2 * $::ICON_SIZE}]]
+        -image [ui::icon help.svg [expr {2 * $::ICON_SIZE}]]
     ttk::button .yesno.yes_button -text Yes -underline 0 \
         -command { yes_no_box::on_yes } -compound left \
-        -image [form::icon yes.svg $size]
+        -image [ui::icon yes.svg $size]
     ttk::button .yesno.no_button -text No -underline 0 \
         -command { yes_no_box::on_no } -compound left \
-        -image [form::icon no.svg $size]
+        -image [ui::icon no.svg $size]
 }
 
 

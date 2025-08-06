@@ -2,8 +2,8 @@
 
 package require form
 package require lambda 1
-package require misc
 package require store
+package require ui
 
 namespace eval gui_add_form {}
 
@@ -35,13 +35,13 @@ proc gui_add_form::make_widgets {} {
         -command {.addForm.addListFrame.addList yview}
     ttk::frame .addForm.controlsFrame
     ttk::button .addForm.controlsFrame.addButton -text Add \
-        -compound left -image [form::icon list-add.svg $::ICON_SIZE] \
+        -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \
         -command { gui_add_form::on_add } -underline 0
     ttk::label .addForm.controlsFrame.addLabel -text "All selected\
         files will be added;\nall unselected files will be ignored." \
         -wraplength 100p
     ttk::button .addForm.controlsFrame.closeButton -text Cancel \
-        -compound left -image [form::icon close.svg $::ICON_SIZE] \
+        -compound left -image [ui::icon close.svg $::ICON_SIZE] \
         -command { gui_add_form::on_close }
 }
 

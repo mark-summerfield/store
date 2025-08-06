@@ -91,8 +91,6 @@ proc gui_about_form::populate_about_text {} {
 }
 
 proc gui_about_form::add_text_tags txt {
-    font create H1 -family [font configure TkTextFont -family] \
-        -size [expr {3 + [font configure TkTextFont -size]}]
     set margin 12
     $txt configure -font TkTextFont
     $txt tag configure spaceabove -spacing1 [expr {$::VGAP * 2}]

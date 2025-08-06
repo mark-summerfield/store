@@ -14,6 +14,7 @@ proc gui::main {} {
     ui::wishinit
     tk appname Store
     set configFilename [read_config]
+    make_fonts
     set app [App new $configFilename]
     $app show
 }
@@ -39,4 +40,9 @@ proc gui::read_config {} {
     }
     font create Mono -family $family -size $size
     return $filename
+}
+
+proc gui::make_fonts {} {
+    font create H1 -family [font configure TkTextFont -family] \
+        -size [expr {3 + [font configure TkTextFont -size]}] -weight bold
 }

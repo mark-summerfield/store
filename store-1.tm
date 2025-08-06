@@ -95,8 +95,10 @@ oo::define Store method untag {{gid 0}} {
 # creates new generation with 'U' or 'Z' or 'S' for every given file —
 # providing it still exists
 oo::define Store method Update {tag args} {
+    const cwd [pwd]
     set filenames [list]
     foreach filename $args {
+        set filename [fileutil::relative $cwd [file normalize $filename]]
         if {[file isfile $filename]} {
             lappend filenames $filename
         } elseif {[my find_gid_for_untracked $filename]} {
@@ -142,6 +144,7 @@ oo::define Store method UpdateOne {gid filename} {
                  (:gid, :filename, :kind, :usize, :zsize, :pgid, :data)}
     }
     $Db transaction {
+        $Db eval {DELETE FROM Ignores WHERE pattern = :filename}
         set updated [$Db eval {SELECT EXISTS(SELECT filename FROM FILES
                                              WHERE filename = :filename)}]
         $Db eval $sql

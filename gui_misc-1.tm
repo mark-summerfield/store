@@ -17,8 +17,8 @@ proc gui_misc::make_text_frame {} {
 }
 
 proc gui_misc::set_tree_tags tree {
-    $tree tag configure parent -foreground blue
-    $tree tag configure untracked -foreground gray
-    $tree tag configure generation -foreground green
-    $tree tag configure updatable -foreground red
+    foreach {tag color} {parent blue untracked gray generation green \
+                         updatable red} {
+        $tree tag configure $tag -foreground $color
+    }
 }

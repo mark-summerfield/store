@@ -8,11 +8,11 @@ namespace eval cli_misc {}
 # can't use globals since they are for stdout and here we need stderr
 proc cli_misc::warn message {
     if {[dict exists [chan configure stderr] -mode]} { ;# tty
-        set reset "\033\[0m"
-        set red "\x1B\[31m"
+        const reset "\033\[0m"
+        const red "\x1B\[31m"
     } else { ;# redirected
-        set reset ""
-        set red ""
+        const reset ""
+        const red ""
     }
     puts stderr "${red}$message${reset}"
     exit 1

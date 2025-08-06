@@ -61,20 +61,22 @@ proc gui_ignores_form::make_widgets {} {
 
 proc gui_ignores_form::make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
-    grid .ignoresForm.ignoresListFrame -row 0 -column 0 -sticky news
-    grid .ignoresForm.ignoresListFrame.ignoresList -row 0 -column 0 \
-        -sticky news
-    grid .ignoresForm.ignoresListFrame.scrolly -row 0 -column 1 -sticky ns
-    grid columnconfigure .ignoresForm.ignoresListFrame 0 -weight 9
-    grid rowconfigure .ignoresForm.ignoresListFrame 0 -weight 1
-    autoscroll::autoscroll .ignoresForm.ignoresListFrame.scrolly
-    grid .ignoresForm.controlsFrame -row 0 -column 1 -sticky ns
-    pack .ignoresForm.controlsFrame.addButton -side top {*}$opts
-    pack .ignoresForm.controlsFrame.addEntry -side top -fill x {*}$opts
-    pack .ignoresForm.controlsFrame.deleteButton -side top {*}$opts
-    pack .ignoresForm.controlsFrame.closeButton -side bottom {*}$opts
-    grid rowconfigure .ignoresForm 0 -weight 1
-    grid columnconfigure .ignoresForm 0 -weight 1
+    set form .ignoresForm
+    set frame $form.ignoresListFrame
+    grid $frame -row 0 -column 0 -sticky news
+    grid $frame.ignoresList -row 0 -column 0 -sticky news
+    grid $frame.scrolly -row 0 -column 1 -sticky ns
+    grid columnconfigure $frame 0 -weight 9
+    grid rowconfigure $frame 0 -weight 1
+    autoscroll::autoscroll $frame.scrolly
+    set frame $form.controlsFrame
+    grid $frame -row 0 -column 1 -sticky ns
+    pack $frame.addButton -side top {*}$opts
+    pack $frame.addEntry -side top -fill x {*}$opts
+    pack $frame.deleteButton -side top {*}$opts
+    pack $frame.closeButton -side bottom {*}$opts
+    grid rowconfigure $form 0 -weight 1
+    grid columnconfigure $form 0 -weight 1
 }
 
 

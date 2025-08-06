@@ -62,47 +62,44 @@ proc gui_about_form::on_close {} { form::delete .about }
 
 
 proc gui_about_form::populate_about_text {} {
-    add_text_tags .about.text
-    set img [.about.text image create end -align center \
+    set txt .about.text
+    add_text_tags $txt
+    set img [$txt image create end -align center \
              -image [ui::icon store.svg 64]]
-    .about.text tag add spaceabove $img
-    .about.text tag add center $img
-    .about.text insert end "\nStore $::VERSION\n" {center title}
-    .about.text insert end "An easy-to-use and simple alternative\n" \
-            {center navy}
-    .about.text insert end "to a version control system.\n" {center navy}
+    $txt tag add spaceabove $img
+    $txt tag add center $img
+    set cmd [list $txt insert end]
+    {*}$cmd "\nStore $::VERSION\n" {center title}
+    {*}$cmd "An easy-to-use and simple alternative\n" {center navy}
+    {*}$cmd "to a version control system.\n" {center navy}
     set year [clock format [clock seconds] -format %Y]
-    if {$year > 2025} {
-        set year "2025-[string range $year end-1 end]"
-    }
+    if {$year > 2025} { set year "2025-[string range $year end-1 end]" }
     set bits [expr {8 * $::tcl_platform(wordSize)}]
     set distro [exec lsb_release -ds]
-    .about.text insert end \
-        "https://github.com/mark-summerfield/store\n" {center green url}
-    .about.text insert end "Copyright © $year Mark Summerfield.\
-                            \nAll Rights Reserved.\n" {center green}
-    .about.text insert end "License: GPLv3.\n" {center green}
-    .about.text insert end "[string repeat " " 60]\n" {center hr}
-    .about.text insert end "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
-    .about.text insert end "[misc::sqlite_version]\n" center
-    if {$distro != ""} { .about.text insert end "$distro\n" center }
-    .about.text insert end "$::tcl_platform(os) $::tcl_platform(osVersion)\
+    {*}$cmd "https://github.com/mark-summerfield/store\n" {center green url}
+    {*}$cmd "Copyright © $year Mark Summerfield.\nAll Rights Reserved.\n" \
+        {center green}
+    {*}$cmd "License: GPLv3.\n" {center green}
+    {*}$cmd "[string repeat " " 60]\n" {center hr}
+    {*}$cmd "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
+    {*}$cmd "[misc::sqlite_version]\n" center
+    if {$distro != ""} { {*}$cmd "$distro\n" center }
+    {*}$cmd "$::tcl_platform(os) $::tcl_platform(osVersion)\
         ($::tcl_platform(machine))\n" center
 }
 
 proc gui_about_form::add_text_tags txt {
     set margin 12
     $txt configure -font TkTextFont
-    $txt tag configure spaceabove -spacing1 [expr {$::VGAP * 2}]
-    $txt tag configure margins -lmargin1 $margin -lmargin2 $margin \
-        -rmargin $margin
-    $txt tag configure center -justify center
-    $txt tag configure title -foreground navy -font H1
-    $txt tag configure navy -foreground navy
-    $txt tag configure green -foreground darkgreen
-    $txt tag configure bold -font bold
-    $txt tag configure italic -font italic
-    $txt tag configure url -underline true -underlinefg darkgreen
-    $txt tag configure hr -overstrike true -overstrikefg lightgray \
-        -spacing3 10
+    set cmd [list $txt tag configure]
+    {*}$cmd spaceabove -spacing1 [expr {$::VGAP * 2}]
+    {*}$cmd margins -lmargin1 $margin -lmargin2 $margin -rmargin $margin
+    {*}$cmd center -justify center
+    {*}$cmd title -foreground navy -font H1
+    {*}$cmd navy -foreground navy
+    {*}$cmd green -foreground darkgreen
+    {*}$cmd bold -font bold
+    {*}$cmd italic -font italic
+    {*}$cmd url -underline true -underlinefg darkgreen
+    {*}$cmd hr -overstrike true -overstrikefg lightgray -spacing3 10
 }

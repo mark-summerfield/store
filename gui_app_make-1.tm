@@ -15,103 +15,100 @@ oo::define App method make_widgets {} {
 }    
 
 oo::define App method make_controls {} {
-    set controlsFrame [ttk::frame .controlsFrame]
-    ttk::button .controlsFrame.openButton -text "Open Store…" \
-        -underline 0 -compound left -command [callback on_open] \
+    set frame [ttk::frame .controlsFrame]
+    ttk::button $frame.openButton -text "Open Store…" -underline 0 \
+        -compound left -command [callback on_open] \
         -image [ui::icon document-open.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.addButton -text "Add Addable…" -underline 0 \
+    ttk::button $frame.addButton -text "Add Addable…" -underline 0 \
         -compound left -command [callback on_add_addable] \
         -image [ui::icon document-save-as.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.updateButton -text Update -underline 0 \
+    ttk::button $frame.updateButton -text Update -underline 0 \
         -compound left -command [callback on_update] \
         -image [ui::icon document-save.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.extractButton -text Extract -underline 0 \
+    ttk::button $frame.extractButton -text Extract -underline 0 \
         -compound left -command [callback on_extract] \
         -image [ui::icon edit-copy.svg $::ICON_SIZE]
-    ttk::button .controlsFrame.copyToButton -text "Copy To…" -underline 0 \
+    ttk::button $frame.copyToButton -text "Copy To…" -underline 0 \
         -compound left -command [callback on_copy_to] \
         -image [ui::icon folder-new.svg $::ICON_SIZE]
-    ttk::menubutton .controlsFrame.moreButton -text More -underline 0
-    menu .controlsFrame.moreButton.menu
-    .controlsFrame.moreButton.menu add command -label Tags… \
-        -underline 0 -compound left -command [callback on_tags] \
+    ttk::menubutton $frame.moreButton -text More -underline 0
+    menu $frame.moreButton.menu
+    $frame.moreButton.menu add command -label Tags… -underline 0 \
+        -compound left -command [callback on_tags] \
         -image [ui::icon bookmark-new.svg $::ICON_SIZE]
-    .controlsFrame.moreButton.menu add command -label Ignores… \
-        -underline 0 -compound left -command [callback on_ignores] \
+    $frame.moreButton.menu add command -label Ignores… -underline 0 \
+        -compound left -command [callback on_ignores] \
         -image [ui::icon document-properties.svg $::ICON_SIZE]
-    .controlsFrame.moreButton.menu add separator
-    .controlsFrame.moreButton.menu add command -label "Add File…" \
-        -underline 0 -compound left -command [callback on_add_file] \
+    $frame.moreButton.menu add separator
+    $frame.moreButton.menu add command -label "Add File…" -underline 0 \
+        -compound left -command [callback on_add_file] \
         -image [ui::icon document-new.svg $::ICON_SIZE]
-    .controlsFrame.moreButton.menu add separator
-    .controlsFrame.moreButton.menu add command -label Restore… \
-        -underline 0 -compound left -command [callback on_restore] \
+    $frame.moreButton.menu add separator
+    $frame.moreButton.menu add command -label Restore… -underline 0 \
+        -compound left -command [callback on_restore] \
         -image [ui::icon edit-undo.svg $::ICON_SIZE]
-    .controlsFrame.moreButton.menu add command -label Clean -underline 0 \
+    $frame.moreButton.menu add command -label Clean -underline 0 \
         -compound left -command [callback on_clean] \
         -image [ui::icon edit-clear.svg $::ICON_SIZE]
-    .controlsFrame.moreButton.menu add command -label Purge… -underline 0 \
+    $frame.moreButton.menu add command -label Purge… -underline 0 \
         -compound left -command [callback on_purge] \
         -image [ui::icon edit-cut.svg $::ICON_SIZE]
-    .controlsFrame.moreButton.menu add separator
-    .controlsFrame.moreButton.menu add command -label About -underline 1 \
+    $frame.moreButton.menu add separator
+    $frame.moreButton.menu add command -label About -underline 1 \
         -compound left -command [callback on_about] \
         -image [ui::icon about.svg $::ICON_SIZE]
-    .controlsFrame.moreButton configure -menu .controlsFrame.moreButton.menu
-    ttk::frame .controlsFrame.showFrame -relief groove 
-    ttk::radiobutton .controlsFrame.showFrame.asIsRadio \
-        -text "Show As-Is" -underline 0 -value asis \
-        -variable [my varname ShowState] -command [callback on_show_asis]
-    ttk::radiobutton .controlsFrame.showFrame.diffWithDiskRadio \
+    $frame.moreButton configure -menu $frame.moreButton.menu
+    ttk::frame $frame.showFrame -relief groove 
+    ttk::radiobutton $frame.showFrame.asIsRadio -text "Show As-Is" \
+        -underline 0 -value asis -variable [my varname ShowState] \
+        -command [callback on_show_asis]
+    ttk::radiobutton $frame.showFrame.diffWithDiskRadio \
         -text "Diff with Disk" -underline 0 -value disk \
         -variable [my varname ShowState] \
         -command [callback on_show_diff_with_disk]
-    ttk::radiobutton .controlsFrame.showFrame.diffToRadio \
-        -text "Diff to Gen.:" -underline 5 -value generation \
-        -variable [my varname ShowState] -command [callback on_show_diff_to]
-    ttk::checkbutton .controlsFrame.showFrame.inContextCheck \
-        -text "In Context" -underline 0 -onvalue true -offvalue false \
+    ttk::radiobutton $frame.showFrame.diffToRadio -text "Diff to Gen.:" \
+        -underline 5 -value generation -variable [my varname ShowState] \
+        -command [callback on_show_diff_to]
+    ttk::checkbutton $frame.showFrame.inContextCheck -text "In Context" \
+        -underline 0 -onvalue true -offvalue false \
         -variable [my varname InContext] -command [callback on_in_context]
-    ttk::label .controlsFrame.showFrame.diffLabel -text @
-    ttk::spinbox .controlsFrame.showFrame.diffGenSpinbox -format %.0f \
-        -from 0 -to 99999 -width 5 -command [callback on_show_diff_to]
-    .controlsFrame.showFrame.diffGenSpinbox set 0
-    ttk::frame .controlsFrame.findFrame -relief groove 
-    ttk::label .controlsFrame.findFrame.findLabel -text Find: -underline 2
-    set FindEntry [ttk::entry .controlsFrame.findFrame.findEntry -width 15]
-    ttk::button .controlsFrame.quitButton -text Quit -underline 0 \
-        -compound left -command [callback on_quit] \
-        -image [ui::icon quit.svg $::ICON_SIZE]
+    ttk::label $frame.showFrame.diffLabel -text @
+    ttk::spinbox $frame.showFrame.diffGenSpinbox -format %.0f -from 0 \
+        -to 99999 -width 5 -command [callback on_show_diff_to]
+    $frame.showFrame.diffGenSpinbox set 0
+    ttk::frame $frame.findFrame -relief groove 
+    ttk::label $frame.findFrame.findLabel -text Find: -underline 2
+    set FindEntry [ttk::entry $frame.findFrame.findEntry -width 15]
+    ttk::button $frame.quitButton -text Quit -underline 0 -compound left \
+        -command [callback on_quit] -image [ui::icon quit.svg $::ICON_SIZE]
 }
 
 oo::define App method layout_controls {} {
     set opts "-padx $::PAD -pady $::PAD"
-    pack .controlsFrame.openButton -side top {*}$opts
-    pack .controlsFrame.addButton -side top {*}$opts
-    pack .controlsFrame.updateButton -side top {*}$opts
-    pack .controlsFrame.extractButton -side top {*}$opts
-    pack .controlsFrame.copyToButton -side top {*}$opts
-    pack .controlsFrame.moreButton -side top -ipadx [expr {$::PAD * 2}] \
-        {*}$opts
-    pack .controlsFrame.showFrame -side top -fill x {*}$opts
-    grid .controlsFrame.showFrame.asIsRadio -row 0 -column 0 -columnspan 2 \
+    set frame .controlsFrame
+    pack $frame.openButton -side top {*}$opts
+    pack $frame.addButton -side top {*}$opts
+    pack $frame.updateButton -side top {*}$opts
+    pack $frame.extractButton -side top {*}$opts
+    pack $frame.copyToButton -side top {*}$opts
+    pack $frame.moreButton -side top -ipadx [expr {$::PAD * 2}] {*}$opts
+    pack $frame.showFrame -side top -fill x {*}$opts
+    grid $frame.showFrame.asIsRadio -row 0 -column 0 -columnspan 2 \
         -sticky w {*}$opts
-    grid .controlsFrame.showFrame.diffWithDiskRadio -row 1 -column 0 \
+    grid $frame.showFrame.diffWithDiskRadio -row 1 -column 0 \
         -columnspan 2 -sticky w {*}$opts
-    grid .controlsFrame.showFrame.diffToRadio -row 2 -column 0 \
-        -columnspan 2 -sticky w {*}$opts
-    grid .controlsFrame.showFrame.diffLabel -row 3 -column 0 -sticky e \
+    grid $frame.showFrame.diffToRadio -row 2 -column 0 -columnspan 2 \
+        -sticky w {*}$opts
+    grid $frame.showFrame.diffLabel -row 3 -column 0 -sticky e \
         -pady [expr {2 * $::PAD}]
-    grid .controlsFrame.showFrame.diffGenSpinbox -row 3 -column 1 \
-        -sticky w -pady [expr {2 * $::PAD}]
-    grid .controlsFrame.showFrame.inContextCheck -row 4 -column 0 \
-        -columnspan 2 -sticky w {*}$opts
-    pack .controlsFrame.findFrame -side top -fill x {*}$opts
-    grid .controlsFrame.findFrame.findLabel -row 0 -column 0 -sticky w \
-        {*}$opts
-    grid .controlsFrame.findFrame.findEntry -row 1 -column 0 -sticky w \
-        {*}$opts
-    pack .controlsFrame.quitButton -side bottom {*}$opts
+    grid $frame.showFrame.diffGenSpinbox -row 3 -column 1 -sticky w \
+        -pady [expr {2 * $::PAD}]
+    grid $frame.showFrame.inContextCheck -row 4 -column 0 -columnspan 2 \
+        -sticky w {*}$opts
+    pack $frame.findFrame -side top -fill x {*}$opts
+    grid $frame.findFrame.findLabel -row 0 -column 0 -sticky w {*}$opts
+    grid $frame.findFrame.findEntry -row 1 -column 0 -sticky w {*}$opts
+    pack $frame.quitButton -side bottom {*}$opts
 }
 
 oo::define App method make_tabs {} {
@@ -154,22 +151,21 @@ oo::define App method make_status_bar {} {
         set message "Click Open Store… to choose a store"
         set ms $::LONG_WAIT
     }
-    set statusFrame [ttk::frame .statusFrame]
-    set StatusInfoLabel [ttk::label .statusFrame.statusInfoLabel \
-                         -relief sunken -text $message]
-    set StatusAddableLabel [ttk::label .statusFrame.statusAddableLabel \
+    set frame [ttk::frame .statusFrame]
+    set StatusInfoLabel [ttk::label $frame.statusInfoLabel -relief sunken \
+                         -text $message]
+    set StatusAddableLabel [ttk::label $frame.statusAddableLabel \
                             -relief sunken]
-    set StatusUpdatableLabel [ttk::label .statusFrame.statusUpdatableLabel \
+    set StatusUpdatableLabel [ttk::label $frame.statusUpdatableLabel \
                               -relief sunken]
-    set StatusCleanableLabel [ttk::label .statusFrame.statusCleanableLabel \
+    set StatusCleanableLabel [ttk::label $frame.statusCleanableLabel \
                               -relief sunken]
-    set StatusSizeLabel [ttk::label .statusFrame.statusSizeLabel \
-                         -relief sunken]
-    pack .statusFrame.statusInfoLabel -side left -fill x -expand true
-    pack .statusFrame.statusSizeLabel -side right -fill x
-    pack .statusFrame.statusCleanableLabel -side right -fill x
-    pack .statusFrame.statusUpdatableLabel -side right -fill x
-    pack .statusFrame.statusAddableLabel -side right -fill x
+    set StatusSizeLabel [ttk::label $frame.statusSizeLabel -relief sunken]
+    pack $frame.statusInfoLabel -side left -fill x -expand true
+    pack $frame.statusSizeLabel -side right -fill x
+    pack $frame.statusCleanableLabel -side right -fill x
+    pack $frame.statusUpdatableLabel -side right -fill x
+    pack $frame.statusAddableLabel -side right -fill x
     after $ms [callback set_status_info]
     my report_status
 }

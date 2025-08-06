@@ -29,31 +29,32 @@ proc gui_tags_form::show_modal {store_filename refresh} {
 }
 
 proc gui_tags_form::make_widgets {} {
-    ttk::label .tagsForm.showLabel -text "Show Generations"
-    ttk::radiobutton .tagsForm.showAllRadio -text All -underline 0 \
+    set form .tagsForm
+    ttk::label $form.showLabel -text "Show Generations"
+    ttk::radiobutton $form.showAllRadio -text All -underline 0 \
         -value all -variable ::gui_tags_form::ShowWhich \
         -command ::gui_tags_form::on_show_changed
-    ttk::radiobutton .tagsForm.showUntaggedRadio -text Untagged \
+    ttk::radiobutton $form.showUntaggedRadio -text Untagged \
         -underline 0 -value untagged -variable ::gui_tags_form::ShowWhich \
         -command ::gui_tags_form::on_show_changed
-    ttk::radiobutton .tagsForm.showTaggedRadio -text Tagged -underline 4 \
+    ttk::radiobutton $form.showTaggedRadio -text Tagged -underline 4 \
         -value tagged -variable ::gui_tags_form::ShowWhich \
         -command ::gui_tags_form::on_show_changed
-    ttk::label .tagsForm.generationsLabel -text Generation: -underline 0
-    ttk::label .tagsForm.atLabel -text @ 
-    ttk::combobox .tagsForm.generationsCombobox
-    ttk::label .tagsForm.tagLabel -text Tag: -underline 0
+    ttk::label $form.generationsLabel -text Generation: -underline 0
+    ttk::label $form.atLabel -text @ 
+    ttk::combobox $form.generationsCombobox
+    ttk::label $form.tagLabel -text Tag: -underline 0
     ttk::style configure TagSaved.TEntry -fieldbackground white
     ttk::style configure TagUnsaved.TEntry -fieldbackground #FFDDE2
     ttk::style configure TagInvalid.TEntry -fieldbackground #FFDDE2 \
         -foreground red
-    ttk::entry .tagsForm.tagEntry -textvariable ::gui_tags_form::Tag \
+    ttk::entry $form.tagEntry -textvariable ::gui_tags_form::Tag \
         -style TagSaved.TEntry
-    ttk::frame .tagsForm.frame
-    ttk::button .tagsForm.frame.saveButton -text Save -underline 0 \
+    ttk::frame $form.frame
+    ttk::button $form.frame.saveButton -text Save -underline 0 \
         -compound left -image [ui::icon document-save.svg $::ICON_SIZE] \
         -command gui_tags_form::on_save
-    ttk::button .tagsForm.frame.closeButton -text Close \
+    ttk::button $form.frame.closeButton -text Close \
         -compound left -image [ui::icon close.svg $::ICON_SIZE] \
         -command gui_tags_form::on_close
 }
@@ -61,21 +62,20 @@ proc gui_tags_form::make_widgets {} {
 
 proc gui_tags_form::make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
-    grid .tagsForm.showLabel -row 0 -column 0 -sticky w {*}$opts
-    grid .tagsForm.showAllRadio -row 0 -column 1 -sticky w {*}$opts
-    grid .tagsForm.showUntaggedRadio -row 0 -column 2 -sticky w {*}$opts
-    grid .tagsForm.showTaggedRadio -row 0 -column 3 -sticky w {*}$opts
-    grid .tagsForm.generationsLabel -row 1 -column 0 -sticky w {*}$opts
-    grid .tagsForm.atLabel -row 1 -column 1 -sticky e {*}$opts
-    grid .tagsForm.generationsCombobox -row 1 -column 2 -columnspan 3 \
+    set form .tagsForm
+    grid $form.showLabel -row 0 -column 0 -sticky w {*}$opts
+    grid $form.showAllRadio -row 0 -column 1 -sticky w {*}$opts
+    grid $form.showUntaggedRadio -row 0 -column 2 -sticky w {*}$opts
+    grid $form.showTaggedRadio -row 0 -column 3 -sticky w {*}$opts
+    grid $form.generationsLabel -row 1 -column 0 -sticky w {*}$opts
+    grid $form.atLabel -row 1 -column 1 -sticky e {*}$opts
+    grid $form.generationsCombobox -row 1 -column 2 -columnspan 3 \
         -sticky we {*}$opts
-    grid .tagsForm.tagLabel -row 2 -column 0 -columnspan 2 -sticky w \
-        {*}$opts
-    grid .tagsForm.tagEntry -row 2 -column 2 -columnspan 3 -sticky we \
-        {*}$opts
-    grid .tagsForm.frame -row 3 -column 0 -columnspan 4
-    grid .tagsForm.frame.saveButton -row 0 -column 0 {*}$opts
-    grid .tagsForm.frame.closeButton -row 0 -column 1 {*}$opts
+    grid $form.tagLabel -row 2 -column 0 -columnspan 2 -sticky w {*}$opts
+    grid $form.tagEntry -row 2 -column 2 -columnspan 3 -sticky we {*}$opts
+    grid $form.frame -row 3 -column 0 -columnspan 4
+    grid $form.frame.saveButton -row 0 -column 0 {*}$opts
+    grid $form.frame.closeButton -row 0 -column 1 {*}$opts
 }
 
 

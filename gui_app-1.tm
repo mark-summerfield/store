@@ -68,23 +68,19 @@ oo::define App method display {} {
 }
 
 oo::define App method update_ui {} {
-    set disabled [expr {$StoreFilename eq "" ? "disabled" : "!disabled"}]
-    foreach widget [list .controlsFrame.addButton \
-        .controlsFrame.updateButton \
-        .controlsFrame.extractButton \
-        .controlsFrame.copyToButton \
-        .controlsFrame.showFrame.asIsRadio \
-        .controlsFrame.showFrame.diffWithDiskRadio \
-        .controlsFrame.showFrame.diffToRadio \
-        .controlsFrame.showFrame.inContextCheck \
-        .controlsFrame.showFrame.diffLabel \
-        .controlsFrame.showFrame.diffGenSpinbox \
-        .controlsFrame.findFrame.findLabel $FindEntry] {
+    const disabled [expr {$StoreFilename eq "" ? "disabled" : "!disabled"}]
+    const frame .controlsFrame
+    foreach widget [list $frame.addButton $frame.updateButton \
+        $frame.extractButton $frame.copyToButton \
+        $frame.showFrame.asIsRadio $frame.showFrame.diffWithDiskRadio \
+        $frame.showFrame.diffToRadio $frame.showFrame.inContextCheck \
+        $frame.showFrame.diffLabel $frame.showFrame.diffGenSpinbox \
+        $frame.findFrame.findLabel $FindEntry] {
         $widget state $disabled
     }
-    set state [expr {$StoreFilename eq "" ? "disabled" : "normal"}]
+    const state [expr {$StoreFilename eq "" ? "disabled" : "normal"}]
     foreach i {0 1 3 5 6 7} {
-        .controlsFrame.moreButton.menu entryconfigure $i -state $state
+        $frame.moreButton.menu entryconfigure $i -state $state
     }
 }
 

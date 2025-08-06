@@ -20,7 +20,7 @@ proc gui::main {} {
 }
 
 proc gui::read_config {} {
-    set filename [ui::get_ini_filename]
+    const filename [ui::get_ini_filename]
     set family [font configure TkFixedFont -family]
     set size [expr {1 + [font configure TkFixedFont -size]}]
     if {[file exists $filename] && [file size $filename]} {

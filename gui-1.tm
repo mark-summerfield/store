@@ -20,8 +20,8 @@ proc gui::main {} {
 
 proc gui::read_config {} {
     set filename [ui::get_ini_filename]
-    set family Courier
-    set size [expr {1 + [font configure TkDefaultFont -size]}]
+    set family [font configure TkFixedFont -family]
+    set size [expr {1 + [font configure TkFixedFont -size]}]
     if {[file exists $filename] && [file size $filename]} {
         set ini [ini::open $filename -encoding utf-8 r]
         try {

@@ -36,16 +36,14 @@ proc gui_ignores_form::on_show {} {
 }
 
 proc gui_ignores_form::make_widgets {} {
-    ttk::frame .ignoresForm.ignoresListFrame
-    set ignoresList [ttk::treeview \
-        .ignoresForm.ignoresListFrame.ignoresList -striped true \
-        -yscrollcommand {.ignoresForm.ignoresListFrame.scrolly set}]
-    ttk::style configure List.Treeview.Item -indicatorsize 0
-    $ignoresList configure -show tree -selectmode browse \
+    set frame [ttk::frame .ignoresForm.ignoresListFrame]
+    set name ignoresList
+    set ignoresList [ttk::treeview $frame.$name -striped true -show tree \
+        -selectmode browse]
+    ui::scrollize $frame $name vertical
+    ttk::style configure List.Treeview.Item -indicatorsize 0 \
         -style List.Treeview
     $ignoresList column #0 -anchor w -stretch true
-    ttk::scrollbar .ignoresForm.ignoresListFrame.scrolly -orient vertical \
-        -command {.ignoresForm.ignoresListFrame.ignoresList yview}
     ttk::frame .ignoresForm.controlsFrame
     ttk::button .ignoresForm.controlsFrame.addButton -text Add: \
         -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \

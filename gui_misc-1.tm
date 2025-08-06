@@ -2,21 +2,18 @@
 
 package require autoscroll 1
 package require ntext 1
+package require ui
 
 namespace eval gui_misc {}
 
 proc gui_misc::make_text_frame {} {
-    set textFrame [ttk::frame .textFrame]
-    set txt [text .textFrame.text -wrap word \
-        -yscrollcommand {.textFrame.scrolly set} -font Mono]
+    set frame [ttk::frame .textFrame]
+    set name text
+    set txt [text $frame.text -wrap word -font Mono]
+    ui::scrollize $frame $name vertical
     bindtags $txt {$txt Ntext . all}
     $txt tag configure sel -selectbackground yellow
-    ttk::scrollbar .textFrame.scrolly -orient vertical \
-        -command {.textFrame.text yview}
-    pack .textFrame.scrolly -side right -fill y -expand true
-    pack .textFrame.text -side left -fill both -expand true
-    autoscroll::autoscroll .textFrame.scrolly
-    list $textFrame $txt
+    list $frame $txt
 }
 
 proc gui_misc::set_tree_tags tree {

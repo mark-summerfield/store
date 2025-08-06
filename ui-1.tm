@@ -86,3 +86,32 @@ proc ui::human_size {value {suffix B}} {
     set dp [expr {$log_n < 2 ? 0 : 1}]
     return "[format %.${dp}f $value] ${prefix}${suffix}"
 }
+
+# which must be one of: vertical horizontal both
+# usage:
+#    set frame [ttk::frame …]
+#    set name _widget_
+#    ttk::_widget_ $frame.$name -opts…
+#    ui::scrollize $frame $name vertical
+#  
+proc ui::scrollize {frame name which} {
+    $frame.$name configure -yscrollcommand "$frame.scrolly set"
+    if {$which eq "vertical" || $which eq "both"} {
+        ttk::scrollbar $frame.scrolly -orient vertical \
+            -command "$frame.${name} yview"
+        grid $frame.$name -row 0 -column 0 -sticky news
+        grid $frame.scrolly -row 0 -column 1 -sticky ns
+        grid columnconfigure $frame 0 -weight 1
+        grid rowconfigure $frame 0 -weight 1
+        autoscroll::autoscroll $frame.scrolly
+    }
+    if {$which eq "horizontal" || $which eq "both"} {
+        ttk::scrollbar $frame.scrollx -orient horizontal \
+            -command "$frame.${name} xview"
+        grid $frame.$name -row 0 -column 0 -sticky news
+        grid $frame.scrollx -row 1 -column 0 -sticky e
+        grid columnconfigure $frame 0 -weight 1
+        grid rowconfigure $frame 0 -weight 1
+        autoscroll::autoscroll $frame.scrollx
+    }
+}

@@ -123,52 +123,27 @@ oo::define App method make_tabs {} {
 }
 
 oo::define App method make_files_tree {} {
-    set filenameTreeFrame [ttk::frame .panes.tabs.filenameTreeFrame]
-    set FilenameTree [ttk::treeview \
-        .panes.tabs.filenameTreeFrame.filenameTree \
-        -yscrollcommand {.panes.tabs.filenameTreeFrame.scrolly set}]
-    $FilenameTree configure -show tree -selectmode browse
-    ttk::scrollbar .panes.tabs.filenameTreeFrame.scrolly -orient vertical \
-        -command {.panes.tabs.filenameTreeFrame.filenameTree yview}
+    set frame [ttk::frame .panes.tabs.filenameTreeFrame]
+    set name filenameTree
+    set FilenameTree [ttk::treeview $frame.$name -show tree \
+        -selectmode browse]
+    ui::scrollize $frame $name vertical
     gui_misc::set_tree_tags $FilenameTree
-    grid .panes.tabs.filenameTreeFrame.filenameTree -row 0 -column 0 \
-        -sticky news
-    grid .panes.tabs.filenameTreeFrame.scrolly -row 0 -column 1 -sticky ns
-    grid columnconfigure .panes.tabs.filenameTreeFrame 0 -weight 9
-    grid rowconfigure .panes.tabs.filenameTreeFrame 0 -weight 1
-    autoscroll::autoscroll .panes.tabs.filenameTreeFrame.scrolly
-    return $filenameTreeFrame
+    return $frame
 }
 
 oo::define App method make_generations_tree {} {
-    set generationTreeFrame [ttk::frame .panes.tabs.generationTreeFrame]
-    set GenerationTree [ttk::treeview \
-        .panes.tabs.generationTreeFrame.generationTree \
-        -columns {Created Message} \
-        -yscrollcommand {.panes.tabs.generationTreeFrame.scrolly set} \
-        -xscrollcommand {.panes.tabs.generationTreeFrame.scrollx set}]
+    set frame [ttk::frame .panes.tabs.generationTreeFrame]
+    set name generationTree
+    set GenerationTree [ttk::treeview $frame.$name \
+        -columns {Created Message}]
+    ui::scrollize $frame $name both
     $GenerationTree configure -show tree -selectmode browse
     $GenerationTree column #0 -stretch false
     $GenerationTree column 0 -stretch false
     $GenerationTree column 1 -stretch true
-    ttk::scrollbar .panes.tabs.generationTreeFrame.scrolly \
-        -orient vertical \
-        -command {.panes.tabs.generationTreeFrame.generationTree yview}
-    ttk::scrollbar .panes.tabs.generationTreeFrame.scrollx \
-        -orient horizontal \
-        -command {.panes.tabs.generationTreeFrame.generationTree xview}
-    grid .panes.tabs.generationTreeFrame.generationTree -row 0 -column 0 \
-        -sticky news
-    grid .panes.tabs.generationTreeFrame.scrolly -row 0 -column 1 \
-        -sticky ns
-    grid .panes.tabs.generationTreeFrame.scrollx -row 1 -column 0 \
-        -sticky we
-    grid columnconfigure .panes.tabs.generationTreeFrame 0 -weight 9
-    grid rowconfigure .panes.tabs.generationTreeFrame 0 -weight 1
-    autoscroll::autoscroll .panes.tabs.generationTreeFrame.scrolly
-    autoscroll::autoscroll .panes.tabs.generationTreeFrame.scrollx
     gui_misc::set_tree_tags $GenerationTree
-    return $generationTreeFrame
+    return $frame
 }
 
 oo::define App method make_status_bar {} {

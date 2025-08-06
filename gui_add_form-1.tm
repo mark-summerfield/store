@@ -24,15 +24,13 @@ proc gui_add_form::show_modal {store_filename refresh names} {
 }
 
 proc gui_add_form::make_widgets {} {
-    ttk::frame .addForm.addListFrame
-    set addList [ttk::treeview \
-        .addForm.addListFrame.addList -striped true \
-        -yscrollcommand {.addForm.addListFrame.scrolly set}]
+    set frame [ttk::frame .addForm.addListFrame]
+    set name addList
+    set addList [ttk::treeview $frame.$name -striped true]
+    ui::scrollize $frame $name vertical
     ttk::style configure List.Treeview.Item -indicatorsize 0
     $addList configure -show tree -style List.Treeview
     $addList column #0 -anchor w -stretch true
-    ttk::scrollbar .addForm.addListFrame.scrolly -orient vertical \
-        -command {.addForm.addListFrame.addList yview}
     ttk::frame .addForm.controlsFrame
     ttk::button .addForm.controlsFrame.addButton -text Add \
         -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \

@@ -48,10 +48,8 @@ proc gui_misc::highlight_tcl txt {
         format fpclassify gets glob global history http incr info \
         interp join lappend lassign ledit lindex link linsert list \
         llength lmap load lpop lrange lremove lrepeat lreplace lreverse \
-        lsearch lseq lset lsort mathfunc memory msgcat my myclass \
-        mymethod namespace next nextto oo::Slot oo::abstract oo::class \
-        oo::configurable oo::copy oo::define oo::objdefine oo::object \
-        oo::singleton open package parray pid pkg::create pkg_mkIndex \
+        lsearch lseq lset lsort mathfunc memory msgcat namespace next \
+        nextto open package parray pid pkg::create pkg_mkIndex \
         platform platform::shell property puts pwd read readFile \
         refchan regexp registry regsub rename safe scan seek self \
         set socket source split string subst tcl::idna \
@@ -71,9 +69,11 @@ proc gui_misc::highlight_tcl txt {
         yes no]
     ctext::addHighlightClass $txt proccmd darkcyan [list apply coroutine \
         proc return tailcall yield yieldto]
+    $txt tag configure proccmd -font MonoBold
     ctext::addHighlightClass $txt conditional darkblue [list if then else \
         elseif switch catch try throw raise finally default while for \
         foreach break continue]
+    $txt tag configure conditional -font MonoBold
     ctext::addHighlightClass $txt tkcmd steelblue [list lower raise \
         print selection send]
     ctext::addHighlightClass $txt widget blue [list bell bind bindtags \
@@ -106,9 +106,16 @@ proc gui_misc::highlight_tcl txt {
 	-displayof -cursor -underline -tags -tag]
     ctext::addHighlightClassWithOnlyCharStart $txt vars purple "\$"
     ctext::addHighlightClassForSpecialChars $txt special #008800 {[]{}:?;}
-    # TODO
-    #ctext::addHighlightClassForRegexp $txt const #228B22 {const [:\w]+}
-    # TODO const #228B22
-    # TODO number #B400B4
-    # TODO simplestring darkyellow
+    ctext::addHighlightClassForRegexp $txt const #228B22 {(?:const )[:\w]+}
+    ctext::addHighlightClass $txt constcmd navy [list const]
+    $txt tag configure constcmd -font MonoBold
+    ctext::addHighlightClassForRegexp $txt simplestring #888000 {(?s)".*?"}
+    ctext::addHighlightClassForRegexp $txt number #B400B4 \
+        {[-+]?\d+(\.\d+([Ee][-+]?\d+))?|0[xX][\dA-Fa-f]+|0[bB][01]+}
+    ctext::addHighlightClass $txt oo #80604D [list classmethod \
+        constructor destructor export forward initialize initialise \
+        method private self my superclass unexport myclass mymethod \
+        oo::Slot oo::abstract oo::class oo::configurable oo::copy \
+        oo::define oo::objdefine oo::object oo::singleton]
+    $txt tag configure oo -font MonoBold
 }

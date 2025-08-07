@@ -1,13 +1,13 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 oo::class create FileData {
-    variable Gid 0
-    variable Filename ""
-    variable Kind ""
-    variable Usize 0
-    variable Zsize 0
-    variable Pgid 0
-    variable Data ""
+    variable Gid
+    variable Filename
+    variable Kind
+    variable Usize
+    variable Zsize
+    variable Pgid
+    variable Data
 }
 
 oo::define FileData constructor {{gid 0} {filename ""} {kind ""} {usize 0} \

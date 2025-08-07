@@ -7,6 +7,7 @@ package require ui
 
 oo::class create App {
     variable ShowState
+    variable WithLinos
     variable InContext
     variable ConfigFilename
     variable StoreFilename
@@ -24,6 +25,7 @@ oo::class create App {
 
 oo::define App constructor {configFilename} {
     set ShowState asis
+    set WithLinos true
     set InContext true
     set ConfigFilename $configFilename
     set StoreFilename [file normalize .[file tail [pwd]].str]
@@ -56,6 +58,7 @@ oo::define App method display {} {
         wm title . "Store — [file dirname $StoreFilename]"
         set widget $FilenameTree
         my populate
+        my jump_to_first
     } else {
         wm title . Store
     }
@@ -70,13 +73,24 @@ oo::define App method display {} {
 oo::define App method update_ui {} {
     const disabled [expr {$StoreFilename eq "" ? "disabled" : "!disabled"}]
     const frame .controlsFrame
+    puts "ShowState=$ShowState"
     foreach widget [list $frame.addButton $frame.updateButton \
-        $frame.extractButton $frame.copyToButton \
-        $frame.showFrame.asIsRadio $frame.showFrame.diffWithDiskRadio \
-        $frame.showFrame.diffToRadio $frame.showFrame.inContextCheck \
-        $frame.showFrame.diffLabel $frame.showFrame.diffGenSpinbox \
-        $frame.findFrame.findLabel $FindEntry] {
+            $frame.extractButton $frame.copyToButton \
+            $frame.showFrame.asIsRadio $frame.showFrame.diffWithDiskRadio \
+            $frame.showFrame.diffToRadio $frame.findFrame.findLabel \
+            $FindEntry] {
         $widget state $disabled
+    }
+    if {$ShowState eq "asis"} {
+        $frame.showFrame.withLinos state !disabled
+        $frame.showFrame.inContextCheck state disabled
+        $frame.showFrame.diffLabel state disabled
+        $frame.showFrame.diffGenSpinbox state disabled
+    } else {
+        $frame.showFrame.withLinos state disabled
+        $frame.showFrame.inContextCheck state !disabled
+        $frame.showFrame.diffLabel state !disabled
+        $frame.showFrame.diffGenSpinbox state !disabled
     }
     const state [expr {$StoreFilename eq "" ? "disabled" : "normal"}]
     foreach i {0 1 3 5 6 7} {
@@ -210,6 +224,16 @@ oo::define App method populate_generation_tree {} {
     }
 }
 
+oo::define App method jump_to_first {} {
+    foreach item [$FilenameTree children {}] {
+        if {[$FilenameTree tag has updatable $item]} {
+            $FilenameTree selection set $item
+            $FilenameTree see $item
+            break
+        }
+    }
+}
+
 oo::define App method show_file {gid filename} {
     if {$ShowState ne "asis"} { 
         set ShowState asis
@@ -221,6 +245,7 @@ oo::define App method show_file {gid filename} {
     } finally {
         $str destroy
     }
+    $Text configure -linemap $WithLinos -highlight true
     $Text delete 1.0 end
     $Text insert end [encoding convertfrom -profile replace utf-8 $data]
 }
@@ -301,6 +326,7 @@ oo::define App method select_generations_tree_item {gid filename} {
 }
 
 oo::define App method diff {new_gid old_gid filename} {
+    $Text configure -linemap false -highlight false
     gui_actions::diff $StoreFilename $Text $InContext \
         [callback set_status_info] $new_gid $old_gid $filename
 }

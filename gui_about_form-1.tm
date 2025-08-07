@@ -8,22 +8,22 @@ package require ui
 
 namespace eval gui_about_form {}
 
-proc gui_about_form::show_modal {} {
-    make_widgets
+proc gui_about_form::show_modal user_version {
+    make_widgets $user_version
     make_layout
     make_bindings
     form::prepare .about { gui_about_form::on_close }
     form::show_modal .about
 }
 
-proc gui_about_form::make_widgets {} {
+proc gui_about_form::make_widgets user_version {
     tk::toplevel .about
     wm title .about "[tk appname] — About"
     wm resizable .about false false
     set height 16
     tk::text .about.text -width 50 -height $height -wrap word \
         -background "#F0F0F0" -spacing3 $::VGAP
-    populate_about_text
+    populate_about_text $user_version
     .about.text configure -state disabled
     ttk::button .about.close_button -text Close -compound left \
         -image [ui::icon close.svg $::ICON_SIZE] \
@@ -61,7 +61,7 @@ proc gui_about_form::on_click_url index {
 proc gui_about_form::on_close {} { form::delete .about }
 
 
-proc gui_about_form::populate_about_text {} {
+proc gui_about_form::populate_about_text user_version {
     set txt .about.text
     add_text_tags $txt
     set img [$txt image create end -align center \
@@ -82,7 +82,7 @@ proc gui_about_form::populate_about_text {} {
     {*}$cmd "License: GPLv3.\n" {center green}
     {*}$cmd "[string repeat " " 60]\n" {center hr}
     {*}$cmd "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
-    {*}$cmd "[misc::sqlite_version]\n" center
+    {*}$cmd "[misc::sqlite_version] (.str $user_version)\n" center
     if {$distro != ""} { {*}$cmd "$distro\n" center }
     {*}$cmd "$::tcl_platform(os) $::tcl_platform(osVersion)\
         ($::tcl_platform(machine))\n" center

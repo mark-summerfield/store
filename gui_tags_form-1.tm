@@ -145,8 +145,18 @@ proc gui_tags_form::on_entry_changed {} {
         .tagsForm.tagEntry configure -style TagSaved.TEntry
         .tagsForm.frame.saveButton state disabled
     } else {
-        .tagsForm.tagEntry configure -style TagUnsaved.TEntry
-        .tagsForm.frame.saveButton state !disabled
+        set str [Store new $::gui_tags_form::StoreFilename]
+        try {
+            if {[$str validtag $::gui_tags_form::Tag]} {
+                .tagsForm.tagEntry configure -style TagUnsaved.TEntry
+                .tagsForm.frame.saveButton state !disabled
+            } else {
+                .tagsForm.tagEntry configure -style TagInvalid.TEntry
+                .tagsForm.frame.saveButton state disabled
+            }
+        } finally {
+            $str destroy
+        }
     }
     return true
 }

@@ -1,3 +1,5 @@
+# TODO ctext color syntax highlighting when showing asis
+
 str
 
 cli-1.tm
@@ -34,6 +36,7 @@ sql/prepare.sql
 sql/create.sql
 sql/insert.sql
 sql/upgrade1to2.sql
+sql/upgrade2to3.sql
 
 README.md
 

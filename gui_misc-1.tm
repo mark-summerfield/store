@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require autoscroll 1
+package require ctext 3
 package require ntext 1
 package require ui
 
@@ -9,7 +10,7 @@ namespace eval gui_misc {}
 proc gui_misc::make_text_frame {} {
     set frame [ttk::frame .textFrame]
     set name text
-    set txt [text $frame.text -wrap word -font Mono]
+    set txt [ctext $frame.text -wrap word -font Mono -linemapbg gray90]
     ui::scrollize $frame $name vertical
     bindtags $txt {$txt Ntext . all}
     $txt tag configure sel -selectbackground yellow

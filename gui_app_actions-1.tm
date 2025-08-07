@@ -71,6 +71,7 @@ oo::define App method on_open {} {
         my set_status_info "Read \"$StoreFilename\""
         my report_status
         gui_ignores_form::populate $StoreFilename
+        my jump_to_first
         my update_ui
     }
 }
@@ -224,6 +225,7 @@ oo::define App method on_show_asis {} {
     if {!$ok} {
         my set_status_info "Select a file to show" $::SHORT_WAIT
     } else {
+        my update_ui
         my show_file $gid $filename
     }
 }
@@ -233,6 +235,7 @@ oo::define App method on_show_diff_with_disk {} {
     if {!$ok} {
         my set_status_info "Select a file to diff against" $::SHORT_WAIT
     } else {
+        my update_ui
         my diff 0 $gid $filename
     }
 }
@@ -248,7 +251,14 @@ oo::define App method on_show_diff_to {} {
             set gid $gid2
             set gid2 $t
         }
+        my update_ui
         my diff $gid $gid2 $filename
+    }
+}
+
+oo::define App method on_with_linos {} {
+    if {$ShowState eq "asis"} {
+        $Text configure -linemap $WithLinos
     }
 }
 
@@ -283,6 +293,17 @@ oo::define App method on_find {} {
     }
 }
 
-oo::define App method on_about {} { gui_about_form::show_modal }
+oo::define App method on_about {} {
+    set user_version ?
+    if {$StoreFilename ne ""} {
+        set str [Store new $StoreFilename [callback set_status_info]]
+        try {
+            set user_version [$str version]
+        } finally {
+            $str destroy
+        }
+    }
+    gui_about_form::show_modal $user_version
+}
 
 oo::define App method on_quit {} { gui_actions::on_quit $ConfigFilename }

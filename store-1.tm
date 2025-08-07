@@ -7,7 +7,7 @@ package require misc
 package require sqlite3 3
 package require ui
 
-const VERSION 1.3.1
+const VERSION 1.4.0
 
 oo::class create Store {
     variable Filename
@@ -31,6 +31,9 @@ oo::define Store constructor {filename {reporter ""}} {
             if {$user_version == 1} {
                 $Db eval [readFile $::APPPATH/sql/upgrade1to2.sql] 
             }
+            if {$user_version == 1 || $user_version == 2} {
+                $Db eval [readFile $::APPPATH/sql/upgrade2to3.sql] 
+            }
         } else {
             $Db eval [readFile $::APPPATH/sql/create.sql] 
             $Db eval [readFile $::APPPATH/sql/insert.sql] 
@@ -44,6 +47,8 @@ oo::define Store destructor {
 }
 
 oo::define Store method filename {} { return $Filename }
+
+oo::define Store method version {} { $Db eval {PRAGMA USER_VERSION} }
 
 oo::define Store method current_generation {} {
     $Db eval {SELECT gid FROM CurrentGeneration}
@@ -68,6 +73,15 @@ oo::define Store method update {tag} {
     if {!$gid} { error "can only update an existing nonempty store" }
     if {$tag ne ""} { {*}$Reporter "updating with tag \"$tag\"" }
     my Update $tag {*}[my filenames $gid]
+}
+
+# returns whether the given tag is valid: not an integer & unique
+oo::define Store method validtag {tag} {
+    if {[string is integer -strict $tag]} {
+        return false
+    }
+    expr {![llength \
+            [$Db eval {SELECT gid FROM Generations WHERE tag = :tag}]]}
 }
 
 # gets or sets or deletes (if tag is "-") a tag for the given or current gid

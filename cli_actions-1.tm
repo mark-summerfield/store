@@ -298,6 +298,8 @@ proc cli_actions::tag {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         $str tag $gid $rest
+    } on error {err} {
+        cli_misc::warn "failed to add tag '$rest': $err"
     } finally {
         $str destroy
     }

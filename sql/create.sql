@@ -1,6 +1,6 @@
 -- Copyright © 2025 Mark Summerfield. All Rights Reserved.
 
-PRAGMA USER_VERSION = 2;
+PRAGMA USER_VERSION = 3;
 
 CREATE TABLE Generations (
     gid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -58,3 +58,19 @@ CREATE VIEW Untracked AS
     SELECT DISTINCT filename FROM Files WHERE filename NOT IN (
         SELECT filename FROM Files WHERE gid IN (
             SELECT MAX(gid) FROM Generations)) ORDER BY LOWER(filename);
+
+CREATE TRIGGER InsertUniqueTag BEFORE INSERT ON Generations FOR EACH ROW
+    WHEN EXISTS (SELECT TRUE FROM Generations
+                    WHERE NEW.tag IS NOT NULL AND
+                          NEW.tag != '' AND Generations.tag = NEW.tag)
+        BEGIN
+            SELECT RAISE(ABORT, 'every tag must be unique');
+        END;
+    
+CREATE TRIGGER UpdateUniqueTag BEFORE UPDATE ON Generations FOR EACH ROW
+    WHEN EXISTS (SELECT TRUE FROM Generations
+                    WHERE NEW.tag IS NOT NULL AND
+                          NEW.tag != '' AND Generations.tag = NEW.tag)
+        BEGIN
+            SELECT RAISE(ABORT, 'every tag must be unique');
+        END;

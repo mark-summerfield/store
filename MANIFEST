@@ -1,3 +1,8 @@
+# TODO
+#  (*) Show As-Is
+#     [X] Line Nos
+#     (  ) All  (*) Updated
+#     # only enable All & Updated if Show As Is _and_ Files tab
 # TODO allow @tagname as well as @gid in cli & update usage to match
 
 str
@@ -42,6 +47,7 @@ README.md
 
 st.sh
 
+# TODO gui_misc-1.tm: highlight_py highlight_go
 # NOTE Could add to find frame:
 #   [ ] Case Sensitive
 #   [ ] Whole Words

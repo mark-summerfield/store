@@ -39,6 +39,8 @@ proc gui::read_config {} {
         }
     }
     font create Mono -family $family -size $size
+    font create MonoItalic -family $family -size $size -slant italic
+    font create MonoBold -family $family -size $size -weight bold
     return $filename
 }
 

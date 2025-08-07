@@ -58,7 +58,6 @@ oo::define App method display {} {
         wm title . "Store — [file dirname $StoreFilename]"
         set widget $FilenameTree
         my populate
-        my jump_to_first
     } else {
         wm title . Store
     }
@@ -68,12 +67,12 @@ oo::define App method display {} {
     raise .
     update
     after idle {.panes sashpos 0 [winfo width .controlsFrame]}
+    after idle [callback jump_to_first]
 }
 
 oo::define App method update_ui {} {
     const disabled [expr {$StoreFilename eq "" ? "disabled" : "!disabled"}]
     const frame .controlsFrame
-    puts "ShowState=$ShowState"
     foreach widget [list $frame.addButton $frame.updateButton \
             $frame.extractButton $frame.copyToButton \
             $frame.showFrame.asIsRadio $frame.showFrame.diffWithDiskRadio \
@@ -245,9 +244,11 @@ oo::define App method show_file {gid filename} {
     } finally {
         $str destroy
     }
+    gui_misc::refresh_highlighting $Text [file extension $filename]
     $Text configure -linemap $WithLinos -highlight true
     $Text delete 1.0 end
     $Text insert end [encoding convertfrom -profile replace utf-8 $data]
+    $Text highlight 1.0 end
 }
 
 oo::define App method get_selected {} {

@@ -1,4 +1,5 @@
 # TODO ctext color syntax highlighting when showing asis
+# TODO allow @tagname as well as @gid in cli & update usage to match
 
 str
 

@@ -19,23 +19,27 @@ oo::define App method on_tab_changed {} {
 
 oo::define App method on_filename_tree_select {} {
     set item [$FilenameTree selection]
-    set gid [$FilenameTree item $item -text]
-    set parent [$FilenameTree parent $item]
-    set filename [$FilenameTree item $parent -text]
-    lassign [my get_selected] ok gid filename
-    if {$ok} {
-        my show_file $gid $filename
+    if {$item ne ""} {
+        set gid [$FilenameTree item $item -text]
+        set parent [$FilenameTree parent $item]
+        set filename [$FilenameTree item $parent -text]
+        lassign [my get_selected] ok gid filename
+        if {$ok} {
+            my show_file $gid $filename
+        }
     }
 }
 
 oo::define App method on_generation_tree_select {} {
     set item [$GenerationTree selection]
-    set filename [$GenerationTree item $item -text]
-    set parent [$GenerationTree parent $item]
-    set gid [$GenerationTree item $parent -text]
-    lassign [my get_selected] ok gid filename
-    if {$ok} {
-        my show_file $gid $filename
+    if {$item ne ""} {
+        set filename [$GenerationTree item $item -text]
+        set parent [$GenerationTree parent $item]
+        set gid [$GenerationTree item $parent -text]
+        lassign [my get_selected] ok gid filename
+        if {$ok} {
+            my show_file $gid $filename
+        }
     }
 }
 

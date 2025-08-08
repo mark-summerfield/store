@@ -7,7 +7,7 @@ package require misc
 package require sqlite3 3
 package require ui
 
-const VERSION 1.4.0
+const VERSION 1.5.0
 
 oo::class create Store {
     variable Filename
@@ -52,6 +52,12 @@ oo::define Store method version {} { $Db eval {PRAGMA USER_VERSION} }
 
 oo::define Store method current_generation {} {
     $Db eval {SELECT gid FROM CurrentGeneration}
+}
+
+oo::define Store method gid_for_tag tag {
+    set gid [$Db eval {SELECT gid FROM Generations WHERE tag = :tag}]
+    if {![llength $gid]} { return 0 }
+    return [lindex $gid 0]
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file and

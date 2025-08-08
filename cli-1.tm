@@ -124,8 +124,8 @@ proc cli::usage {} {
     say1 "^v% ~or% ^version% ~or% ^-v% ~or% ^--version% — prints the\
         version"
     puts ""
-    say1 "• @gid — @-prefixed generation number, (e.g., @28), or current is\
-        assumed" $width2 "  "
+    say1 "• @gid — @-prefixed generation number or tag name, (e.g., @28, \
+        @alpha1), or current is assumed" $width2 "  "
     say1 "• glob — use quotes to avoid shell expansion (e.g., '*.o')." \
         $width2 "  "
     say1 "• verbose — ^-v% ~or% ^--verbose% full, ~or% ^-q% ~or%\
@@ -213,8 +213,8 @@ proc cli::usage_full {} {
     puts [unmark "^v% ~or% ^version% ~or% ^-v% ~or% ^--version%"]
     say2 "Show ^str%’s version and exit."
     puts ""
-    say1 "• @gid — @-prefixed generation number, e.g., @28;
-        if unspecified, the current generation is assumed" 0 "  "
+    say1 "• @gid — @-prefixed generation number or tag name, (e.g., @28,
+        @alpha1); if unspecified, the current generation is assumed" 0 "  "
     say1 "• glob — when using globs for ignore or unignore use quotes
         to avoid shell expansion of glob characters (e.g., '*.o')." 0 "  "
     say1 "• verbose — default is filtered; otherwise specified as

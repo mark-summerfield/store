@@ -361,6 +361,11 @@ proc cli_actions::GidAndRest {str rest} {
     if {[string match {@[0-9]*} $first]} {
         set gid [string range $first 1 end]
         set rest [lrange $rest 1 end]
+    } elseif {[string match {@?*} $first]} {
+        set tag [string range $first 1 end]
+        set gid [$str gid_for_tag $tag]
+        if {!$gid} { cli_misc::warn "tag \"$tag\" not found" }
+        set rest [lrange $rest 1 end]
     }
     list $gid $rest
 }

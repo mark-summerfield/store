@@ -260,6 +260,33 @@ oo::define App method on_show_diff_to {} {
     }
 }
 
+oo::define App method on_show_options {} {
+    set frame .controlsFrame
+    if {$ShowOptions} {
+        set opts "-padx $::PAD -pady $::PAD"
+        pack forget $frame.findFrame
+        pack $frame.showFrame -side top -fill x {*}$opts
+        pack $frame.findFrame -side top -fill x {*}$opts
+    } else {
+        pack forget $frame.showFrame
+    }
+}
+
+oo::define App method on_show_all {} {
+    if {$ShowState eq "asis"} {
+        if {$ShowAll} {
+            foreach item [$FilenameTree children {}] {
+                $FilenameTree item $item -hidden false
+            }
+        } else {
+            foreach item [$FilenameTree children {}] {
+                set shown [expr {![$FilenameTree tag has updatable $item]}]
+                $FilenameTree item $item -hidden $shown
+            }
+        }
+    }
+}
+
 oo::define App method on_with_linos {} {
     if {$ShowState eq "asis"} {
         $Text configure -linemap $WithLinos

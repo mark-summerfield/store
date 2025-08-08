@@ -6,7 +6,9 @@ package require lambda 1
 package require ui
 
 oo::class create App {
+    variable ShowOptions
     variable ShowState
+    variable ShowAll
     variable WithLinos
     variable InContext
     variable ConfigFilename
@@ -24,8 +26,10 @@ oo::class create App {
 }
 
 oo::define App constructor {configFilename} {
+    set ShowOptions true
     set ShowState asis
-    set WithLinos true
+    set ShowAll false
+    set WithLinos false
     set InContext true
     set ConfigFilename $configFilename
     set StoreFilename [file normalize .[file tail [pwd]].str]
@@ -81,11 +85,13 @@ oo::define App method update_ui {} {
         $widget state $disabled
     }
     if {$ShowState eq "asis"} {
+        $frame.showFrame.showAll state !disabled
         $frame.showFrame.withLinos state !disabled
         $frame.showFrame.inContextCheck state disabled
         $frame.showFrame.diffLabel state disabled
         $frame.showFrame.diffGenSpinbox state disabled
     } else {
+        $frame.showFrame.showAll state disabled
         $frame.showFrame.withLinos state disabled
         $frame.showFrame.inContextCheck state !disabled
         $frame.showFrame.diffLabel state !disabled
@@ -104,6 +110,7 @@ oo::define App method refresh {} {
 
 oo::define App method populate {} {
     my populate_file_tree
+    my on_show_all
     my populate_generation_tree
     my on_files_tab
     if {$StoreFilename ne ""} {

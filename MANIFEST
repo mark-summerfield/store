@@ -1,8 +1,3 @@
-# TODO
-#  (*) Show As-Is
-#     [X] Line Nos
-#     (  ) All  (*) Updated
-#     # only enable All & Updated if Show As Is _and_ Files tab
 # TODO allow @tagname as well as @gid in cli & update usage to match
 
 str
@@ -47,10 +42,21 @@ README.md
 
 st.sh
 
-# TODO gui_misc-1.tm: highlight_py highlight_go
-# NOTE Could add to find frame:
-#   [ ] Case Sensitive
-#   [ ] Whole Words
-# NOTE Could change Find ttk:entry to ttk::combobox & keep history
+# Future TODO's
+# - gui_misc-1.tm: highlight_py highlight_go
+# - Add &Options… to &More menu to modal dialog to set:
+#   . [X] Show Diff In &Context
+#   . [X] Show &Line Numbers
+#   . [&Font…] [family & size  ]
+#   . +- Files Tab -----------+
+#   . | ( ) Show &All Files    |
+#   . | (*) Show &Only Updated |
+#   . +-----------------------+
+#   . +- Find -------------+
+#   . | [ ] &Case Sensitive |
+#   . | [ ] &Whole Words    |
+#   . +--------------------+
+#   .           [Close]
+# - Could change Find ttk:entry to ttk::combobox & keep history
 
 # vim: syn=yaml

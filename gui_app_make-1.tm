@@ -58,6 +58,10 @@ oo::define App method make_controls {} {
         -compound left -command [callback on_about] \
         -image [ui::icon about.svg $::ICON_SIZE]
     $frame.moreButton configure -menu $frame.moreButton.menu
+    ttk::checkbutton $frame.showOptions -text "Show Options" \
+        -underline 6 -onvalue true -offvalue false \
+        -variable [my varname ShowOptions] \
+        -command [callback on_show_options]
     ttk::frame $frame.showFrame -relief groove 
     ttk::radiobutton $frame.showFrame.asIsRadio -text "Show As-Is" \
         -underline 0 -value asis -variable [my varname ShowState] \
@@ -65,6 +69,9 @@ oo::define App method make_controls {} {
     ttk::checkbutton $frame.showFrame.withLinos -text "Line Nºs" \
         -underline 0 -onvalue true -offvalue false \
         -variable [my varname WithLinos] -command [callback on_with_linos]
+    ttk::checkbutton $frame.showFrame.showAll -text "Show All" \
+        -underline 1 -onvalue true -offvalue false \
+        -variable [my varname ShowAll] -command [callback on_show_all]
     ttk::radiobutton $frame.showFrame.diffWithDiskRadio \
         -text "Diff with Disk" -underline 0 -value disk \
         -variable [my varname ShowState] \
@@ -95,19 +102,22 @@ oo::define App method layout_controls {} {
     pack $frame.extractButton -side top {*}$opts
     pack $frame.copyToButton -side top {*}$opts
     pack $frame.moreButton -side top -ipadx [expr {$::PAD * 2}] {*}$opts
+    pack $frame.showOptions -side top -fill x {*}$opts
     pack $frame.showFrame -side top -fill x {*}$opts
     grid $frame.showFrame.asIsRadio -row 0 -column 0 -columnspan 3 \
         -sticky w {*}$opts
-    grid $frame.showFrame.withLinos -row 1 -column 1 -sticky w \
+    grid $frame.showFrame.showAll -row 1 -column 1 -sticky w \
         -columnspan 2 {*}$opts
-    grid $frame.showFrame.diffWithDiskRadio -row 2 -column 0 \
+    grid $frame.showFrame.withLinos -row 2 -column 1 -sticky w \
+        -columnspan 2 {*}$opts
+    grid $frame.showFrame.diffWithDiskRadio -row 3 -column 0 \
         -columnspan 3 -sticky w {*}$opts
-    grid $frame.showFrame.diffToRadio -row 3 -column 0 -columnspan 3 \
+    grid $frame.showFrame.diffToRadio -row 4 -column 0 -columnspan 3 \
         -sticky w {*}$opts
-    grid $frame.showFrame.diffLabel -row 4 -column 1 -sticky e -pady $::PAD
-    grid $frame.showFrame.diffGenSpinbox -row 4 -column 2 -columnspan 2 \
+    grid $frame.showFrame.diffLabel -row 5 -column 1 -sticky e -pady $::PAD
+    grid $frame.showFrame.diffGenSpinbox -row 5 -column 2 -columnspan 2 \
         -sticky w -pady $::PAD
-    grid $frame.showFrame.inContextCheck -row 5 -column 1 -columnspan 2 \
+    grid $frame.showFrame.inContextCheck -row 6 -column 1 -columnspan 2 \
         -sticky w {*}$opts
     pack $frame.findFrame -side top -fill x {*}$opts
     grid $frame.findFrame.findLabel -row 0 -column 0 -sticky w {*}$opts
@@ -205,6 +215,7 @@ oo::define App method make_bindings {} {
     bind . <Alt-c> [callback on_copy_to]
     bind . <Alt-d> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
     bind . <Alt-e> [callback on_extract]
+    bind . <Alt-h> {.controlsFrame.showFrame.showAll invoke}
     bind . <Alt-i> {.controlsFrame.showFrame.inContextCheck invoke}
     bind . <Alt-l> {.controlsFrame.showFrame.withLinos invoke}
     bind . <Alt-m> {
@@ -215,6 +226,7 @@ oo::define App method make_bindings {} {
     }
     bind . <Alt-n> {focus .controlsFrame.findFrame.findEntry}
     bind . <Alt-o> [callback on_open]
+    bind . <Alt-p> {.controlsFrame.showOptions invoke}
     bind . <Alt-q> [callback on_quit]
     bind . <Alt-s> {.controlsFrame.showFrame.asIsRadio invoke}
     bind . <Alt-t> {

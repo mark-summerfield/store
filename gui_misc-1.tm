@@ -12,9 +12,9 @@ namespace eval gui_misc {
 proc gui_misc::make_text_frame {} {
     set frame [ttk::frame .textFrame]
     set name text
-    set txt [ctext $frame.text -wrap word -undo true -font Mono \
+    set txt [ctext $frame.$name -wrap none -undo true -font Mono \
              -linemapbg gray90]
-    ui::scrollize $frame $name vertical
+    ui::scrollize $frame $name both
     bindtags $txt {$txt Ntext . all}
     $txt tag configure sel -selectbackground yellow
     list $frame $txt

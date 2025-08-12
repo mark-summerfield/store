@@ -1,3 +1,11 @@
+# TODO
+# - try using \f for NULL instead of {}
+# - proc first {row {default \f}} { ...
+# - refactor gui_misc-1.tm into gui_highlight-1.tm (highlight_tcl function)
+# - at startup if there are no updates then [X] Show All (like I do
+#   immediately after on_update
+# - VERSION 1.5.2 + tag v1.5.2
+
 str
 
 cli-1.tm

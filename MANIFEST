@@ -58,5 +58,6 @@ st.sh
 #    	+--------------------+
 #    	          [Close]
 # - Could change Find ttk:entry to ttk::combobox & keep history
+# - Merge support to merge one .str into another?
 
 # vim: syn=yaml

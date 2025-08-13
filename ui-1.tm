@@ -95,6 +95,8 @@ proc ui::human_size {value {suffix B}} {
 #    ui::scrollize $frame $name vertical
 #  
 proc ui::scrollize {frame name which} {
+    package require autoscroll 1
+
     grid $frame.$name -row 0 -column 0 -sticky news
     if {$which eq "vertical" || $which eq "both"} {
         $frame.$name configure -yscrollcommand "$frame.scrolly set"

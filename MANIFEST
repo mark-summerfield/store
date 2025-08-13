@@ -1,3 +1,6 @@
+# TODO
+# - use same font initialization as manview (FontSize _and_ FontFamily)
+
 str
 
 cli-1.tm

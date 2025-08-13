@@ -43,7 +43,7 @@ README.md
 st.sh
 
 # Future TODO's
-# - gui_misc-1.tm:
+# - gui_highlight-1.tm:
 #   . highlight_py
 #   . highlight_go
 # - Add &Options… to &More menu to modal dialog to set:
@@ -60,6 +60,6 @@ st.sh
 #    	+--------------------+
 #    	          [Close]
 # - Could change Find ttk:entry to ttk::combobox & keep history
-# - Merge support to merge one .str into another?
+# - Sync support to synchonize one .str with another?
 
 # vim: syn=yaml

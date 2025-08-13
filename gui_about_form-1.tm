@@ -1,5 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require db
 package require form
 package require gui_misc
 package require misc
@@ -82,7 +83,7 @@ proc gui_about_form::populate_about_text user_version {
     {*}$cmd "License: GPLv3.\n" {center green}
     {*}$cmd "[string repeat " " 60]\n" {center hr}
     {*}$cmd "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
-    {*}$cmd "[misc::sqlite_version] (.str $user_version)\n" center
+    {*}$cmd "[db::sqlite_version] (.str $user_version)\n" center
     if {$distro != ""} { {*}$cmd "$distro\n" center }
     {*}$cmd "$::tcl_platform(os) $::tcl_platform(osVersion)\
         ($::tcl_platform(machine))\n" center

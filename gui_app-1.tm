@@ -118,6 +118,10 @@ oo::define App method populate {} {
         try {
             .controlsFrame.showFrame.diffGenSpinbox set \
                 [$str current_generation]
+            if {![$str have_updates]} {
+                .controlsFrame.showFrame.asIsRadio invoke
+                .controlsFrame.showFrame.showAll invoke
+            }
         } finally {
             $str destroy
         }

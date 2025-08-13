@@ -120,8 +120,6 @@ oo::define App method on_update {} {
             my set_status_info updated $::SHORT_WAIT
             my report_status
             my populate
-            .controlsFrame.showFrame.asIsRadio invoke
-            .controlsFrame.showFrame.showAll invoke
         } else {
             my set_status_info "none to update" $::SHORT_WAIT
         }

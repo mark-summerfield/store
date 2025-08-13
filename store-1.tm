@@ -1,5 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require db
 package require filedata
 package require fileutil 1
 package require lambda 1
@@ -55,9 +56,9 @@ oo::define Store method current_generation {} {
 }
 
 oo::define Store method gid_for_tag tag {
-    set gid [$Db eval {SELECT gid FROM Generations WHERE tag = :tag}]
-    if {![llength $gid]} { return 0 }
-    return [lindex $gid 0]
+    set gid [$Db eval {SELECT gid FROM Generations
+                        WHERE tag = :tag LIMIT 1}]
+    expr {$gid eq "" ? 0 : $gid}
 }
 
 # creates new generation with 'U' or 'Z' or 'S' for every given file and
@@ -86,8 +87,8 @@ oo::define Store method validtag {tag} {
     if {[string is integer -strict $tag]} {
         return false
     }
-    expr {![llength \
-            [$Db eval {SELECT gid FROM Generations WHERE tag = :tag}]]}
+    expr {![llength [$Db eval {SELECT gid FROM Generations
+                                WHERE tag = :tag LIMIT 1}]]}
 }
 
 # gets or sets or deletes (if tag is "-") a tag for the given or current gid
@@ -101,8 +102,7 @@ oo::define Store method tag {{gid 0} {tag ""}} {
         $Db eval {UPDATE Generations SET tag = :tag WHERE gid = :gid}
     } else {
         set tag [$Db eval {SELECT tag FROM Generations WHERE gid = :gid}]
-        if {![llength $tag]} { return "" }
-        return [lindex $tag 0]
+        return [db::first $tag ""]
     }
 }
 
@@ -185,8 +185,7 @@ oo::define Store method FindMatch {gid filename data} {
               AND gid != :gid
         ORDER BY gid DESC LIMIT 1
     }]
-    if {![llength $gid]} { return 0 }
-    return [lindex $gid 0]
+    db::first $gid 0
 }
 
 # returns the filenames, dirnames, and globs to ignore

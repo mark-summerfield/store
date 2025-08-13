@@ -4,6 +4,7 @@
 const APPPATH [file normalize [file dirname [info script]]]
 tcl::tm::path add $APPPATH
 
+package require db
 package require lambda 1
 package require misc
 package require store
@@ -14,7 +15,7 @@ proc test1 {} {
     set ok true
     set filename /tmp/${procname}.db
     file delete $filename
-    set sqlite_version [misc::sqlite_version]
+    set sqlite_version [db::sqlite_version]
     if {![string match {SQLite 3.*} $sqlite_version]} {
         puts "FAIL: expected SQLite 3.x.y; got $sqlite_version"
         set ok false
@@ -136,8 +137,8 @@ proc test4 {} {
     file delete $filename
     set str [Store new $filename]
     try {
-        if {[$str to_string] ne "Store \"/tmp/test4.db\""} {
-            puts "FAIL: expected 'Store \"/tmp/test4.db\"'; got\
+        if {[$str to_string] ne "Store \"/tmp/$procname.db\""} {
+            puts "FAIL: expected 'Store \"/tmp/$procname.db\"'; got\
                 \"[$str to_string]\""
             set ok false
         }
@@ -201,6 +202,59 @@ proc test5 {} {
                 set ok false
             }
             incr i
+        }
+    } finally {
+        $str destroy 
+    }
+    if {$ok} { puts OK }
+}
+
+proc test6 {} {
+    set procname [lindex [info level 0] 0]
+    puts -nonewline "$procname "
+    set ok true
+    set filename /tmp/${procname}.db
+    file delete $filename
+    set str [Store new $filename]
+    try {
+        if {[$str to_string] ne "Store \"/tmp/$procname.db\""} {
+            puts "FAIL: expected 'Store \"/tmp/$procname.db\"'; got\
+                \"[$str to_string]\""
+            set ok false
+        }
+        $str add sql/prepare.sql sql/create.sql cli-1.tm
+        $str tag 0 first
+        $str add README.md store-1.tm
+        $str tag 0 second
+        set tag [$str tag 1]
+        if {$tag ne "first"} {
+            puts "FAIL: expected tag \"first\"'; got \"$tag\""
+            set ok false
+        }
+        set gid [$str gid_for_tag first]
+        if {$gid != 1} {
+            puts "FAIL: expected gid 1; got $gid"
+            set ok false
+        }
+        set tag [$str tag 2]
+        if {$tag ne "second"} {
+            puts "FAIL: expected tag \"second\"'; got \"$tag\""
+            set ok false
+        }
+        set gid [$str gid_for_tag second]
+        if {$gid != 2} {
+            puts "FAIL: expected gid 2; got $gid"
+            set ok false
+        }
+        set tag [$str tag 3]
+        if {$tag ne ""} {
+            puts "FAIL: expected tag \"\"'; got \"$tag\""
+            set ok false
+        }
+        set gid [$str gid_for_tag none-such]
+        if {$gid != 0} {
+            puts "FAIL: expected gid 0; got $gid"
+            set ok false
         }
     } finally {
         $str destroy 
@@ -330,3 +384,4 @@ test3 $MESSAGES2 [lambda {message} {
 }]
 test4
 test5
+test6

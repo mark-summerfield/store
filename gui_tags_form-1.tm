@@ -5,7 +5,10 @@ package require lambda 1
 package require store
 package require ui
 
-namespace eval gui_tags_form {}
+namespace eval gui_tags_form {
+    variable Tag ""
+    variable OldTag ""
+}
 
 proc gui_tags_form::show_modal {store_filename refresh} {
     set ::gui_tags_form::Refresh $refresh

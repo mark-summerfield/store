@@ -53,6 +53,7 @@ oo::define App method prepare {} {
     wm iconname . [tk appname]
     wm iconphoto . -default [ui::icon store.svg]
     wm minsize . 640 480
+    wm geometry . [$Cfg geometry]
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
 

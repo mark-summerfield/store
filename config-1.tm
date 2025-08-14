@@ -10,7 +10,7 @@ oo::class create Config {
     variable FontFamily
 }
 
-oo::define Config constructor {{filename ""} {geometry ""}} {
+oo::define Config constructor {{filename ""} {geometry "1024x800"}} {
     set Filename $filename
     set Geometry $geometry
     set FontSize [expr {2 + [font configure TkFixedFont -size]}]

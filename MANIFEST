@@ -1,6 +1,3 @@
-# TODO
-# - use same font initialization as manview (FontSize _and_ FontFamily)
-
 str
 
 cli-1.tm
@@ -20,6 +17,7 @@ gui_about_form-1.tm
 gui_misc-1.tm
 gui_highlight-1.tm
 gui_globals-1.tm
+config-1.tm
 
 store-1.tm # VERSION
 filedata-1.tm

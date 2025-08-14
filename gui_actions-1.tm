@@ -36,16 +36,3 @@ proc gui_actions::diff {store_filename txt in_context set_status_info \
     if {$in_context} { set delta [diff::contextualize $delta] }
     diff::diff_text $delta $txt
 }
-
-proc gui_actions::on_quit config_filename {
-    set ini [ini::open $config_filename -encoding utf-8 w]
-    try {
-        ini::set $ini Window Geometry [wm geometry .]
-        ini::set $ini Window FontSize [font configure Mono -size]
-        ini::set $ini Window FontFamily [font configure Mono -family]
-        ini::commit $ini
-    } finally {
-        ini::close $ini
-    }
-    exit
-}

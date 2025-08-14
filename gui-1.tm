@@ -1,5 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require config
 package require gui_app
 package require gui_app_actions
 package require gui_app_make
@@ -13,38 +14,20 @@ namespace eval gui {}
 proc gui::main {} {
     ui::wishinit
     tk appname Store
-    set configFilename [read_config]
-    make_fonts
-    set app [App new $configFilename]
+    set cfg [Config load]
+    make_fonts [$cfg fontfamily] [$cfg fontsize]
+    set app [App new $cfg]
     $app show
 }
 
-proc gui::read_config {} {
-    const filename [ui::get_ini_filename]
-    set family [font configure TkFixedFont -family]
-    set size [expr {1 + [font configure TkFixedFont -size]}]
-    if {[file exists $filename] && [file size $filename]} {
-        set ini [ini::open $filename -encoding utf-8 r]
-        try {
-            if {[ini::exists $ini Window]} {
-                set geometry [ini::value $ini Window Geometry ""]
-                if {$geometry ne ""} {
-                    wm geometry . $geometry
-                }
-                set family [ini::value $ini Window FontFamily $family]
-                set size [ini::value $ini Window FontSize $size]
-            }
-        } finally {
-            ini::close $ini
-        }
-    }
-    font create Mono -family $family -size $size
-    font create MonoItalic -family $family -size $size -slant italic
-    font create MonoBold -family $family -size $size -weight bold
-    return $filename
-}
-
-proc gui::make_fonts {} {
+proc gui::make_fonts {family size} {
     font create H1 -family [font configure TkTextFont -family] \
         -size [expr {3 + [font configure TkTextFont -size]}] -weight bold
+    font create Mono -family $family -size $size
+    font create MonoBold -family [font configure Mono -family] \
+        -size $size -weight bold
+    font create MonoItalic -family [font configure Mono -family] \
+        -size $size -slant italic
+    font create MonoBoldItalic -family [font configure Mono -family] \
+        -size $size -weight bold -slant italic
 }

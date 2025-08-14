@@ -6,12 +6,12 @@ package require lambda 1
 package require ui
 
 oo::class create App {
+    variable Cfg
     variable ShowOptions
     variable ShowState
     variable ShowAll
     variable WithLinos
     variable InContext
-    variable ConfigFilename
     variable StoreFilename
     variable Tabs
     variable FilenameTree
@@ -25,13 +25,13 @@ oo::class create App {
     variable StatusSizeLabel
 }
 
-oo::define App constructor {configFilename} {
+oo::define App constructor cfg {
+    set Cfg $cfg
     set ShowOptions true
     set ShowState asis
     set ShowAll false
     set WithLinos false
     set InContext true
-    set ConfigFilename $configFilename
     set StoreFilename [file normalize .[file tail [pwd]].str]
     if {![file exists $StoreFilename]} {
         set StoreFilename ""

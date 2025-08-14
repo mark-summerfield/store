@@ -337,4 +337,7 @@ oo::define App method on_about {} {
     gui_about_form::show_modal $user_version
 }
 
-oo::define App method on_quit {} { gui_actions::on_quit $ConfigFilename }
+oo::define App method on_quit {} {
+    $Cfg save
+    exit
+}

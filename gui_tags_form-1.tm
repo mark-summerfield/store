@@ -54,9 +54,12 @@ proc gui_tags_form::make_widgets {} {
     ttk::entry $form.tagEntry -textvariable ::gui_tags_form::Tag \
         -style TagSaved.TEntry
     ttk::frame $form.frame
-    ttk::button $form.frame.saveButton -text Save -underline 0 \
+    ttk::button $form.frame.saveButton -text "Save Tag" -underline 0 \
         -compound left -image [ui::icon document-save.svg $::ICON_SIZE] \
         -command gui_tags_form::on_save
+    ttk::button $form.frame.untagButton -text "Delete Tag" -underline 0 \
+        -compound left -image [ui::icon edit-cut.svg $::ICON_SIZE] \
+        -command gui_tags_form::on_untag
     ttk::button $form.frame.closeButton -text Close \
         -compound left -image [ui::icon close.svg $::ICON_SIZE] \
         -command gui_tags_form::on_close
@@ -78,7 +81,8 @@ proc gui_tags_form::make_layout {} {
     grid $form.tagEntry -row 2 -column 2 -columnspan 3 -sticky we {*}$opts
     grid $form.frame -row 3 -column 0 -columnspan 4
     grid $form.frame.saveButton -row 0 -column 0 {*}$opts
-    grid $form.frame.closeButton -row 0 -column 1 {*}$opts
+    grid $form.frame.untagButton -row 0 -column 1 {*}$opts
+    grid $form.frame.closeButton -row 0 -column 2 {*}$opts
 }
 
 
@@ -87,6 +91,7 @@ proc gui_tags_form::make_bindings {} {
         gui_tags_form::on_generation_changed
     }
     bind .tagsForm <Alt-a> { .tagsForm.showAllRadio invoke }
+    bind .tagsForm <Alt-d> { gui_tags_form::on_untag }
     bind .tagsForm <Alt-e> { .tagsForm.showTaggedRadio invoke }
     bind .tagsForm <Alt-g> { focus .tagsForm.generationsCombobox }
     bind .tagsForm <Alt-s> { gui_tags_form::on_save }
@@ -175,6 +180,21 @@ proc gui_tags_form::on_save {} {
             $str destroy
         }
         set ::gui_tags_form::OldTag $tag
+        on_entry_changed
+    }
+}
+
+proc gui_tags_form::on_untag {} {
+    if {[winfo exists .tagsForm]} {
+        set gid [.tagsForm.generationsCombobox get]
+        .tagsForm.tagEntry delete 0 end
+        set str [Store new $::gui_tags_form::StoreFilename]
+        try {
+            $str tag $gid -
+        } finally {
+            $str destroy
+        }
+        set ::gui_tags_form::OldTag ""
         on_entry_changed
     }
 }

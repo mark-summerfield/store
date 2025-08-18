@@ -26,8 +26,8 @@ proc gui_tags_form::show_modal {store_filename refresh} {
         wm resizable .tagsForm false false
         set on_close [lambda {} {form::hide .tagsForm}]
         form::prepare .tagsForm $on_close false
-        populate $store_filename
     }
+    populate $store_filename
     form::show_modal .tagsForm .tagsForm.tagEntry
 }
 

@@ -9,11 +9,9 @@ proc ui::wishinit {} {
         close $fh
         eval $raw
     }
-    const ::LINEHEIGHT [expr {[font metrics font -linespace] * 1.0125}]
+    const ::LINEHEIGHT [expr {[font metrics font -linespace] * 1.125}]
     ttk::style configure Treeview -rowheight $::LINEHEIGHT
-    set font [font create -family [font actual TkDefaultFont -family] \
-                -size [font actual TkDefaultFont -size]]
-    ttk::style configure Treeview.Heading -font $font
+    ttk::style configure Treeview.Heading -font TkDefaultFont
     ttk::style configure TCheckbutton -indicatorsize \
         [expr {$::LINEHEIGHT * 0.75}]
     set ::ICON_SIZE [expr {max(24, round(20 * [tk scaling]))}]

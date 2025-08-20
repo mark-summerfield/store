@@ -3,7 +3,10 @@
 # - don't use wishinit.tcl (change ui-1.tm)
 # - add &Config… &Menu option
 # - config_form-1.tm
-# - convert yes_no_box-1.tm to use Ref for reply & back-port to ../util
+# - convert yes_no_box-1.tm:
+#   . to be a class and
+#   . to use Ref for reply
+#   . then copy to ../util
 
 str
 

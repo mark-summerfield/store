@@ -54,6 +54,9 @@ oo::define App method make_controls {} {
         -compound left -command [callback on_purge] \
         -image [ui::icon edit-cut.svg $::ICON_SIZE]
     $frame.moreButton.menu add separator
+    $frame.moreButton.menu add command -label Config… -underline 1 \
+        -compound left -command [callback on_config] \
+        -image [ui::icon preferences-system.svg $::ICON_SIZE]
     $frame.moreButton.menu add command -label About -underline 1 \
         -compound left -command [callback on_about] \
         -image [ui::icon about.svg $::ICON_SIZE]
@@ -211,7 +214,6 @@ oo::define App method make_bindings {} {
     bind . <KP_Enter> [callback on_find]
     bind . <F3> [callback on_find]
     bind . <Alt-a> [callback on_add_addable]
-    bind . <Alt-b> [callback on_about]
     bind . <Alt-c> [callback on_copy_to]
     bind . <Alt-d> {.controlsFrame.showFrame.diffWithDiskRadio invoke}
     bind . <Alt-e> [callback on_extract]

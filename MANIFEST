@@ -1,13 +1,3 @@
-# TODO
-# - change all classes to use getters/setters (see manpager Config-1.tm)
-# - don't use wishinit.tcl (change ui-1.tm)
-# - add &Config… &Menu option
-# - config_form-1.tm
-# - convert yes_no_box-1.tm:
-#   . to be a class and
-#   . to use Ref for reply
-#   . then copy to ../util
-
 str
 
 cli-1.tm
@@ -28,6 +18,7 @@ gui_misc-1.tm
 gui_highlight-1.tm
 gui_globals-1.tm
 config-1.tm
+config_form-1.tm
 
 store-1.tm # VERSION
 filedata-1.tm
@@ -35,10 +26,12 @@ diff-1.tm
 misc-1.tm
 
 # from ../util
+ref-1.tm
 db-1.tm
 form-1.tm
 ui-1.tm
 yes_no_box-1.tm
+yes_no_form-1.tm
 
 test_store.tcl
 test_diff.tcl

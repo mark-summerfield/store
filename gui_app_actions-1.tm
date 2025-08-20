@@ -1,13 +1,15 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require config_form
 package require fileutil 1
 package require gui_about_form
 package require gui_actions
 package require gui_add_form
 package require gui_ignores_form
 package require gui_tags_form
+package require ref
 package require ui
-package require yes_no_box
+package require yes_no_form
 
 oo::define App method on_tab_changed {} {
     if {[$Tabs index [$Tabs select]]} {
@@ -186,7 +188,7 @@ oo::define App method on_restore {} {
     if {!$ok} {
         my set_status_info "Select a file to restore" $::SHORT_WAIT
     } else {
-        if {[yes_no_box::show_modal "[tk appname] — Restore" \
+        if {[YesNoForm show_modal "[tk appname] — Restore" \
                 "Restore \"$filename\" from the Store\noverwriting the\
                 disk version?\nThis cannot be undone!" no] eq "yes"} {
             set str [Store new $StoreFilename [callback set_status_info]]
@@ -207,7 +209,7 @@ oo::define App method on_purge {} {
     if {!$ok} {
         my set_status_info "Select a file to purge" $::SHORT_WAIT
     } else {
-        if {[yes_no_box::show_modal "[tk appname] — Purge" \
+        if {[YesNoForm show_modal "[tk appname] — Purge" \
                 "Permanently delete \"$filename\" from the Store?\n
                 This cannot be undone!" no] eq "yes"} {
             set str [Store new $StoreFilename [callback set_status_info]]
@@ -321,6 +323,20 @@ oo::define App method on_find {} {
     } else {
         focus $FindEntry
         my set_status_info "nothing to find" $::SHORT_WAIT
+    }
+}
+
+oo::define App method on_config {} {
+    set ok [Ref new false]
+    set fontfamily [$Cfg fontfamily]
+    set fontsize [$Cfg fontsize]
+    ConfigForm new $ok $Cfg
+    tkwait window .config
+    if {[$ok get]} {
+        if {$fontfamily ne [$Cfg fontfamily] || \
+                $fontsize != [$Cfg fontsize]} {
+            gui::make_fonts [$Cfg fontfamily] [$Cfg fontsize]
+        }
     }
 }
 

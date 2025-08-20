@@ -368,6 +368,7 @@ copied "store-1.tm" → "/tmp/test3/store-1.tm"
 proc full_reporter message { lappend ::messages "$message\n" }
 
 cd $::APPPATH
+destroy .
 test1
 test2
 puts "test3 with full reporter"

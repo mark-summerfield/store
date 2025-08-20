@@ -41,42 +41,28 @@ oo::define FileData method is_valid {} {
     string match {[UZS]} $Kind
 }
 
-oo::define FileData method gid {{gid 0}} {
-    if {$gid} { set Gid $gid }
-    return $Gid
+oo::define FileData method gid {} { return $Gid }
+oo::define FileData method set_gid {gid} { set Gid $gid }
+
+oo::define FileData method filename {} { return $Filename }
+oo::define FileData method set_filename {filename} {
+    set Filename $filename
 }
 
-oo::define FileData method filename {{filename ""}} {
-    if {$filename ne ""} { set Filename $filename }
-    return $Filename
-}
+oo::define FileData method kind {} { return $Kind }
+oo::define FileData method set_kind {kind} { set Kind $kind }
 
-oo::define FileData method kind {{kind ""}} {
-    if {$kind ne ""} { set Kind $kind }
-    return $Kind
-}
+oo::define FileData method usize {} { return $Usize }
+oo::define FileData method set_usize {usize} { set Usize $usize }
 
-oo::define FileData method usize {{usize 0}} {
-    if {$usize} { set Usize $usize }
-    return $Usize
-}
+oo::define FileData method zsize {} { return $Zsize }
+oo::define FileData method set_zsize {zsize} { set Zsize $zsize }
 
-oo::define FileData method zsize {{zsize 0}} {
-    if {$zsize} { set Zsize $zsize }
-    return $Zsize
-}
+oo::define FileData method pgid {} { return $Pgid }
+oo::define FileData method set_pgid {pgid} { set Pgid $pgid }
 
-oo::define FileData method pgid {{pgid 0}} {
-    if {$pgid} { set Pgid $pgid }
-    return $Pgid
-}
-
-oo::define FileData method data {{data ""}} {
-    if {$data ne ""} { set Data $data }
-    return $Data
-}
-
-oo::define FileData method clear_data {} { set Data "" }
+oo::define FileData method data {} { return $Data }
+oo::define FileData method set_data {data} { set Data $data }
 
 # for debugging
 oo::define FileData method to_string {} {

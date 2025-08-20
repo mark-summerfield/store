@@ -210,7 +210,6 @@ oo::define App method make_bindings {} {
         {.controlsFrame.showFrame.diffToRadio invoke}
     bind .controlsFrame.showFrame.diffGenSpinbox <<Decrement>> \
         {.controlsFrame.showFrame.diffToRadio invoke}
-    bind . <Escape> [callback on_quit]
     bind . <KP_Enter> [callback on_find]
     bind . <F3> [callback on_find]
     bind . <Alt-a> [callback on_add_addable]

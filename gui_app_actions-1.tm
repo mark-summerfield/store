@@ -350,7 +350,7 @@ oo::define App method on_about {} {
             $str destroy
         }
     }
-    gui_about_form::show_modal $user_version
+    AboutForm new $user_version
 }
 
 oo::define App method on_quit {} {

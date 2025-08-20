@@ -2,52 +2,44 @@
 
 package require db
 package require form
-package require gui_misc
-package require misc
-package require store
 package require ui
 
-namespace eval gui_about_form {}
+oo::class create AboutForm {}
 
-proc gui_about_form::show_modal user_version {
-    make_widgets $user_version
-    make_layout
-    make_bindings
-    form::prepare .about { gui_about_form::on_close }
+oo::define AboutForm constructor user_version {
+    my make_widgets $user_version
+    my make_layout
+    my make_bindings
+    form::prepare .about [callback on_close]
     form::show_modal .about
 }
 
-proc gui_about_form::make_widgets user_version {
+oo::define AboutForm method make_widgets user_version {
     tk::toplevel .about
     wm title .about "[tk appname] — About"
     wm resizable .about false false
     set height 16
     tk::text .about.text -width 50 -height $height -wrap word \
         -background "#F0F0F0" -spacing3 $::VGAP
-    populate_about_text $user_version
+    my populate $user_version
     .about.text configure -state disabled
     ttk::button .about.close_button -text Close -compound left \
         -image [ui::icon close.svg $::ICON_SIZE] \
-        -command { gui_about_form::on_close }
+        -command [callback on_close]
 }
 
-
-proc gui_about_form::make_layout {} {
+oo::define AboutForm method make_layout {} {
     grid .about.text -sticky nsew -pady $::PAD
     grid .about.close_button -pady $::PAD
 }
 
-
-proc gui_about_form::make_bindings {} {
-    bind .about <Escape> { gui_about_form::on_close }
-    bind .about <Return> { gui_about_form::on_close }
-    .about.text tag bind url <Double-1> {
-        gui_about_form::on_click_url @%x,%y
-    }
+oo::define AboutForm method make_bindings {} {
+    bind .about <Escape> [callback on_close]
+    bind .about <Return> [callback on_close]
+    .about.text tag bind url <Double-1> [callback on_click_url @%x,%y]
 }
 
-
-proc gui_about_form::on_click_url index {
+oo::define AboutForm method on_click_url index {
     set indexes [.about.text tag prevrange url $index]
     set url [string trim [.about.text get {*}$indexes]]
     if {$url ne ""} {
@@ -58,38 +50,36 @@ proc gui_about_form::on_click_url index {
     }
 }
 
+oo::define AboutForm method on_close {} { form::delete .about }
 
-proc gui_about_form::on_close {} { form::delete .about }
-
-
-proc gui_about_form::populate_about_text user_version {
+oo::define AboutForm method populate user_version {
     set txt .about.text
-    add_text_tags $txt
+    my add_text_tags $txt
     set img [$txt image create end -align center \
              -image [ui::icon store.svg 64]]
     $txt tag add spaceabove $img
     $txt tag add center $img
-    set cmd [list $txt insert end]
-    {*}$cmd "\nStore $::VERSION\n" {center title}
-    {*}$cmd "An easy-to-use and simple alternative\n" {center navy}
-    {*}$cmd "to a version control system.\n" {center navy}
+    set add [list $txt insert end]
+    {*}$add "\nStore $::VERSION\n" {center title}
+    {*}$add "An easy-to-use and simple alternative\n" {center navy}
+    {*}$add "to a version control system.\n" {center navy}
     set year [clock format [clock seconds] -format %Y]
     if {$year > 2025} { set year "2025-[string range $year end-1 end]" }
     set bits [expr {8 * $::tcl_platform(wordSize)}]
     set distro [exec lsb_release -ds]
-    {*}$cmd "https://github.com/mark-summerfield/store\n" {center green url}
-    {*}$cmd "Copyright © $year Mark Summerfield.\nAll Rights Reserved.\n" \
+    {*}$add "https://github.com/mark-summerfield/store\n" {center green url}
+    {*}$add "Copyright © $year Mark Summerfield.\nAll Rights Reserved.\n" \
         {center green}
-    {*}$cmd "License: GPLv3.\n" {center green}
-    {*}$cmd "[string repeat " " 60]\n" {center hr}
-    {*}$cmd "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
-    {*}$cmd "[db::sqlite_version] (.str $user_version)\n" center
-    if {$distro != ""} { {*}$cmd "$distro\n" center }
-    {*}$cmd "$::tcl_platform(os) $::tcl_platform(osVersion)\
+    {*}$add "License: GPLv3.\n" {center green}
+    {*}$add "[string repeat " " 60]\n" {center hr}
+    {*}$add "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
+    {*}$add "[db::sqlite_version] (.str $user_version)\n" center
+    if {$distro != ""} { {*}$add "$distro\n" center }
+    {*}$add "$::tcl_platform(os) $::tcl_platform(osVersion)\
         ($::tcl_platform(machine))\n" center
 }
 
-proc gui_about_form::add_text_tags txt {
+oo::define AboutForm method add_text_tags txt {
     set margin 12
     $txt configure -font TkTextFont
     set cmd [list $txt tag configure]

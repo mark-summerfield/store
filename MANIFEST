@@ -30,7 +30,6 @@ ref-1.tm
 db-1.tm
 form-1.tm
 ui-1.tm
-yes_no_box-1.tm
 yes_no_form-1.tm
 
 test_store.tcl
@@ -50,19 +49,9 @@ st.sh
 # - gui_highlight-1.tm:
 #   . highlight_py
 #   . highlight_go
-# - Add &Options… to &More menu to modal dialog to set:
-#	[X] Show Diff In &Context
-#    	[X] Show &Line Numbers
-#    	[&Font…] [family & size  ]
-#    	+- Files Tab -----------+
-#    	| ( ) Show &All Files    |
-#    	| (*) Show &Only Updated |
-#    	+-----------------------+
-#    	+- Find -------------+
-#    	| [ ] &Case Sensitive |
-#    	| [ ] &Whole Words    |
-#    	+--------------------+
-#    	          [Close]
+# - Add more Find options...
+#    	[ ] &Case Sensitive
+#    	[ ] &Whole Words
 # - Could change Find ttk:entry to ttk::combobox & keep history
 # - Sync support to synchonize one .str with another?
 

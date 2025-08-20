@@ -4,14 +4,16 @@ package require db
 package require form
 package require ui
 
-oo::class create AboutForm {}
+oo::class create AboutForm {
+    superclass AbstractForm
+}
 
 oo::define AboutForm constructor user_version {
     my make_widgets $user_version
     my make_layout
     my make_bindings
-    form::prepare .about [callback on_close]
-    form::show_modal .about
+    next .about [callback on_close]
+    my show_modal .about.closeBUtton
 }
 
 oo::define AboutForm method make_widgets user_version {
@@ -23,14 +25,14 @@ oo::define AboutForm method make_widgets user_version {
         -background "#F0F0F0" -spacing3 $::VGAP
     my populate $user_version
     .about.text configure -state disabled
-    ttk::button .about.close_button -text Close -compound left \
+    ttk::button .about.closeBUtton -text Close -compound left \
         -image [ui::icon close.svg $::ICON_SIZE] \
         -command [callback on_close]
 }
 
 oo::define AboutForm method make_layout {} {
     grid .about.text -sticky nsew -pady $::PAD
-    grid .about.close_button -pady $::PAD
+    grid .about.closeBUtton -pady $::PAD
 }
 
 oo::define AboutForm method make_bindings {} {
@@ -50,7 +52,7 @@ oo::define AboutForm method on_click_url index {
     }
 }
 
-oo::define AboutForm method on_close {} { form::delete .about }
+oo::define AboutForm method on_close {} { my delete }
 
 oo::define AboutForm method populate user_version {
     set txt .about.text

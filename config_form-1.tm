@@ -5,6 +5,8 @@ package require tooltip 2
 package require ui
 
 oo::class create ConfigForm {
+    superclass AbstractForm
+
     variable Cfg
     variable Blinking
     variable FontFamily
@@ -21,8 +23,8 @@ oo::define ConfigForm constructor {ok cfg} {
     my make_widgets 
     my make_layout
     my make_bindings
-    form::prepare .config [callback on_cancel]
-    form::show_modal .config
+    next .config [callback on_cancel]
+    my show_modal .config.scaleSpinbox
 }
 
 oo::define ConfigForm method make_widgets {} {
@@ -114,7 +116,7 @@ oo::define ConfigForm method on_ok {} {
     $Cfg set_fontfamily $FontFamily
     $Cfg set_fontsize $FontSize
     $Ok set true
-    form::delete .config
+    my delete
 }
 
-oo::define ConfigForm method on_cancel {} { form::delete .config }
+oo::define ConfigForm method on_cancel {} { my delete }

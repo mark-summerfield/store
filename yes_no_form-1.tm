@@ -5,11 +5,12 @@ package require ref
 package require ui
 
 oo::class create YesNoForm {
+    superclass AbstractForm
+
     variable YesNo
 }
 
-oo::define YesNoForm classmethod show_modal {title body_text \
-        {default yes}} {
+oo::define YesNoForm classmethod show {title body_text {default yes}} {
     set yesno [Ref new $default]
     set form [YesNoForm new $yesno $title $body_text $default]
     tkwait window .yesno
@@ -21,9 +22,9 @@ oo::define YesNoForm constructor {yesno title body_text default} {
     my make_widgets $title $body_text
     my make_layout
     my make_bindings $default
-    form::prepare .yesno [callback on_no]
-    form::show_modal .yesno [expr {$default eq "yes" ? {.yesno.yes_button} \
-                                                     : {.yesno.no_button}}]
+    next .yesno [callback on_no]
+    my show_modal [expr {$default eq "yes" ? {.yesno.yes_button} \
+                                           : {.yesno.no_button}}]
 }
 
 oo::define YesNoForm method make_widgets {title body_text} {
@@ -72,10 +73,10 @@ oo::define YesNoForm method make_bindings default {
 
 oo::define YesNoForm method on_yes {} {
     $YesNo set yes
-    form::delete .yesno
+    my delete
 }
 
 oo::define YesNoForm method on_no {} {
     $YesNo set no
-    form::delete .yesno
+    my delete
 }

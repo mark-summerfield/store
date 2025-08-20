@@ -108,7 +108,8 @@ oo::define App method on_add_addable {} {
         $str destroy
     }
     if {[llength $names]} {
-        gui_add_form::show_modal $StoreFilename [callback refresh] $names
+        set form [AddForm new]
+        $form show $StoreFilename [callback refresh] $names
     } else {
         my set_status_info "none to add" $::SHORT_WAIT
     }
@@ -188,7 +189,7 @@ oo::define App method on_restore {} {
     if {!$ok} {
         my set_status_info "Select a file to restore" $::SHORT_WAIT
     } else {
-        if {[YesNoForm show_modal "[tk appname] — Restore" \
+        if {[YesNoForm show "[tk appname] — Restore" \
                 "Restore \"$filename\" from the Store\noverwriting the\
                 disk version?\nThis cannot be undone!" no] eq "yes"} {
             set str [Store new $StoreFilename [callback set_status_info]]
@@ -209,7 +210,7 @@ oo::define App method on_purge {} {
     if {!$ok} {
         my set_status_info "Select a file to purge" $::SHORT_WAIT
     } else {
-        if {[YesNoForm show_modal "[tk appname] — Purge" \
+        if {[YesNoForm show "[tk appname] — Purge" \
                 "Permanently delete \"$filename\" from the Store?\n
                 This cannot be undone!" no] eq "yes"} {
             set str [Store new $StoreFilename [callback set_status_info]]

@@ -76,7 +76,6 @@ oo::define App method on_open {} {
         my populate
         my set_status_info "Read \"$StoreFilename\""
         my report_status
-        gui_ignores_form::populate $StoreFilename
         my jump_to_first
         my update_ui
     }
@@ -166,11 +165,13 @@ oo::define App method on_copy_to {} {
 }
 
 oo::define App method on_tags {} {
-    gui_tags_form::show_modal $StoreFilename [callback refresh]
+    set form [TagsForm new]
+    $form show $StoreFilename [callback refresh]
 }
 
 oo::define App method on_ignores {} {
-    gui_ignores_form::show_modal $StoreFilename [callback report_status]
+    set form [IgnoresForm new]
+    $form show $StoreFilename [callback report_status]
 }
 
 oo::define App method on_clean {} {

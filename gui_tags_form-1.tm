@@ -5,44 +5,49 @@ package require lambda 1
 package require store
 package require ui
 
-namespace eval gui_tags_form {
-    variable Tag ""
-    variable OldTag ""
+oo::singleton create TagsForm {
+    superclass AbstractForm
+
+    variable Refresh
+    variable StoreFilename
+    variable ShowWhich
+    variable Tag
+    variable OldTag
 }
 
-proc gui_tags_form::show_modal {store_filename refresh} {
-    set ::gui_tags_form::Refresh $refresh
-    if {![winfo exists .tagsForm]} {
-        set ::gui_tags_form::ShowWhich all
-        set ::gui_tags_form::OldTag ""
-        set ::gui_tags_form::Tag ""
-        trace add variable ::gui_tags_form::Tag write \
-            ::gui_tags_form::on_tag_changed 
-        toplevel .tagsForm
-        wm title .tagsForm "[tk appname] — Tags"
-        make_widgets
-        make_layout
-        make_bindings
-        wm resizable .tagsForm false false
-        set on_close [lambda {} {form::hide .tagsForm}]
-        form::prepare .tagsForm $on_close false
-    }
-    populate $store_filename
-    form::show_modal .tagsForm .tagsForm.tagEntry
+oo::define TagsForm constructor {} {
+    set ShowWhich all
+    set OldTag ""
+    set Tag ""
+    trace add variable [my varname Tag] write [callback on_tag_changed]
+    toplevel .tagsForm
+    wm title .tagsForm "[tk appname] — Tags"
+    my make_widgets
+    my make_layout
+    my make_bindings
+    wm resizable .tagsForm false false
+    next .tagsForm [callback on_close] false
 }
 
-proc gui_tags_form::make_widgets {} {
+oo::define TagsForm method show {store_filename refresh} {
+    set StoreFilename $store_filename
+    set Refresh $refresh
+    my populate $StoreFilename
+    my show_modal .tagsForm.tagEntry
+}
+
+oo::define TagsForm method make_widgets {} {
     set form .tagsForm
     ttk::label $form.showLabel -text "Show Generations"
     ttk::radiobutton $form.showAllRadio -text All -underline 0 \
-        -value all -variable ::gui_tags_form::ShowWhich \
-        -command ::gui_tags_form::on_show_changed
+        -value all -variable [my varname ShowWhich] \
+        -command [callback on_show_changed]
     ttk::radiobutton $form.showUntaggedRadio -text Untagged \
-        -underline 0 -value untagged -variable ::gui_tags_form::ShowWhich \
-        -command ::gui_tags_form::on_show_changed
+        -underline 0 -value untagged -variable [my varname ShowWhich] \
+        -command [callback on_show_changed]
     ttk::radiobutton $form.showTaggedRadio -text Tagged -underline 4 \
-        -value tagged -variable ::gui_tags_form::ShowWhich \
-        -command ::gui_tags_form::on_show_changed
+        -value tagged -variable [my varname ShowWhich] \
+        -command [callback on_show_changed]
     ttk::label $form.generationsLabel -text Generation: -underline 0
     ttk::label $form.atLabel -text @ 
     ttk::combobox $form.generationsCombobox
@@ -51,22 +56,22 @@ proc gui_tags_form::make_widgets {} {
     ttk::style configure TagUnsaved.TEntry -fieldbackground #FFDDE2
     ttk::style configure TagInvalid.TEntry -fieldbackground #FFDDE2 \
         -foreground red
-    ttk::entry $form.tagEntry -textvariable ::gui_tags_form::Tag \
+    ttk::entry $form.tagEntry -textvariable [my varname Tag] \
         -style TagSaved.TEntry
     ttk::frame $form.frame
     ttk::button $form.frame.saveButton -text "Save Tag" -underline 0 \
         -compound left -image [ui::icon document-save.svg $::ICON_SIZE] \
-        -command gui_tags_form::on_save
+        -command [callback on_save]
     ttk::button $form.frame.untagButton -text "Delete Tag" -underline 0 \
         -compound left -image [ui::icon edit-cut.svg $::ICON_SIZE] \
-        -command gui_tags_form::on_untag
+        -command [callback on_untag]
     ttk::button $form.frame.closeButton -text Close \
         -compound left -image [ui::icon close.svg $::ICON_SIZE] \
-        -command gui_tags_form::on_close
+        -command [callback on_close]
 }
 
 
-proc gui_tags_form::make_layout {} {
+oo::define TagsForm method make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
     set form .tagsForm
     grid $form.showLabel -row 0 -column 0 -sticky w {*}$opts
@@ -86,76 +91,72 @@ proc gui_tags_form::make_layout {} {
 }
 
 
-proc gui_tags_form::make_bindings {} {
-    bind .tagsForm.generationsCombobox <<ComboboxSelected>> {
-        gui_tags_form::on_generation_changed
-    }
+oo::define TagsForm method make_bindings {} {
+    bind .tagsForm.generationsCombobox <<ComboboxSelected>> \
+        [callback on_generation_changed]
     bind .tagsForm <Alt-a> { .tagsForm.showAllRadio invoke }
-    bind .tagsForm <Alt-d> { gui_tags_form::on_untag }
+    bind .tagsForm <Alt-d> [callback on_untag]
     bind .tagsForm <Alt-e> { .tagsForm.showTaggedRadio invoke }
     bind .tagsForm <Alt-g> { focus .tagsForm.generationsCombobox }
-    bind .tagsForm <Alt-s> { gui_tags_form::on_save }
+    bind .tagsForm <Alt-s> [callback on_save]
     bind .tagsForm <Alt-t> { focus .tagsForm.tagEntry }
     bind .tagsForm <Alt-u> { .tagsForm.showUntaggedRadio invoke }
-    bind .tagsForm <Escape> { gui_tags_form::on_close }
+    bind .tagsForm <Escape> [callback on_close]
 }
 
-proc gui_tags_form::populate {{store_filename ""}} {
+oo::define TagsForm method populate {{store_filename ""}} {
     if {$store_filename ne ""} {
-        set ::gui_tags_form::StoreFilename $store_filename
+        set StoreFilename $store_filename
     }
-    if {[winfo exists .tagsForm]} {
-        set str [Store new $::gui_tags_form::StoreFilename]
-        try {
-            set gids [$str gids $::gui_tags_form::ShowWhich]
-            .tagsForm.generationsCombobox configure -values $gids
-            if {[llength $gids]} {
-                .tagsForm.generationsCombobox set [lindex $gids 0]
-            }
-            lassign [ui::n_s [llength $gids]] n s
-            .tagsForm.generationsLabel configure -text "Generation$s ($n):"
-        } finally {
-            $str destroy
+    set str [Store new $StoreFilename]
+    try {
+        set gids [$str gids $ShowWhich]
+        .tagsForm.generationsCombobox configure -values $gids
+        if {[llength $gids]} {
+            .tagsForm.generationsCombobox set [lindex $gids 0]
         }
-        on_generation_changed
+        lassign [ui::n_s [llength $gids]] n s
+        .tagsForm.generationsLabel configure -text "Generation$s ($n):"
+    } finally {
+        $str destroy
     }
+    my on_generation_changed
 }
 
-proc gui_tags_form::on_show_changed {} {
-    if {[winfo exists .tagsForm]} { populate }
-}
+oo::define TagsForm method on_show_changed {} { my populate }
 
-proc gui_tags_form::on_generation_changed {} {
-    if {[winfo exists .tagsForm]} {
-        set gid [.tagsForm.generationsCombobox get]
-        set str [Store new $::gui_tags_form::StoreFilename]
-        try {
-            set tag [$str tag $gid]
-        } finally {
-            $str destroy
-        }
-        .tagsForm.tagEntry delete 0 end
-        if {$tag ne ""} { .tagsForm.tagEntry insert 0 $tag }
-        set ::gui_tags_form::OldTag $tag
-        on_entry_changed
+oo::define TagsForm method on_generation_changed {} {
+    set gid [.tagsForm.generationsCombobox get]
+    set str [Store new $StoreFilename]
+    try {
+        set tag [$str tag $gid]
+    } finally {
+        $str destroy
     }
+    .tagsForm.tagEntry delete 0 end
+    if {$tag ne ""} { .tagsForm.tagEntry insert 0 $tag }
+    set OldTag $tag
+    my on_entry_changed
 }
 
-proc gui_tags_form::on_tag_changed args {
-    ::gui_tags_form::on_entry_changed
-}
+oo::define TagsForm method on_tag_changed args { my on_entry_changed }
 
-proc gui_tags_form::on_entry_changed {} {
-    if {[string is integer -strict $::gui_tags_form::Tag]} {
+oo::define TagsForm method on_entry_changed {} {
+    if {$Tag ne ""} {
+        .tagsForm.frame.untagButton state !disabled
+    } else {
+        .tagsForm.frame.untagButton state disabled
+    }
+    if {[string is integer -strict $Tag]} {
         .tagsForm.tagEntry configure -style TagInvalid.TEntry
         .tagsForm.frame.saveButton state disabled
-    } elseif {$::gui_tags_form::Tag eq $::gui_tags_form::OldTag} {
+    } elseif {$Tag eq $OldTag} {
         .tagsForm.tagEntry configure -style TagSaved.TEntry
         .tagsForm.frame.saveButton state disabled
     } else {
-        set str [Store new $::gui_tags_form::StoreFilename]
+        set str [Store new $StoreFilename]
         try {
-            if {[$str validtag $::gui_tags_form::Tag]} {
+            if {[$str validtag $Tag]} {
                 .tagsForm.tagEntry configure -style TagUnsaved.TEntry
                 .tagsForm.frame.saveButton state !disabled
             } else {
@@ -169,37 +170,33 @@ proc gui_tags_form::on_entry_changed {} {
     return true
 }
 
-proc gui_tags_form::on_save {} {
-    if {[winfo exists .tagsForm]} {
-        set gid [.tagsForm.generationsCombobox get]
-        set tag [.tagsForm.tagEntry get]
-        set str [Store new $::gui_tags_form::StoreFilename]
-        try {
-            $str tag $gid [expr {$tag eq "" ? "-" : $tag}]
-        } finally {
-            $str destroy
-        }
-        set ::gui_tags_form::OldTag $tag
-        on_entry_changed
+oo::define TagsForm method on_save {} {
+    set gid [.tagsForm.generationsCombobox get]
+    set tag [.tagsForm.tagEntry get]
+    set str [Store new $StoreFilename]
+    try {
+        $str tag $gid [expr {$tag eq "" ? "-" : $tag}]
+    } finally {
+        $str destroy
     }
+    set OldTag $tag
+    my on_entry_changed
 }
 
-proc gui_tags_form::on_untag {} {
-    if {[winfo exists .tagsForm]} {
-        set gid [.tagsForm.generationsCombobox get]
-        .tagsForm.tagEntry delete 0 end
-        set str [Store new $::gui_tags_form::StoreFilename]
-        try {
-            $str tag $gid -
-        } finally {
-            $str destroy
-        }
-        set ::gui_tags_form::OldTag ""
-        on_entry_changed
+oo::define TagsForm method on_untag {} {
+    set gid [.tagsForm.generationsCombobox get]
+    .tagsForm.tagEntry delete 0 end
+    set str [Store new $StoreFilename]
+    try {
+        $str tag $gid -
+    } finally {
+        $str destroy
     }
+    set OldTag ""
+    my on_entry_changed
 }
 
-proc gui_tags_form::on_close {} {
-    form::hide .tagsForm
-    {*}$::gui_tags_form::Refresh
+oo::define TagsForm method on_close {} {
+    my hide
+    {*}$Refresh
 }

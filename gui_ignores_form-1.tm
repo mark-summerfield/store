@@ -5,27 +5,33 @@ package require lambda 1
 package require store
 package require ui
 
-namespace eval gui_ignores_form {}
+oo::singleton create IgnoresForm {
+    superclass AbstractForm
 
-proc gui_ignores_form::show_modal {store_filename refresh} {
-    set ::gui_ignores_form::Refresh $refresh
-    if {![winfo exists .ignoresForm]} {
-        toplevel .ignoresForm
-        wm title .ignoresForm "[tk appname] — Ignores"
-        make_widgets
-        make_layout
-        make_bindings
-        wm minsize .ignoresForm 480 320
-        set on_close [lambda {} {form::hide .ignoresForm}]
-        form::prepare .ignoresForm $on_close false
-        populate $store_filename
-    }
-    .ignoresForm.controlsFrame.addEntry delete 0 end
-    form::show_modal .ignoresForm .ignoresForm.ignoresListFrame.ignoresList
-    on_show
+    variable Refresh
+    variable StoreFilename
 }
 
-proc gui_ignores_form::on_show {} {
+oo::define IgnoresForm constructor {} {
+    toplevel .ignoresForm
+    wm title .ignoresForm "[tk appname] — Ignores"
+    my make_widgets
+    my make_layout
+    my make_bindings
+    wm minsize .ignoresForm 480 320
+    next .ignoresForm [callback on_close] false
+}
+
+oo::define IgnoresForm method show {store_filename refresh} {
+    set StoreFilename $store_filename
+    set Refresh $refresh
+    my populate $StoreFilename
+    .ignoresForm.controlsFrame.addEntry delete 0 end
+    my show_modal .ignoresForm.ignoresListFrame.ignoresList
+    my on_show
+}
+
+oo::define IgnoresForm method on_show {} {
     set ignoresList .ignoresForm.ignoresListFrame.ignoresList
     if {![llength [$ignoresList selection]]} {
         set first [lindex [$ignoresList children {}] 0]
@@ -35,7 +41,7 @@ proc gui_ignores_form::on_show {} {
     }
 }
 
-proc gui_ignores_form::make_widgets {} {
+oo::define IgnoresForm method make_widgets {} {
     set frame [ttk::frame .ignoresForm.ignoresListFrame]
     set name ignoresList
     set ignoresList [ttk::treeview $frame.$name -striped true -show tree \
@@ -47,19 +53,18 @@ proc gui_ignores_form::make_widgets {} {
     ttk::frame .ignoresForm.controlsFrame
     ttk::button .ignoresForm.controlsFrame.addButton -text Add: \
         -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \
-        -command { gui_ignores_form::on_add } -underline 0
+        -command [callback on_add] -underline 0
     ttk::entry .ignoresForm.controlsFrame.addEntry -width 12
     ttk::button .ignoresForm.controlsFrame.deleteButton -text Delete \
-        -compound left \
-        -image [ui::icon list-remove.svg $::ICON_SIZE] \
-        -command { gui_ignores_form::on_delete } -underline 0
+        -compound left -image [ui::icon list-remove.svg $::ICON_SIZE] \
+        -command [callback on_delete] -underline 0
     ttk::button .ignoresForm.controlsFrame.closeButton -text Close \
         -compound left -image [ui::icon close.svg $::ICON_SIZE] \
-        -command { gui_ignores_form::on_close }
+        -command [callback on_close]
 }
 
 
-proc gui_ignores_form::make_layout {} {
+oo::define IgnoresForm method make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
     set form .ignoresForm
     set frame $form.ignoresListFrame
@@ -80,77 +85,69 @@ proc gui_ignores_form::make_layout {} {
 }
 
 
-proc gui_ignores_form::make_bindings {} {
-    bind .ignoresForm.controlsFrame.addEntry <Return> {
-        gui_ignores_form::on_add
-    }
-    bind .ignoresForm <Alt-a> { gui_ignores_form::on_add }
-    bind .ignoresForm <Alt-d> { gui_ignores_form::on_delete }
-    bind .ignoresForm <Escape> { gui_ignores_form::on_close }
+oo::define IgnoresForm method make_bindings {} {
+    bind .ignoresForm.controlsFrame.addEntry <Return> [callback on_add]
+    bind .ignoresForm <Alt-a> [callback on_add ]
+    bind .ignoresForm <Alt-d> [callback on_delete]
+    bind .ignoresForm <Escape> [callback on_close]
 }
 
-proc gui_ignores_form::populate {{store_filename ""}} {
+oo::define IgnoresForm method populate {{store_filename ""}} {
     if {$store_filename ne ""} {
-        set ::gui_ignores_form::StoreFilename $store_filename
+        set StoreFilename $store_filename
     }
-    if {[winfo exists .ignoresForm]} {
-        set ignoresList .ignoresForm.ignoresListFrame.ignoresList
-        $ignoresList delete [$ignoresList children {}]
-        set str [Store new $::gui_ignores_form::StoreFilename]
+    set ignoresList .ignoresForm.ignoresListFrame.ignoresList
+    $ignoresList delete [$ignoresList children {}]
+    set str [Store new $StoreFilename]
+    try {
+        foreach ignore [$str ignores] {
+            $ignoresList insert {} end -text $ignore
+        }
+    } finally {
+        $str destroy
+    }
+}
+
+oo::define IgnoresForm method on_add {} {
+    set txt [.ignoresForm.controlsFrame.addEntry get]
+    if {$txt eq ""} {
+        focus .ignoresForm.controlsFrame.addEntry
+    } else {
+        set str [Store new $StoreFilename]
         try {
-            foreach ignore [$str ignores] {
-                $ignoresList insert {} end -text $ignore
-            }
+            $str ignore $txt
+            my populate
         } finally {
             $str destroy
         }
     }
 }
 
-proc gui_ignores_form::on_add {} {
-    if {[winfo exists .ignoresForm]} {
-        set txt [.ignoresForm.controlsFrame.addEntry get]
-        if {$txt eq ""} {
-            focus .ignoresForm.controlsFrame.addEntry
-        } else {
-            set str [Store new $::gui_ignores_form::StoreFilename]
-            try {
-                $str ignore $txt
-                populate
-            } finally {
-                $str destroy
-            }
+oo::define IgnoresForm method on_delete {} {
+    set ignoresList .ignoresForm.ignoresListFrame.ignoresList
+    set item [$ignoresList selection]
+    if {$item ne {}} {
+        set index [expr {[$ignoresList index $item] - 1}]
+        set str [Store new $StoreFilename]
+        try {
+            $str unignore [$ignoresList item $item -text]
+            my populate
+        } finally {
+            $str destroy
+        }
+        if {$index < 0 && ![llength [$ignoresList selection]]} {
+            set index 0
+        }
+        if {$index >= 0} {
+            set item [lindex [$ignoresList children {}] $index]
+            $ignoresList see $item
+            $ignoresList selection set $item
+            $ignoresList focus $item
         }
     }
 }
 
-proc gui_ignores_form::on_delete {} {
-    if {[winfo exists .ignoresForm]} {
-        set ignoresList .ignoresForm.ignoresListFrame.ignoresList
-        set item [$ignoresList selection]
-        if {$item ne {}} {
-            set index [expr {[$ignoresList index $item] - 1}]
-            set str [Store new $::gui_ignores_form::StoreFilename]
-            try {
-                $str unignore [$ignoresList item $item -text]
-                populate
-            } finally {
-                $str destroy
-            }
-            if {$index < 0 && ![llength [$ignoresList selection]]} {
-                set index 0
-            }
-            if {$index >= 0} {
-                set item [lindex [$ignoresList children {}] $index]
-                $ignoresList see $item
-                $ignoresList selection set $item
-                $ignoresList focus $item
-            }
-        }
-    }
-}
-
-proc gui_ignores_form::on_close {} {
-    form::hide .ignoresForm
-    {*}$::gui_ignores_form::Refresh
+oo::define IgnoresForm method on_close {} {
+    my hide
+    {*}$Refresh
 }

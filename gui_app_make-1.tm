@@ -46,14 +46,14 @@ oo::define App method make_controls {} {
     $frame.moreButton.menu add command -label Restore… -underline 0 \
         -compound left -command [callback on_restore] \
         -image [ui::icon edit-undo.svg $::ICON_SIZE]
-    $frame.moreButton.menu add command -label Clean -underline 0 \
+    $frame.moreButton.menu add command -label Clean -underline 1 \
         -compound left -command [callback on_clean] \
         -image [ui::icon edit-clear.svg $::ICON_SIZE]
     $frame.moreButton.menu add command -label Purge… -underline 0 \
         -compound left -command [callback on_purge] \
         -image [ui::icon edit-cut.svg $::ICON_SIZE]
     $frame.moreButton.menu add separator
-    $frame.moreButton.menu add command -label Config… -underline 1 \
+    $frame.moreButton.menu add command -label Config… -underline 0 \
         -compound left -command [callback on_config] \
         -image [ui::icon preferences-system.svg $::ICON_SIZE]
     $frame.moreButton.menu add command -label About -underline 1 \

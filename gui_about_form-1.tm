@@ -1,7 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require abstract_form
 package require db
-package require form
 package require ui
 
 oo::class create AboutForm {

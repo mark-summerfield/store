@@ -1,6 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require form
+package require abstract_form
 package require tooltip 2
 package require ui
 

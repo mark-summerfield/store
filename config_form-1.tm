@@ -35,8 +35,8 @@ oo::define ConfigForm method make_widgets {} {
     ttk::label .config.scaleLabel -text "Application Scale" -underline 12
     ttk::spinbox .config.scaleSpinbox -format %.2f -from 1.0 -to 10.0 \
         -increment 0.1
-    $tip .config.scaleSpinbox "Application’s scale factor (only applied\
-        after restart)"
+    $tip .config.scaleSpinbox "Application’s scale factor.\nBest\
+        to set this before setting the font.\nRestart to apply."
     .config.scaleSpinbox set [format %.2f [tk scaling]]
     ttk::checkbutton .config.blinkCheckbutton -text "Cursor Blink" \
         -underline 7 -variable [my varname Blinking]
@@ -45,7 +45,8 @@ oo::define ConfigForm method make_widgets {} {
     ttk::button .config.fontButton -text Font… -underline 0 -compound left \
         -image [ui::icon preferences-desktop-font.svg $::ICON_SIZE] \
         -command [callback on_font]
-    $tip .config.fontButton "The font to use for displaying man pages."
+    $tip .config.fontButton "The font to use for displaying file\
+        contents.\nBest to set the application’s scale (and restart) first."
     ttk::label .config.fontLabel -relief sunken \
         -text "[$Cfg fontfamily] [$Cfg fontsize]"
     ttk::label .config.configFileLabel -text "Config file"

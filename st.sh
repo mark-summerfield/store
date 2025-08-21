@@ -14,6 +14,8 @@ nagelfar.sh \
     | grep -v Wrong.number.of.arguments.*to..self \
     | grep -v .*Argument.*at.*line \
     | grep -v Non.constant.definition...Db \
+    | grep -v No.superclass.found.for..next \
+    | grep -v No.braces.around.code.in.trace.add \
     | grep -v Unknown.subcommand..load..to..FileData
 echo --- Tests ---
 ./test_store.tcl

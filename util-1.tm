@@ -41,7 +41,7 @@ proc util::open_webpage url {
     }
     try {
         exec {*}$cmd $url &
-    } on error {err} {
+    } on error err {
         puts "failed to open $url: $err"
     }
 }

@@ -27,7 +27,7 @@ oo::define TagsForm constructor {} {
     my make_layout
     my make_bindings
     wm resizable .tagsForm false false
-    next .tagsForm [callback on_close] false
+    next .tagsForm [callback on_close]
 }
 
 oo::define TagsForm method show {store_filename refresh} {

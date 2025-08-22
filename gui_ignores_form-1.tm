@@ -19,7 +19,7 @@ oo::define IgnoresForm constructor {} {
     my make_layout
     my make_bindings
     wm minsize .ignoresForm 480 320
-    next .ignoresForm [callback on_close] false
+    next .ignoresForm [callback on_close]
 }
 
 oo::define IgnoresForm method show {store_filename refresh} {

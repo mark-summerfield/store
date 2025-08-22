@@ -9,9 +9,7 @@ oo::define AbstractForm constructor {form on_close {modal true} \
     set Form $form
     wm withdraw $Form
     wm attributes $Form -type dialog
-    if {$modal} {
-        wm transient $Form .
-    }
+    if {$modal} { wm transient $Form . }
     wm group $Form .
     set parent [winfo parent $Form]
     if {!($x && $y)} {
@@ -31,11 +29,12 @@ oo::define AbstractForm method show_modal {{focus_widget ""}} {
     if {$focus_widget ne ""} { focus $focus_widget }
 }
 
-oo::define AbstractForm method show_modeless {} {
+oo::define AbstractForm method show_modeless {{focus_widget ""}} {
     wm deiconify $Form
     raise $Form
     update
     focus $Form
+    if {$focus_widget ne ""} { focus $focus_widget }
 }
 
 oo::define AbstractForm method delete {} {

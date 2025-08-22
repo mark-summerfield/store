@@ -100,8 +100,8 @@ proc cli_actions::copy {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str dirname
     try {
         $str copy $gid $dirname
-    } on error {message} {
-        cli_misc::warn $message
+    } on error err {
+        cli_misc::warn $err
     } finally {
         $str destroy
     }
@@ -298,7 +298,7 @@ proc cli_actions::tag {reporter storefile rest} {
     lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
     try {
         $str tag $gid $rest
-    } on error {err} {
+    } on error err {
         cli_misc::warn "failed to add tag '$rest': $err"
     } finally {
         $str destroy

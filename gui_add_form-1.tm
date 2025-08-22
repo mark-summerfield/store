@@ -19,7 +19,7 @@ oo::define AddForm constructor {} {
     my make_layout
     my make_bindings
     wm minsize .addForm 480 320
-    next .addForm [callback on_close] false
+    next .addForm [callback on_close]
 }
 
 oo::define AddForm method show {store_filename refresh names} {

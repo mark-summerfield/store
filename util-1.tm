@@ -1,0 +1,72 @@
+# Copyright © 2025 Mark Summerfield. All rights reserved.
+
+proc bool_to_str b {expr {$b ? true : false}}
+
+proc commas n {regsub -all {\d(?=(\d{3})+($|\.))} $n {\0,}}
+
+proc lrandom lst { lindex $lst [expr {int(rand() * [llength $lst])}] }
+
+namespace eval util {}
+
+proc util::islink filename { expr {![catch {file link $filename}]} }
+
+proc util::uid {} { return #[string range [clock clicks] end-8 end] }
+
+proc util::get_ini_filename {} {
+    set name [string totitle [tk appname]].ini
+    set home [file home]
+    if {[tk windowingsystem] eq "win32"} {
+        set names [list [file join $home $name] $::APPPATH/$name]
+        set index 0
+    } else {
+        set names [list [file join $home .config/$name] \
+                        [file join $home .$name] $::APPPATH/$name]
+        set index [expr {[file isdirectory \
+                            [file join $home .config]] ? 0 : 1}]
+    }
+    foreach name $names {
+        set name [file normalize $name]
+        if {[file exists $name]} {
+            return $name
+        }
+    }
+    lindex $names $index
+}
+
+proc util::open_webpage url {
+    if {[tk windowingsystem] eq "win32"} {
+        set cmd [list {*}[auto_execok start] {}]
+    } else {
+        set cmd [auto_execok xdg-open]
+    }
+    try {
+        exec {*}$cmd $url &
+    } on error {err} {
+        puts "failed to open $url: $err"
+    }
+}
+
+proc util::n_s size {
+    if {!$size} { return [list "no" "s"] }
+    if {$size == 1} { return [list "one" ""] }
+    list $size "s"
+}
+
+proc util::humanize {value {suffix B}} {
+    if {!$value} {
+        return "$value $suffix"
+    }
+    set factor 1
+    if {$value < 0} {
+        set factor -1
+        set value [expr {$value * $factor}]
+    }
+
+    set log_n [expr {int(log($value) / log(1024))}]
+    set prefix [lindex [list "" "Ki" "Mi" "Gi" "Ti" "Pi" "Ei" "Zi" "Yi"] \
+        $log_n]
+    set value [expr {$value / (pow(1024, $log_n))}]
+    set value [expr {$value * $factor}]
+    set dp [expr {$log_n < 2 ? 0 : 1}]
+    return "[format %.${dp}f $value] ${prefix}${suffix}"
+}

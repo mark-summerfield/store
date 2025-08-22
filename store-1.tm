@@ -6,9 +6,9 @@ package require fileutil 1
 package require lambda 1
 package require misc
 package require sqlite3 3
-package require ui
+package require util
 
-const VERSION 1.6.1
+const VERSION 1.6.2
 
 oo::class create Store {
     variable Filename
@@ -256,8 +256,8 @@ oo::define Store method clean {} {
                     SELECT gid FROM Files);}
         set ngens [$Db changes]
     }
-    lassign [ui::n_s $nfiles] nf ns
-    lassign [ui::n_s $ngens] gf gs
+    lassign [util::n_s $nfiles] nf ns
+    lassign [util::n_s $ngens] gf gs
     {*}$Reporter "cleaned $nf file$ns in $gf generation$gs"
 }
 

@@ -3,7 +3,7 @@
 package require cli_misc
 package require diff
 package require store
-package require ui
+package require util
 
 namespace eval cli_actions {}
 
@@ -34,7 +34,7 @@ proc cli_actions::update {reporter storefile rest} {
         }
         set names [$str addable]
         if {$::VERBOSE && [llength $names]} {
-            lassign [ui::n_s [llength $names]] n s
+            lassign [util::n_s [llength $names]] n s
             cli_misc::info "$n unstored unignored nonempty file$s present" \
                 true
         }
@@ -59,7 +59,7 @@ proc cli_actions::status {reporter storefile rest} {
     try {
         set names [$str addable]
         if {[llength $names]} {
-            lassign [ui::n_s [llength $names]] n s
+            lassign [util::n_s [llength $names]] n s
             lappend yes_messages "$n unstored unignored nonempty file$s\
                                   present"
             if {$::VERBOSE > 1} {
@@ -71,7 +71,7 @@ proc cli_actions::status {reporter storefile rest} {
         }
         set names [$str updatable]
         if {[llength $names]} {
-            lassign [ui::n_s [llength $names]] n s
+            lassign [util::n_s [llength $names]] n s
             lappend yes_messages "$n file$s to update"
             if {$::VERBOSE > 1} {
                 lappend yes_messages \
@@ -341,7 +341,7 @@ proc cli_actions::purge {reporter storefile rest} {
         if {[cli_misc::yes_no "permanently permanently purge \"$filename\"\
                           from the store" true]} {
             set n [$str purge $filename]
-            lassign [ui::n_s $n] n s
+            lassign [util::n_s $n] n s
             cli_misc::info "purged $n version$s"
         }
     } finally {

@@ -4,6 +4,7 @@ package require abstract_form
 package require lambda 1
 package require store
 package require ui
+package require util
 
 oo::singleton create TagsForm {
     superclass AbstractForm
@@ -115,7 +116,7 @@ oo::define TagsForm method populate {{store_filename ""}} {
         if {[llength $gids]} {
             .tagsForm.generationsCombobox set [lindex $gids 0]
         }
-        lassign [ui::n_s [llength $gids]] n s
+        lassign [util::n_s [llength $gids]] n s
         .tagsForm.generationsLabel configure -text "Generation$s ($n):"
     } finally {
         $str destroy

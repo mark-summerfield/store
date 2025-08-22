@@ -10,7 +10,6 @@ package require textutil
 namespace eval cli {}
 
 proc cli::main {} {
-    destroy .
     set storefile .[file tail [pwd]].str
     if {!$::argc} {
         if {[file exists $storefile]} {

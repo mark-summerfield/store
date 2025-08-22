@@ -1,7 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require inifile
-package require ui
+package require util
 
 # Also handles tk scaling
 oo::class create Config {
@@ -21,7 +21,7 @@ oo::define Config constructor {{filename ""} {geometry "1024x800"}} {
 }
 
 oo::define Config classmethod load {} {
-    set filename [ui::get_ini_filename]
+    set filename [util::get_ini_filename]
     set config [Config new]
     $config set_filename $filename
     if {[file exists $filename] && [file size $filename]} {

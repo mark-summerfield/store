@@ -26,8 +26,9 @@ diff-1.tm
 misc-1.tm
 
 # from ../util
-ref-1.tm
 db-1.tm
+ref-1.tm
+util-1.tm
 abstract_form-1.tm
 ui-1.tm
 yes_no_form-1.tm

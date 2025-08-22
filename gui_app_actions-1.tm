@@ -8,7 +8,7 @@ package require gui_add_form
 package require gui_ignores_form
 package require gui_tags_form
 package require ref
-package require ui
+package require util
 package require yes_no_form
 
 oo::define App method on_tab_changed {} {
@@ -82,7 +82,6 @@ oo::define App method on_open {} {
 }
 
 oo::define App method on_add_file {} {
-    puts on_add_file
     set filename [tk_getOpenFile -initialdir . \
                  -title "[tk appname] — Choose a File to Add" -parent .]
     if {$filename ne ""} {
@@ -217,7 +216,7 @@ oo::define App method on_purge {} {
             set str [Store new $StoreFilename [callback set_status_info]]
             try {
                 set n [$str purge $filename]
-                lassign [ui::n_s $n] n s
+                lassign [util::n_s $n] n s
                 my set_status_info "purged $n version$s" $::SHORT_WAIT
                 my report_status
                 my populate

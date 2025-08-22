@@ -3,6 +3,7 @@
 package require abstract_form
 package require db
 package require ui
+package require util
 
 oo::class create AboutForm {
     superclass AbstractForm
@@ -48,7 +49,7 @@ oo::define AboutForm method on_click_url index {
         if {![string match -nocase http*://* $url]} {
             set url [string cat http:// $url]
         }
-        ui::open_webpage $url
+        util::open_webpage $url
     }
 }
 

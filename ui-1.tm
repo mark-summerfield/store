@@ -7,7 +7,8 @@ namespace eval ui {}
 proc ui::wishinit {} {
     option add *tearOff 0
     ttk::style theme use clam
-    const ::LINEHEIGHT [expr {[font metrics font -linespace] * 1.25}]
+    const ::LINEHEIGHT [expr {[font metrics TkDefaultFont -linespace] \
+        * 1.5}]
     ttk::style configure Treeview -rowheight $::LINEHEIGHT
     ttk::style configure Treeview.Heading -font TkDefaultFont
     ttk::style configure TCheckbutton -indicatorsize \

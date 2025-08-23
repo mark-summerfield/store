@@ -103,20 +103,7 @@ time.
 Unpack anywhere convenient and either put the folder in your `PATH` or add
 soft links to `str` and `store`.
 
-The GUI `store` reads `~/.wishinit.tcl` if present. Mine contains:
-
-    tk scaling 1.67
-    option add *tearOff 0
-    option add *insertOffTime 0
-    ttk::style configure . -insertofftime 0
-    ttk::style theme use clam
-
-The GUI `store` maintains a configuration file in `~/.config/Store.str`,
-(e.g., to save/restore the window size and position) and default font for
-showing files.
-
-The command line `str` tool depends on Tcl 9 and the Tcllib; the GUI `store`
-tool depends on Tcl 9, Tk 9, the Tcllib, and the Tklib.
+Dependencies: Tcl/Tk >= 9.0.2; Tcllib >= 2.0; Tklib >= 0.9.
 
 ## License
 

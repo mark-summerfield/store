@@ -38,15 +38,17 @@ oo::define AddForm method make_widgets {} {
     $addList configure -show tree -style List.Treeview
     $addList column #0 -anchor w -stretch true
     ttk::frame .addForm.controlsFrame
+    set width 9
+    set wrap [expr {(3 + $width) * [font measure TkDefaultFont X]}]
     ttk::button .addForm.controlsFrame.addButton -text Add \
         -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \
-        -command [callback on_add] -underline 0
+        -command [callback on_add] -underline 0 -width $width
     ttk::label .addForm.controlsFrame.addLabel -text "All selected\
-        files will be added;\nall unselected files will be ignored." \
-        -wraplength 100p
+        files will be added; all unselected files will be ignored." \
+        -wraplength $wrap -width $width
     ttk::button .addForm.controlsFrame.closeButton -text Cancel \
         -compound left -image [ui::icon close.svg $::ICON_SIZE] \
-        -command [callback on_close]
+        -command [callback on_close] -width $width
 }
 
 oo::define AddForm method make_layout {} {
@@ -60,7 +62,7 @@ oo::define AddForm method make_layout {} {
     autoscroll::autoscroll .addForm.addListFrame.scrolly
     grid .addForm.controlsFrame -row 0 -column 1 -sticky ns
     pack .addForm.controlsFrame.addButton -side top {*}$opts
-    pack .addForm.controlsFrame.addLabel -side top -fill x {*}$opts
+    pack .addForm.controlsFrame.addLabel -side top -fill both {*}$opts
     pack .addForm.controlsFrame.closeButton -side bottom {*}$opts
     grid rowconfigure .addForm 0 -weight 1
     grid columnconfigure .addForm 0 -weight 1

@@ -13,38 +13,38 @@ oo::define AboutForm constructor user_version {
     my make_widgets $user_version
     my make_layout
     my make_bindings
-    next .about [callback on_close]
-    my show_modal .about.closeBUtton
+    next .aboutForm [callback on_close]
+    my show_modal .aboutForm.closeBUtton
 }
 
 oo::define AboutForm method make_widgets user_version {
-    tk::toplevel .about
-    wm title .about "[tk appname] — About"
-    wm resizable .about false false
+    tk::toplevel .aboutForm
+    wm title .aboutForm "[tk appname] — About"
+    wm resizable .aboutForm false false
     set height 16
-    tk::text .about.text -width 50 -height $height -wrap word \
+    tk::text .aboutForm.text -width 50 -height $height -wrap word \
         -background "#F0F0F0" -spacing3 $::VGAP
     my populate $user_version
-    .about.text configure -state disabled
-    ttk::button .about.closeBUtton -text Close -compound left \
+    .aboutForm.text configure -state disabled
+    ttk::button .aboutForm.closeBUtton -text Close -compound left \
         -image [ui::icon close.svg $::ICON_SIZE] \
         -command [callback on_close]
 }
 
 oo::define AboutForm method make_layout {} {
-    grid .about.text -sticky nsew -pady $::PAD
-    grid .about.closeBUtton -pady $::PAD
+    grid .aboutForm.text -sticky nsew -pady $::PAD
+    grid .aboutForm.closeBUtton -pady $::PAD
 }
 
 oo::define AboutForm method make_bindings {} {
-    bind .about <Escape> [callback on_close]
-    bind .about <Return> [callback on_close]
-    .about.text tag bind url <Double-1> [callback on_click_url @%x,%y]
+    bind .aboutForm <Escape> [callback on_close]
+    bind .aboutForm <Return> [callback on_close]
+    .aboutForm.text tag bind url <Double-1> [callback on_click_url @%x,%y]
 }
 
 oo::define AboutForm method on_click_url index {
-    set indexes [.about.text tag prevrange url $index]
-    set url [string trim [.about.text get {*}$indexes]]
+    set indexes [.aboutForm.text tag prevrange url $index]
+    set url [string trim [.aboutForm.text get {*}$indexes]]
     if {$url ne ""} {
         if {![string match -nocase http*://* $url]} {
             set url [string cat http:// $url]
@@ -56,7 +56,7 @@ oo::define AboutForm method on_click_url index {
 oo::define AboutForm method on_close {} { my delete }
 
 oo::define AboutForm method populate user_version {
-    set txt .about.text
+    set txt .aboutForm.text
     my add_text_tags $txt
     set img [$txt image create end -align center \
              -image [ui::icon store.svg 64]]

@@ -51,9 +51,10 @@ oo::define ConfigForm method make_widgets {} {
         contents.\nBest to set the application’s scale (and restart) first."
     ttk::label .configForm.fontLabel -relief sunken \
         -text "[$Cfg fontfamily] [$Cfg fontsize]"
-    ttk::label .configForm.configFileLabel -text "Config file"
-    ttk::label .configForm.configFilenameLabel  \
-        -foreground gray25 -text [$Cfg filename]
+    ttk::label .configForm.configFileLabel -foreground gray25 \
+        -text "Config file"
+    ttk::label .configForm.configFilenameLabel -foreground gray25 \
+        -text [$Cfg filename]
     ttk::frame .configForm.buttons
     ttk::button .configForm.buttons.okButton -text OK -underline 0 \
         -compound left -image [ui::icon ok.svg $::ICON_SIZE] \

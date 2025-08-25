@@ -27,8 +27,6 @@ oo::define ConfigForm constructor {ok cfg} {
     my show_modal .configForm.scaleSpinbox
 }
 
-oo::define ConfigForm method form {} { return .configForm }
-
 oo::define ConfigForm method make_widgets {} {
     tk::toplevel .configForm
     wm resizable .configForm false false

@@ -20,6 +20,8 @@ oo::define AbstractForm constructor {form on_close {modal true} \
     wm protocol $Form WM_DELETE_WINDOW $on_close
 }
 
+oo::define AbstractForm method form {} { return $Form }
+
 oo::define AbstractForm method show_modal {{focus_widget ""}} {
     wm deiconify $Form
     grab set $Form

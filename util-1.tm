@@ -2,11 +2,50 @@
 
 proc bool_to_str b {expr {$b ? true : false}}
 
+proc list_to_str lst {
+    set str [list]
+    foreach x $lst {
+        lappend str "'$x'"
+    }
+    return "{[join $str " "]}"
+}
+
 proc commas n {regsub -all {\d(?=(\d{3})+($|\.))} $n {\0,}}
 
 proc lrandom lst { lindex $lst [expr {int(rand() * [llength $lst])}] }
 
 namespace eval util {}
+
+proc util::pre_process_args argv {
+    set ppargv [list]
+    foreach arg $argv {
+        if {[string match {-*} $arg]} {
+            set i [string first = $arg]
+            if {$i == -1} {
+                if {[string match {--*} $arg] || \
+                        [string length $arg] == 2} {
+                    lappend ppargv $arg
+                } else {
+                    lappend ppargv [string range $arg 0 1] \
+                                   [string range $arg 2 end]
+                }
+            } else {
+                lappend ppargv [string range $arg 0 [expr {$i - 1}]] \
+                               [string range $arg [expr {$i + 1}] end]
+            }
+        } else {
+            lappend ppargv $arg
+        }
+    }
+    list [llength $ppargv] $ppargv
+}
+
+proc util::term_width {{defwidth 72}} {
+    if {[dict exists [chan configure stdout] -mode]} { ;# tty
+        return [lindex [chan configure stdout -winsize] 0]
+    }
+    return $defwidth ;# redirected
+}
 
 proc util::islink filename { expr {![catch {file link $filename}]} }
 

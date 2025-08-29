@@ -54,7 +54,7 @@ oo::define ConfigForm method make_widgets {} {
     ttk::label .configForm.configFileLabel -foreground gray25 \
         -text "Config file"
     ttk::label .configForm.configFilenameLabel -foreground gray25 \
-        -text [$Cfg filename]
+        -text [$Cfg filename] -relief sunken
     ttk::frame .configForm.buttons
     ttk::button .configForm.buttons.okButton -text OK -underline 0 \
         -compound left -image [ui::icon ok.svg $::ICON_SIZE] \

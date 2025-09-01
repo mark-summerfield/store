@@ -63,7 +63,7 @@ oo::define AboutForm method populate user_version {
     $txt tag add spaceabove $img
     $txt tag add center $img
     set add [list $txt insert end]
-    {*}$add "\nStore $::VERSION\n" {center title}
+    {*}$add "\n[tk appname] $::VERSION\n" {center title}
     {*}$add "An easy-to-use and simple alternative\n" {center navy}
     {*}$add "to a version control system.\n" {center navy}
     set year [clock format [clock seconds] -format %Y]

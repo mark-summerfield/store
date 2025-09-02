@@ -50,6 +50,7 @@ st.sh
 # - gui_highlight-1.tm:
 #   . highlight_py
 #   . highlight_go
+# - Add Config option: External Diff Tool |________|
 # - Add more Find options...
 #    	[ ] &Case Sensitive
 #    	[ ] &Whole Words

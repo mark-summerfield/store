@@ -1,15 +1,11 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-oo::abstract create AbstractForm {
-    variable Form
-}
+oo::abstract create AbstractForm { variable Form }
 
-oo::define AbstractForm constructor {form on_close {modal true} \
-        {x 0} {y 0}} {
+oo::define AbstractForm constructor {form on_close {x 0} {y 0}} {
     set Form $form
     wm withdraw $Form
     wm attributes $Form -type dialog
-    if {$modal} { wm transient $Form . }
     wm group $Form .
     set parent [winfo parent $Form]
     if {!($x && $y)} {
@@ -24,6 +20,7 @@ oo::define AbstractForm method form {} { return $Form }
 
 oo::define AbstractForm method show_modal {{focus_widget ""}} {
     wm deiconify $Form
+    wm transient $Form .
     grab set $Form
     raise $Form
     update

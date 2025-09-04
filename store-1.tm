@@ -8,7 +8,7 @@ package require misc
 package require sqlite3 3
 package require util
 
-const VERSION 1.6.2
+const VERSION 1.6.3
 
 oo::class create Store {
     variable Filename

@@ -3,7 +3,15 @@
 namespace eval gui_highlight {}
 
 proc gui_highlight::highlight_tcl txt {
-    ctext::addHighlightClassForRegexp $txt comment #666666 {#[^\n\r]*}
+    const DARK_GRAY #666666
+    const DARK_GREEN #228B22
+    const MID_GREEN #228B22
+    const GREEN #008800
+    const BROWN #80604D
+    const MID_BROWN #80604D 
+    const GOLD #888000
+    const BRIGHT_PURPLE #B400B4
+    ctext::addHighlightClassForRegexp $txt comment $DARK_GRAY {(?n)#.*}
     $txt tag configure comment -font MonoItalic
     ctext::addHighlightClass $txt cmd blue [list after append \
         array bgerror binary break buildinfo callback cd chan \
@@ -31,8 +39,8 @@ proc gui_highlight::highlight_tcl txt {
         tcl_startOfPreviousWord tcl_traceCompile tcl_traceExec \
         tcl_version tcl_wordBreakAfter tcl_wordBreakBefore tcl_wordchars \
         tcltest]
-    ctext::addHighlightClass $txt bools #228B22 [list true false on off \
-        yes no]
+    ctext::addHighlightClass $txt bools $DARK_GREEN [list true false on \
+        off yes no]
     ctext::addHighlightClass $txt proccmd darkcyan [list apply coroutine \
         proc return tailcall yield yieldto]
     $txt tag configure proccmd -font MonoBold
@@ -59,7 +67,7 @@ proc gui_highlight::highlight_tcl txt {
         ttk::scale ttk::scrollbar ttk::separator ttk::sizegrip \
         ttk::spinbox ttk::style ttk::treeview ttk::widget ttk_image winfo \
         wm]
-    ctext::addHighlightClass $txt flags #80604D [list -text -command \
+    ctext::addHighlightClass $txt flags $BROWN [list -text -command \
 	-yscrollcommand -xscrollcommand -background -foreground -fg -bg \
 	-highlightbackground -y -x -highlightcolor -relief -width -height \
 	-wrap -font -fill -side -outline -style -insertwidth -textvariable \
@@ -71,17 +79,55 @@ proc gui_highlight::highlight_tcl txt {
 	-row -column -cursor -highlightcolors -linemap -menu -tearoff \
 	-displayof -cursor -underline -tags -tag]
     ctext::addHighlightClassWithOnlyCharStart $txt vars purple "\$"
-    ctext::addHighlightClassForSpecialChars $txt special #008800 {[]{}:?;}
-    ctext::addHighlightClassForRegexp $txt const #228B22 {(?:const )[:\w]+}
+    ctext::addHighlightClassForSpecialChars $txt special $GREEN {[]{}:?;}
+    ctext::addHighlightClassForRegexp $txt const $MID_GREEN \
+        {(?:const )[:\w]+}
     ctext::addHighlightClass $txt constcmd navy [list const]
     $txt tag configure constcmd -font MonoBold
-    ctext::addHighlightClassForRegexp $txt simplestring #888000 {(?s)".*?"}
-    ctext::addHighlightClassForRegexp $txt number #B400B4 \
+    ctext::addHighlightClassForRegexp $txt simplestring $GOLD {(?s)".*?"}
+    ctext::addHighlightClassForRegexp $txt number $BRIGHT_PURPLE \
         {[-+]?\d+(\.\d+([Ee][-+]?\d+))?|0[xX][\dA-Fa-f]+|0[bB][01]+}
-    ctext::addHighlightClass $txt oo #80604D [list classmethod \
+    ctext::addHighlightClass $txt oo $MID_BROWN [list classmethod \
         constructor destructor export forward initialize initialise \
         method private self my superclass unexport myclass mymethod \
         oo::Slot oo::abstract oo::class oo::configurable oo::copy \
         oo::define oo::objdefine oo::object oo::singleton]
     $txt tag configure oo -font MonoBold
+    ctext::addHighlightClass $txt sql orange [list AFTER AND ALTER AS ASC \
+        BEFORE BEGIN BETWEEN BY CASE CHECK COLUMN CREATE DEFAULT DELETE \
+        DESC DISTINCT DROP EACH END EXISTS FOR FOREIGN FROM GROUP HAVING \
+        IF IN INDEX INSERT INTO IS JOIN KEY LIKE LIMIT NOT NULL ON OR \
+        ORDER PRIMARY REFERENCES RENAME REPLACE ROW SELECT SET TABLE TO \
+        TRIGGER UNION UNIQUE UPDATE VALUES VIEW WHEN WHERE WITH]
+}
+
+proc gui_highlight::highlight_sql txt {
+    const DARK_GRAY #666666
+    const BRIGHT_PURPLE #B400B4
+    const GOLD #888000
+    const GREEN #008800
+    ctext::addHighlightClassForRegexp $txt comment $DARK_GRAY {(?n)--.*}
+    $txt tag configure comment -font MonoItalic
+    ctext::addHighlightClass $txt cmd blue [list AFTER AND ALTER AS ASC \
+        BEFORE BEGIN BETWEEN BY CASE CHECK COLUMN CREATE DEFAULT DELETE \
+        DESC DISTINCT DROP EACH END EXISTS FOR FOREIGN FROM GROUP HAVING \
+        IF IN INDEX INSERT INTO IS JOIN KEY LIKE LIMIT NOT NULL ON OR \
+        ORDER PRIMARY REFERENCES RENAME REPLACE ROW SELECT SET TABLE TO \
+        TRIGGER UNION UNIQUE UPDATE VALUES VIEW WHEN WHERE WITH]
+    ctext::addHighlightClass $txt types navy [list INTEGER REAL BLOB \
+        TEXT BOOL DATE DATETIME]
+    ctext::addHighlightClass $txt meta brown [list PRAGMA]
+    ctext::addHighlightClass $txt bools darkgreen [list NULL TRUE FALSE]
+    ctext::addHighlightClassForRegexp $txt number $BRIGHT_PURPLE \
+        {[-+]?\d+(\.\d+([Ee][-+]?\d+))?|0[xX][\dA-Fa-f]+|0[bB][01]+}
+    ctext::addHighlightClassForRegexp $txt string $GOLD {'[^\n\r]*?'}
+    ctext::addHighlightClass $txt except red [list RAISE ABORT]
+    ctext::addHighlightClassForRegexp $txt op $GREEN \
+        {(?:=|!=|<|<=|>|>=)}
+    ctext::addHighlightClass $txt funcs darkcyan [list ABS CHANGES CHAR \
+        COALESCE CONCAT CONCAT_WS FORMAT GLOB HEX IFNULL IIF INSTR \
+        LAST_INSERT_ROWID LENGTH LIKELIHOOD LIKELY LOAD_EXTENSION LOWER \
+        LTRIM MAX MIN NULLIF OCTET_LENGTH PRINTF QUOTE RANDOM RANDOMBLOB \
+        ROUND RTRIM SIGN SOUNDEX SUBSTR SUBSTRING TRIM TYPEOF UNHEX \
+        UNLIKELY UPPER ZEROBLOB]
 }

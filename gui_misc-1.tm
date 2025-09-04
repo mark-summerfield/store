@@ -34,6 +34,7 @@ proc gui_misc::refresh_highlighting {txt ext} {
         ctext::clearHighlightClasses $txt
         switch $ext {
             .tcl - .tm { gui_highlight::highlight_tcl $txt }
+            .sql { gui_highlight::highlight_sql $txt }
         }
     }
 }

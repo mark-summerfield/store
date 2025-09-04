@@ -48,7 +48,6 @@ oo::define App method show {} {
 }
 
 oo::define App method prepare {} {
-    wm withdraw .
     wm title . [tk appname]
     wm iconname . [tk appname]
     wm iconphoto . -default [ui::icon store.svg]

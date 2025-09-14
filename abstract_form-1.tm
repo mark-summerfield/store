@@ -5,7 +5,9 @@ oo::abstract create AbstractForm { variable Form }
 oo::define AbstractForm constructor {form on_close {x 0} {y 0}} {
     set Form $form
     wm withdraw $Form
-    wm attributes $Form -type dialog
+    if {$::tcl_platform(platform) eq "unix"} {
+        wm attributes $Form -type dialog
+    }
     wm group $Form .
     set parent [winfo parent $Form]
     if {!($x && $y)} {

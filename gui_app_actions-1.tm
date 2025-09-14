@@ -81,14 +81,19 @@ oo::define App method on_open {} {
     }
 }
 
-oo::define App method on_add_file {} {
-    set filename [tk_getOpenFile -initialdir . \
+oo::define App method on_add_files {} {
+    set filenames [tk_getOpenFile -initialdir . -multiple true\
                  -title "[tk appname] — Choose a File to Add" -parent .]
-    if {$filename ne ""} {
+    set n [llength $filenames] 
+    if {$n} {
         set str [Store new $StoreFilename [callback set_status_info]]
         try {
-            $str add $filename
-            my set_status_info "added $filename" $::SHORT_WAIT
+            $str add {*}$filenames
+            if {$n == 1} {
+                my set_status_info "added $filenames" $::SHORT_WAIT
+            } else {
+                my set_status_info "added $n files" $::SHORT_WAIT
+            }
             my report_status
             my populate
         } finally {

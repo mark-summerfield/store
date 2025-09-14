@@ -83,7 +83,7 @@ oo::define App method on_open {} {
 
 oo::define App method on_add_files {} {
     set filenames [tk_getOpenFile -initialdir . -multiple true\
-                 -title "[tk appname] — Choose a File to Add" -parent .]
+                   -title "[tk appname] — Choose a File to Add" -parent .]
     set n [llength $filenames] 
     if {$n} {
         set str [Store new $StoreFilename [callback set_status_info]]

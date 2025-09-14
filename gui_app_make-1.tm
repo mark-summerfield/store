@@ -39,8 +39,8 @@ oo::define App method make_controls {} {
         -compound left -command [callback on_ignores] \
         -image [ui::icon document-properties.svg $::ICON_SIZE]
     $frame.moreButton.menu add separator
-    $frame.moreButton.menu add command -label "Add File…" -underline 0 \
-        -compound left -command [callback on_add_file] \
+    $frame.moreButton.menu add command -label "Add Files…" -underline 0 \
+        -compound left -command [callback on_add_files] \
         -image [ui::icon document-new.svg $::ICON_SIZE]
     $frame.moreButton.menu add separator
     $frame.moreButton.menu add command -label Restore… -underline 0 \

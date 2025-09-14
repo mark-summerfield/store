@@ -15,7 +15,7 @@ proc gui_highlight::highlight_tcl txt {
     $txt tag configure comment -font MonoItalic
     ctext::addHighlightClass $txt cmd blue [list after append \
         array bgerror binary break buildinfo callback cd chan \
-        classvariable clock close concat configure const continue \
+        classvariable clock close concat configure continue \
         cookiejar coroinject coroprobe dde dict encoding env \
         eof error errorCode errorInfo eval exec exit expr fblocked \
         fconfigure fcopy file fileevent flush for foreach foreachLine \

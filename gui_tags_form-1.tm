@@ -34,11 +34,11 @@ oo::define TagsForm method show {store_filename refresh} {
     set StoreFilename $store_filename
     set Refresh $refresh
     my populate $StoreFilename
-    my show_modal .tagsForm.tagEntry
+    my show_modal .tagsForm.frame.tagEntry
 }
 
 oo::define TagsForm method make_widgets {} {
-    set form .tagsForm
+    set form [ttk::frame .tagsForm.frame]
     ttk::label $form.showLabel -text "Show Generations"
     ttk::radiobutton $form.showAllRadio -text All -underline 0 \
         -value all -variable [my varname ShowWhich] \
@@ -74,7 +74,7 @@ oo::define TagsForm method make_widgets {} {
 
 oo::define TagsForm method make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
-    set form .tagsForm
+    set form .tagsForm.frame
     grid $form.showLabel -row 0 -column 0 -sticky w {*}$opts
     grid $form.showAllRadio -row 0 -column 1 -sticky w {*}$opts
     grid $form.showUntaggedRadio -row 0 -column 2 -sticky w {*}$opts
@@ -89,19 +89,20 @@ oo::define TagsForm method make_layout {} {
     grid $form.frame.saveButton -row 0 -column 0 {*}$opts
     grid $form.frame.untagButton -row 0 -column 1 {*}$opts
     grid $form.frame.closeButton -row 0 -column 2 {*}$opts
+    pack $form -fill both -expand 1
 }
 
 
 oo::define TagsForm method make_bindings {} {
-    bind .tagsForm.generationsCombobox <<ComboboxSelected>> \
+    bind .tagsForm.frame.generationsCombobox <<ComboboxSelected>> \
         [callback on_generation_changed]
-    bind .tagsForm <Alt-a> { .tagsForm.showAllRadio invoke }
+    bind .tagsForm <Alt-a> { .tagsForm.frame.showAllRadio invoke }
     bind .tagsForm <Alt-d> [callback on_untag]
-    bind .tagsForm <Alt-e> { .tagsForm.showTaggedRadio invoke }
-    bind .tagsForm <Alt-g> { focus .tagsForm.generationsCombobox }
+    bind .tagsForm <Alt-e> { .tagsForm.frame.showTaggedRadio invoke }
+    bind .tagsForm <Alt-g> { focus .tagsForm.frame.generationsCombobox }
     bind .tagsForm <Alt-s> [callback on_save]
-    bind .tagsForm <Alt-t> { focus .tagsForm.tagEntry }
-    bind .tagsForm <Alt-u> { .tagsForm.showUntaggedRadio invoke }
+    bind .tagsForm <Alt-t> { focus .tagsForm.frame.tagEntry }
+    bind .tagsForm <Alt-u> { .tagsForm.frame.showUntaggedRadio invoke }
     bind .tagsForm <Escape> [callback on_close]
 }
 
@@ -112,12 +113,12 @@ oo::define TagsForm method populate {{store_filename ""}} {
     set str [Store new $StoreFilename]
     try {
         set gids [$str gids $ShowWhich]
-        .tagsForm.generationsCombobox configure -values $gids
+        .tagsForm.frame.generationsCombobox configure -values $gids
         if {[llength $gids]} {
-            .tagsForm.generationsCombobox set [lindex $gids 0]
+            .tagsForm.frame.generationsCombobox set [lindex $gids 0]
         }
         lassign [util::n_s [llength $gids]] n s
-        .tagsForm.generationsLabel configure -text "Generation$s ($n):"
+        .tagsForm.frame.generationsLabel configure -text "Generation$s ($n):"
     } finally {
         $str destroy
     }
@@ -127,15 +128,15 @@ oo::define TagsForm method populate {{store_filename ""}} {
 oo::define TagsForm method on_show_changed {} { my populate }
 
 oo::define TagsForm method on_generation_changed {} {
-    set gid [.tagsForm.generationsCombobox get]
+    set gid [.tagsForm.frame.generationsCombobox get]
     set str [Store new $StoreFilename]
     try {
         set tag [$str tag $gid]
     } finally {
         $str destroy
     }
-    .tagsForm.tagEntry delete 0 end
-    if {$tag ne ""} { .tagsForm.tagEntry insert 0 $tag }
+    .tagsForm.frame.tagEntry delete 0 end
+    if {$tag ne ""} { .tagsForm.frame.tagEntry insert 0 $tag }
     set OldTag $tag
     my on_entry_changed
 }
@@ -144,25 +145,25 @@ oo::define TagsForm method on_tag_changed args { my on_entry_changed }
 
 oo::define TagsForm method on_entry_changed {} {
     if {$Tag ne ""} {
-        .tagsForm.frame.untagButton state !disabled
+        .tagsForm.frame.frame.untagButton state !disabled
     } else {
-        .tagsForm.frame.untagButton state disabled
+        .tagsForm.frame.frame.untagButton state disabled
     }
     if {[string is integer -strict $Tag]} {
-        .tagsForm.tagEntry configure -style TagInvalid.TEntry
-        .tagsForm.frame.saveButton state disabled
+        .tagsForm.frame.tagEntry configure -style TagInvalid.TEntry
+        .tagsForm.frame.frame.saveButton state disabled
     } elseif {$Tag eq $OldTag} {
-        .tagsForm.tagEntry configure -style TagSaved.TEntry
-        .tagsForm.frame.saveButton state disabled
+        .tagsForm.frame.tagEntry configure -style TagSaved.TEntry
+        .tagsForm.frame.frame.saveButton state disabled
     } else {
         set str [Store new $StoreFilename]
         try {
             if {[$str validtag $Tag]} {
-                .tagsForm.tagEntry configure -style TagUnsaved.TEntry
-                .tagsForm.frame.saveButton state !disabled
+                .tagsForm.frame.tagEntry configure -style TagUnsaved.TEntry
+                .tagsForm.frame.frame.saveButton state !disabled
             } else {
-                .tagsForm.tagEntry configure -style TagInvalid.TEntry
-                .tagsForm.frame.saveButton state disabled
+                .tagsForm.frame.tagEntry configure -style TagInvalid.TEntry
+                .tagsForm.frame.frame.saveButton state disabled
             }
         } finally {
             $str destroy
@@ -172,8 +173,8 @@ oo::define TagsForm method on_entry_changed {} {
 }
 
 oo::define TagsForm method on_save {} {
-    set gid [.tagsForm.generationsCombobox get]
-    set tag [.tagsForm.tagEntry get]
+    set gid [.tagsForm.frame.generationsCombobox get]
+    set tag [.tagsForm.frame.tagEntry get]
     set str [Store new $StoreFilename]
     try {
         $str tag $gid [expr {$tag eq "" ? "-" : $tag}]
@@ -185,8 +186,8 @@ oo::define TagsForm method on_save {} {
 }
 
 oo::define TagsForm method on_untag {} {
-    set gid [.tagsForm.generationsCombobox get]
-    .tagsForm.tagEntry delete 0 end
+    set gid [.tagsForm.frame.generationsCombobox get]
+    .tagsForm.frame.tagEntry delete 0 end
     set str [Store new $StoreFilename]
     try {
         $str tag $gid -

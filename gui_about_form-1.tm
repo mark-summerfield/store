@@ -14,7 +14,7 @@ oo::define AboutForm constructor user_version {
     my make_layout
     my make_bindings
     next .aboutForm [callback on_close]
-    my show_modal .aboutForm.closeBUtton
+    my show_modal .aboutForm.frame.closeButton
 }
 
 oo::define AboutForm method make_widgets user_version {
@@ -22,29 +22,34 @@ oo::define AboutForm method make_widgets user_version {
     wm title .aboutForm "[tk appname] — About"
     wm resizable .aboutForm false false
     set height 16
-    tk::text .aboutForm.text -width 50 -height $height -wrap word \
-        -background "#F0F0F0" -spacing3 $::VGAP
+    ttk::frame .aboutForm.frame
+    set background [ttk::style lookup TFrame -background]
+    tk::text .aboutForm.frame.text -width 50 -height $height \
+        -wrap word -spacing1 3 -spacing3 3 -relief flat \
+        -background $background
     my populate $user_version
-    .aboutForm.text configure -state disabled
-    ttk::button .aboutForm.closeBUtton -text Close -compound left \
-        -image [ui::icon close.svg $::ICON_SIZE] \
-        -command [callback on_close]
+    .aboutForm.frame.text configure -state disabled
+    ttk::button .aboutForm.frame.closeButton -text Close \
+        -compound left -command [callback on_close] \
+        -image [ui::icon close.svg $::ICON_SIZE]
 }
 
 oo::define AboutForm method make_layout {} {
-    grid .aboutForm.text -sticky nsew -pady $::PAD
-    grid .aboutForm.closeBUtton -pady $::PAD
+    grid .aboutForm.frame.text -sticky nsew -pady $::PAD
+    grid .aboutForm.frame.closeButton -pady $::PAD
+    pack .aboutForm.frame -fill both -expand true
 }
 
 oo::define AboutForm method make_bindings {} {
     bind .aboutForm <Escape> [callback on_close]
     bind .aboutForm <Return> [callback on_close]
-    .aboutForm.text tag bind url <Double-1> [callback on_click_url @%x,%y]
+    .aboutForm.frame.text tag bind url <Double-1> \
+        [callback on_click_url @%x,%y]
 }
 
 oo::define AboutForm method on_click_url index {
-    set indexes [.aboutForm.text tag prevrange url $index]
-    set url [string trim [.aboutForm.text get {*}$indexes]]
+    set indexes [.aboutForm.frame.text tag prevrange url $index]
+    set url [string trim [.aboutForm.frame.text get {*}$indexes]]
     if {$url ne ""} {
         if {![string match -nocase http*://* $url]} {
             set url [string cat http:// $url]
@@ -56,7 +61,7 @@ oo::define AboutForm method on_click_url index {
 oo::define AboutForm method on_close {} { my delete }
 
 oo::define AboutForm method populate user_version {
-    set txt .aboutForm.text
+    set txt .aboutForm.frame.text
     my add_text_tags $txt
     set img [$txt image create end -align center \
              -image [ui::icon store.svg 64]]
@@ -69,7 +74,7 @@ oo::define AboutForm method populate user_version {
     set year [clock format [clock seconds] -format %Y]
     if {$year > 2025} { set year "2025-[string range $year end-1 end]" }
     set bits [expr {8 * $::tcl_platform(wordSize)}]
-    set distro [exec lsb_release -ds]
+    catch { set distro [exec lsb_release -ds] }
     {*}$add "https://github.com/mark-summerfield/store\n" {center green url}
     {*}$add "Copyright © $year Mark Summerfield.\nAll Rights Reserved.\n" \
         {center green}
@@ -77,7 +82,7 @@ oo::define AboutForm method populate user_version {
     {*}$add "[string repeat " " 60]\n" {center hr}
     {*}$add "Tcl/Tk $::tcl_patchLevel (${bits}-bit)\n" center
     {*}$add "[db::sqlite_version] (.str $user_version)\n" center
-    if {$distro != ""} { {*}$add "$distro\n" center }
+    if {[info exists distro] && $distro != ""} { {*}$add "$distro\n" center }
     {*}$add "$::tcl_platform(os) $::tcl_platform(osVersion)\
         ($::tcl_platform(machine))\n" center
 }
@@ -95,5 +100,5 @@ oo::define AboutForm method add_text_tags txt {
     {*}$cmd bold -font bold
     {*}$cmd italic -font italic
     {*}$cmd url -underline true -underlinefg darkgreen
-    {*}$cmd hr -overstrike true -overstrikefg lightgray -spacing3 10
+    {*}$cmd hr -overstrike true -overstrikefg gray67 -spacing3 10
 }

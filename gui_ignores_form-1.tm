@@ -44,11 +44,10 @@ oo::define IgnoresForm method on_show {} {
 oo::define IgnoresForm method make_widgets {} {
     set frame [ttk::frame .ignoresForm.ignoresListFrame]
     set name ignoresList
+    ttk::style configure List.Treeview.Item -indicatorsize 0
     set ignoresList [ttk::treeview $frame.$name -striped true -show tree \
-        -selectmode browse]
+        -selectmode browse -style List.Treeview]
     ui::scrollize $frame $name vertical
-    ttk::style configure List.Treeview.Item -indicatorsize 0 \
-        -style List.Treeview
     $ignoresList column #0 -anchor w -stretch true
     ttk::frame .ignoresForm.controlsFrame
     ttk::button .ignoresForm.controlsFrame.addButton -text Add: \

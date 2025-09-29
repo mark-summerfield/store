@@ -6,7 +6,6 @@ package require ui
 package require util
 
 oo::class create App {
-    variable Cfg
     variable ShowOptions
     variable ShowState
     variable ShowAll
@@ -25,8 +24,7 @@ oo::class create App {
     variable StatusSizeLabel
 }
 
-oo::define App constructor cfg {
-    set Cfg $cfg
+oo::define App constructor {} {
     set ShowOptions true
     set ShowState asis
     set ShowAll false
@@ -52,7 +50,8 @@ oo::define App method prepare {} {
     wm iconname . [tk appname]
     wm iconphoto . -default [ui::icon store.svg]
     wm minsize . 640 480
-    wm geometry . [$Cfg geometry]
+    set config [Config new]
+    wm geometry . [$config geometry]
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
 

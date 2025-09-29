@@ -334,14 +334,15 @@ oo::define App method on_find {} {
 
 oo::define App method on_config {} {
     set ok [Ref new false]
-    set fontfamily [$Cfg fontfamily]
-    set fontsize [$Cfg fontsize]
-    set form [ConfigForm new $ok $Cfg]
+    set config [Config new]
+    set fontfamily [$config fontfamily]
+    set fontsize [$config fontsize]
+    set form [ConfigForm new $ok]
     tkwait window [$form form]
     if {[$ok get]} {
-        if {$fontfamily ne [$Cfg fontfamily] || \
-                $fontsize != [$Cfg fontsize]} {
-            gui::make_fonts [$Cfg fontfamily] [$Cfg fontsize]
+        if {$fontfamily ne [$config fontfamily] || \
+                $fontsize != [$config fontsize]} {
+            gui::make_fonts [$config fontfamily] [$config fontsize]
         }
     }
 }
@@ -360,6 +361,7 @@ oo::define App method on_about {} {
 }
 
 oo::define App method on_quit {} {
-    $Cfg save
+    set config [Config new]
+    $config save
     exit
 }

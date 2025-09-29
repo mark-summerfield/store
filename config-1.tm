@@ -4,7 +4,7 @@ package require inifile
 package require util
 
 # Also handles tk scaling
-oo::class create Config {
+oo::singleton create Config {
     variable Filename
     variable Blinking
     variable Geometry

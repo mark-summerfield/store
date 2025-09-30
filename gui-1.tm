@@ -14,7 +14,7 @@ namespace eval gui {}
 proc gui::main {} {
     ui::wishinit
     tk appname Store
-    set config [Config load]
+    set config [Config new]
     make_fonts [$config fontfamily] [$config fontsize]
     set app [App new]
     $app show

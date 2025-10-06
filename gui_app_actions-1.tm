@@ -1,8 +1,8 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require about_form
 package require config_form
 package require fileutil 1
-package require gui_about_form
 package require gui_actions
 package require gui_add_form
 package require gui_ignores_form
@@ -357,7 +357,9 @@ oo::define App method on_about {} {
             $str destroy
         }
     }
-    AboutForm new $user_version
+    AboutForm new "An easy-to-use alternative to a version control\
+        system.\nStore format $user_version (.str)" \
+        https://github.com/mark-summerfield/store
 }
 
 oo::define App method on_quit {} {

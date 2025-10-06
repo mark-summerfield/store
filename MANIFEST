@@ -13,12 +13,12 @@ gui_actions-1.tm
 gui_add_form-1.tm
 gui_ignores_form-1.tm
 gui_tags_form-1.tm
-gui_about_form-1.tm
 gui_misc-1.tm
 gui_highlight-1.tm
 gui_globals-1.tm
 config-1.tm
 config_form-1.tm
+about_form-1.tm
 
 store-1.tm # VERSION
 filedata-1.tm

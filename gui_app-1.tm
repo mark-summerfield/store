@@ -48,7 +48,7 @@ oo::define App method show {} {
 oo::define App method prepare {} {
     wm title . [tk appname]
     wm iconname . [tk appname]
-    wm iconphoto . -default [ui::icon store.svg]
+    wm iconphoto . -default [ui::icon icon.svg]
     wm minsize . 640 480
     set config [Config new]
     wm geometry . [$config geometry]

@@ -1,6 +1,8 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require gui_actions
+package require gui_globals
+package require gui_misc
 package require lambda 1
 package require ui
 package require util
@@ -23,6 +25,9 @@ oo::class create App {
     variable StatusCleanableLabel
     variable StatusSizeLabel
 }
+
+package require gui_app_actions
+package require gui_app_make
 
 oo::define App constructor {} {
     set ShowOptions true

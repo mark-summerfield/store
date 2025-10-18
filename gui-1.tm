@@ -2,10 +2,6 @@
 
 package require config
 package require gui_app
-package require gui_app_actions
-package require gui_app_make
-package require gui_globals
-package require gui_misc
 package require inifile
 package require ui
 

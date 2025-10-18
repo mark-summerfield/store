@@ -28,7 +28,7 @@ proc test1 {} {
             set ok false
         }
         if {[$str filename] ne $filename} {
-            puts "FAIL: expected \"$filename\"; got \"[str filename]\""
+            puts "FAIL: expected \"$filename\"; got \"[$str filename]\""
             set ok false
         }
     } finally {

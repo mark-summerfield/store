@@ -118,7 +118,8 @@ oo::define TagsForm method populate {{store_filename ""}} {
             .tagsForm.frame.generationsCombobox set [lindex $gids 0]
         }
         lassign [util::n_s [llength $gids]] n s
-        .tagsForm.frame.generationsLabel configure -text "Generation$s ($n):"
+        .tagsForm.frame.generationsLabel configure \
+            -text "Generation$s ($n):"
     } finally {
         $str destroy
     }

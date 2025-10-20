@@ -8,7 +8,7 @@ package require misc
 package require sqlite3 3
 package require util
 
-const VERSION 1.7.0
+const VERSION 1.7.1
 
 oo::class create Store {
     variable Filename
@@ -261,8 +261,10 @@ oo::define Store method clean {} {
     {*}$Reporter "cleaned $nf file$ns in $gf generation$gs"
 }
 
+# the current generation—even if empy—is never cleanable
 oo::define Store method needs_clean {} {
-    $Db eval {SELECT COUNT(*) FROM EmptyGenerations;}
+    $Db eval {SELECT COUNT(*) FROM EmptyGenerations
+                WHERE gid NOT IN CurrentGeneration;}
 }
 
 oo::define Store method untracked {{filename ""}} {

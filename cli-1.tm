@@ -45,7 +45,8 @@ proc cli::main {} {
         U - unignore { cli_actions::unignore $reporter $storefile $rest }
         u - update { cli_actions::update $reporter $storefile $rest }
         untag { cli_actions::untag $reporter $storefile $rest }
-        v - version - -v - --version { version }
+        v - version - -v - --version { cli_actions::version $reporter \
+                                       $storefile $rest }
         default {
             if {$command ne ""} {
                 cli_misc::warn "unrecognized command: \"$command\""
@@ -70,11 +71,6 @@ proc cli::get_reporter rest {
         }
     }
     list $rest $reporter
-}
-
-proc cli::version {} {
-    cli_misc::info "str v$::VERSION"
-    exit 2
 }
 
 proc cli::usage {} {

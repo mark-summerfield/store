@@ -348,17 +348,16 @@ oo::define App method on_config {} {
 }
 
 oo::define App method on_about {} {
-    set user_version ?
+    set ::VERSION ""
     if {$StoreFilename ne ""} {
         set str [Store new $StoreFilename [callback set_status_info]]
         try {
-            set user_version [$str version]
+            set ::VERSION [$str version]
         } finally {
             $str destroy
         }
     }
-    AboutForm new "An easy-to-use alternative to a version control\
-        system.\nStore format $user_version (.str)" \
+    AboutForm new "An easy-to-use alternative to a version control system" \
         https://github.com/mark-summerfield/store
 }
 

@@ -8,12 +8,16 @@ package require misc
 package require sqlite3 3
 package require util
 
-const VERSION 1.7.1
-
 oo::class create Store {
     variable Filename
     variable Db
     variable Reporter
+}
+
+oo::define Store initialize {
+    variable VERSION
+
+    const VERSION 1.7.1
 }
 
 # creates database if it doesn't exist; sets reporter to ignore messages
@@ -49,7 +53,10 @@ oo::define Store destructor {
 
 oo::define Store method filename {} { return $Filename }
 
-oo::define Store method version {} { $Db eval {PRAGMA USER_VERSION} }
+oo::define Store method version {} {
+    classvariable VERSION
+    return "${VERSION}#[$Db eval {PRAGMA USER_VERSION}]"
+}
 
 oo::define Store method current_generation {} {
     $Db eval {SELECT gid FROM CurrentGeneration}

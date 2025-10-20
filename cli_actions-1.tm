@@ -349,6 +349,16 @@ proc cli_actions::purge {reporter storefile rest} {
     }
 }
 
+proc cli_actions::version {reporter storefile rest} {
+    lassign [GidStoreAndRest $reporter $storefile $rest] _ str _
+    try {
+        cli_misc::info "str v [$str version]"
+    } finally {
+        $str destroy
+    }
+    exit 2
+}
+
 proc cli_actions::GidStoreAndRest {reporter storefile rest} {
     set str [Store new $storefile $reporter]
     lassign [GidAndRest $str $rest] gid rest

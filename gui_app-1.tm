@@ -7,7 +7,7 @@ package require lambda 1
 package require ui
 package require util
 
-oo::class create App {
+oo::singleton create App {
     variable ShowOptions
     variable ShowState
     variable ShowAll

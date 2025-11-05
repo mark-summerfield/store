@@ -78,12 +78,12 @@ proc cli_actions::status {reporter storefile rest} {
                     {*}[lmap name $names {expr {"  $name"}}]
             }
         } elseif {$::VERBOSE} {
-            lappend no_messages "no updates needed"
+            lappend no_messages "up to date"
         }
         if {$::VERBOSE && [$str needs_clean]} {
             lappend yes_messages "clean needed"
         } elseif {$::VERBOSE} {
-            lappend no_messages "no clean needed"
+            lappend no_messages "clean"
         }
         if {[llength $yes_messages]} {
             cli_misc::info [join $yes_messages "\n"] true

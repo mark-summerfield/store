@@ -1,5 +1,4 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
-################################################################
 
 proc bool_to_str b {expr {$b ? true : false}}
 
@@ -82,7 +81,7 @@ proc util::get_ini_filename {} {
     lindex $names $index
 }
 
-proc util::open_webpage url {
+proc util::open_url url {
     if {[tk windowingsystem] eq "win32"} {
         set cmd [list {*}[auto_execok start] {}]
     } else {

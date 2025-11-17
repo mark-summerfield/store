@@ -34,11 +34,11 @@ oo::define TagsForm method show {store_filename refresh} {
     set StoreFilename $store_filename
     set Refresh $refresh
     my populate $StoreFilename
-    my show_modal .tagsForm.frame.tagEntry
+    my show_modal .tagsForm.mf.tagEntry
 }
 
 oo::define TagsForm method make_widgets {} {
-    set form [ttk::frame .tagsForm.frame]
+    set form [ttk::frame .tagsForm.mf]
     ttk::label $form.showLabel -text "Show Generations"
     ttk::radiobutton $form.showAllRadio -text All -underline 0 \
         -value all -variable [my varname ShowWhich] \
@@ -52,6 +52,7 @@ oo::define TagsForm method make_widgets {} {
     ttk::label $form.generationsLabel -text Generation: -underline 0
     ttk::label $form.atLabel -text @ 
     ttk::combobox $form.generationsCombobox
+    ui::apply_edit_bindings $form.generationsCombobox
     ttk::label $form.tagLabel -text Tag: -underline 0
     ttk::style configure TagSaved.TEntry -fieldbackground white
     ttk::style configure TagUnsaved.TEntry -fieldbackground #FFDDE2
@@ -59,14 +60,15 @@ oo::define TagsForm method make_widgets {} {
         -foreground red
     ttk::entry $form.tagEntry -textvariable [my varname Tag] \
         -style TagSaved.TEntry
-    ttk::frame $form.frame
-    ttk::button $form.frame.saveButton -text "Save Tag" -underline 0 \
+    ui::apply_edit_bindings $form.tagEntry
+    ttk::frame $form.mf
+    ttk::button $form.mf.saveButton -text "Save Tag" -underline 0 \
         -compound left -image [ui::icon document-save.svg $::ICON_SIZE] \
         -command [callback on_save]
-    ttk::button $form.frame.untagButton -text "Delete Tag" -underline 0 \
+    ttk::button $form.mf.untagButton -text "Delete Tag" -underline 0 \
         -compound left -image [ui::icon edit-cut.svg $::ICON_SIZE] \
         -command [callback on_untag]
-    ttk::button $form.frame.closeButton -text Close \
+    ttk::button $form.mf.closeButton -text Close \
         -compound left -image [ui::icon close.svg $::ICON_SIZE] \
         -command [callback on_close]
 }
@@ -74,7 +76,7 @@ oo::define TagsForm method make_widgets {} {
 
 oo::define TagsForm method make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
-    set form .tagsForm.frame
+    set form .tagsForm.mf
     grid $form.showLabel -row 0 -column 0 -sticky w {*}$opts
     grid $form.showAllRadio -row 0 -column 1 -sticky w {*}$opts
     grid $form.showUntaggedRadio -row 0 -column 2 -sticky w {*}$opts
@@ -85,24 +87,24 @@ oo::define TagsForm method make_layout {} {
         -sticky we {*}$opts
     grid $form.tagLabel -row 2 -column 0 -columnspan 2 -sticky w {*}$opts
     grid $form.tagEntry -row 2 -column 2 -columnspan 3 -sticky we {*}$opts
-    grid $form.frame -row 3 -column 0 -columnspan 4
-    grid $form.frame.saveButton -row 0 -column 0 {*}$opts
-    grid $form.frame.untagButton -row 0 -column 1 {*}$opts
-    grid $form.frame.closeButton -row 0 -column 2 {*}$opts
+    grid $form.mf -row 3 -column 0 -columnspan 4
+    grid $form.mf.saveButton -row 0 -column 0 {*}$opts
+    grid $form.mf.untagButton -row 0 -column 1 {*}$opts
+    grid $form.mf.closeButton -row 0 -column 2 {*}$opts
     pack $form -fill both -expand 1
 }
 
 
 oo::define TagsForm method make_bindings {} {
-    bind .tagsForm.frame.generationsCombobox <<ComboboxSelected>> \
+    bind .tagsForm.mf.generationsCombobox <<ComboboxSelected>> \
         [callback on_generation_changed]
-    bind .tagsForm <Alt-a> { .tagsForm.frame.showAllRadio invoke }
+    bind .tagsForm <Alt-a> { .tagsForm.mf.showAllRadio invoke }
     bind .tagsForm <Alt-d> [callback on_untag]
-    bind .tagsForm <Alt-e> { .tagsForm.frame.showTaggedRadio invoke }
-    bind .tagsForm <Alt-g> { focus .tagsForm.frame.generationsCombobox }
+    bind .tagsForm <Alt-e> { .tagsForm.mf.showTaggedRadio invoke }
+    bind .tagsForm <Alt-g> { focus .tagsForm.mf.generationsCombobox }
     bind .tagsForm <Alt-s> [callback on_save]
-    bind .tagsForm <Alt-t> { focus .tagsForm.frame.tagEntry }
-    bind .tagsForm <Alt-u> { .tagsForm.frame.showUntaggedRadio invoke }
+    bind .tagsForm <Alt-t> { focus .tagsForm.mf.tagEntry }
+    bind .tagsForm <Alt-u> { .tagsForm.mf.showUntaggedRadio invoke }
     bind .tagsForm <Escape> [callback on_close]
 }
 
@@ -113,12 +115,12 @@ oo::define TagsForm method populate {{store_filename ""}} {
     set str [Store new $StoreFilename]
     try {
         set gids [$str gids $ShowWhich]
-        .tagsForm.frame.generationsCombobox configure -values $gids
+        .tagsForm.mf.generationsCombobox configure -values $gids
         if {[llength $gids]} {
-            .tagsForm.frame.generationsCombobox set [lindex $gids 0]
+            .tagsForm.mf.generationsCombobox set [lindex $gids 0]
         }
         lassign [util::n_s [llength $gids]] n s
-        .tagsForm.frame.generationsLabel configure \
+        .tagsForm.mf.generationsLabel configure \
             -text "Generation$s ($n):"
     } finally {
         $str destroy
@@ -129,15 +131,15 @@ oo::define TagsForm method populate {{store_filename ""}} {
 oo::define TagsForm method on_show_changed {} { my populate }
 
 oo::define TagsForm method on_generation_changed {} {
-    set gid [.tagsForm.frame.generationsCombobox get]
+    set gid [.tagsForm.mf.generationsCombobox get]
     set str [Store new $StoreFilename]
     try {
         set tag [$str tag $gid]
     } finally {
         $str destroy
     }
-    .tagsForm.frame.tagEntry delete 0 end
-    if {$tag ne ""} { .tagsForm.frame.tagEntry insert 0 $tag }
+    .tagsForm.mf.tagEntry delete 0 end
+    if {$tag ne ""} { .tagsForm.mf.tagEntry insert 0 $tag }
     set OldTag $tag
     my on_entry_changed
 }
@@ -146,25 +148,25 @@ oo::define TagsForm method on_tag_changed args { my on_entry_changed }
 
 oo::define TagsForm method on_entry_changed {} {
     if {$Tag ne ""} {
-        .tagsForm.frame.frame.untagButton state !disabled
+        .tagsForm.mf.mf.untagButton state !disabled
     } else {
-        .tagsForm.frame.frame.untagButton state disabled
+        .tagsForm.mf.mf.untagButton state disabled
     }
     if {[string is integer -strict $Tag]} {
-        .tagsForm.frame.tagEntry configure -style TagInvalid.TEntry
-        .tagsForm.frame.frame.saveButton state disabled
+        .tagsForm.mf.tagEntry configure -style TagInvalid.TEntry
+        .tagsForm.mf.mf.saveButton state disabled
     } elseif {$Tag eq $OldTag} {
-        .tagsForm.frame.tagEntry configure -style TagSaved.TEntry
-        .tagsForm.frame.frame.saveButton state disabled
+        .tagsForm.mf.tagEntry configure -style TagSaved.TEntry
+        .tagsForm.mf.mf.saveButton state disabled
     } else {
         set str [Store new $StoreFilename]
         try {
             if {[$str validtag $Tag]} {
-                .tagsForm.frame.tagEntry configure -style TagUnsaved.TEntry
-                .tagsForm.frame.frame.saveButton state !disabled
+                .tagsForm.mf.tagEntry configure -style TagUnsaved.TEntry
+                .tagsForm.mf.mf.saveButton state !disabled
             } else {
-                .tagsForm.frame.tagEntry configure -style TagInvalid.TEntry
-                .tagsForm.frame.frame.saveButton state disabled
+                .tagsForm.mf.tagEntry configure -style TagInvalid.TEntry
+                .tagsForm.mf.mf.saveButton state disabled
             }
         } finally {
             $str destroy
@@ -174,8 +176,8 @@ oo::define TagsForm method on_entry_changed {} {
 }
 
 oo::define TagsForm method on_save {} {
-    set gid [.tagsForm.frame.generationsCombobox get]
-    set tag [.tagsForm.frame.tagEntry get]
+    set gid [.tagsForm.mf.generationsCombobox get]
+    set tag [.tagsForm.mf.tagEntry get]
     set str [Store new $StoreFilename]
     try {
         $str tag $gid [expr {$tag eq "" ? "-" : $tag}]
@@ -187,8 +189,8 @@ oo::define TagsForm method on_save {} {
 }
 
 oo::define TagsForm method on_untag {} {
-    set gid [.tagsForm.frame.generationsCombobox get]
-    .tagsForm.frame.tagEntry delete 0 end
+    set gid [.tagsForm.mf.generationsCombobox get]
+    .tagsForm.mf.tagEntry delete 0 end
     set str [Store new $StoreFilename]
     try {
         $str tag $gid -

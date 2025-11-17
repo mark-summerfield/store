@@ -42,18 +42,19 @@ oo::define IgnoresForm method on_show {} {
 }
 
 oo::define IgnoresForm method make_widgets {} {
-    set frame [ttk::frame .ignoresForm.ignoresListFrame]
+    set frm [ttk::frame .ignoresForm.ignoresListFrame]
     set name ignoresList
     ttk::style configure List.Treeview.Item -indicatorsize 0
-    set ignoresList [ttk::treeview $frame.$name -striped true -show tree \
+    set ignoresList [ttk::treeview $frm.$name -striped true -show tree \
         -selectmode browse -style List.Treeview]
-    ui::scrollize $frame $name vertical
+    ui::scrollize $frm $name vertical
     $ignoresList column #0 -anchor w -stretch true
     ttk::frame .ignoresForm.controlsFrame
     ttk::button .ignoresForm.controlsFrame.addButton -text Add: \
         -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \
         -command [callback on_add] -underline 0
     ttk::entry .ignoresForm.controlsFrame.addEntry -width 12
+    ui::apply_edit_bindings .ignoresForm.controlsFrame.addEntry
     ttk::button .ignoresForm.controlsFrame.deleteButton -text Delete \
         -compound left -image [ui::icon list-remove.svg $::ICON_SIZE] \
         -command [callback on_delete] -underline 0
@@ -66,19 +67,19 @@ oo::define IgnoresForm method make_widgets {} {
 oo::define IgnoresForm method make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
     set form .ignoresForm
-    set frame $form.ignoresListFrame
-    grid $frame -row 0 -column 0 -sticky news
-    grid $frame.ignoresList -row 0 -column 0 -sticky news
-    grid $frame.scrolly -row 0 -column 1 -sticky ns
-    grid columnconfigure $frame 0 -weight 9
-    grid rowconfigure $frame 0 -weight 1
-    autoscroll::autoscroll $frame.scrolly
-    set frame $form.controlsFrame
-    grid $frame -row 0 -column 1 -sticky ns
-    pack $frame.addButton -side top {*}$opts
-    pack $frame.addEntry -side top -fill x {*}$opts
-    pack $frame.deleteButton -side top {*}$opts
-    pack $frame.closeButton -side bottom {*}$opts
+    set frm $form.ignoresListFrame
+    grid $frm -row 0 -column 0 -sticky news
+    grid $frm.ignoresList -row 0 -column 0 -sticky news
+    grid $frm.scrolly -row 0 -column 1 -sticky ns
+    grid columnconfigure $frm 0 -weight 9
+    grid rowconfigure $frm 0 -weight 1
+    autoscroll::autoscroll $frm.scrolly
+    set frm $form.controlsFrame
+    grid $frm -row 0 -column 1 -sticky ns
+    pack $frm.addButton -side top {*}$opts
+    pack $frm.addEntry -side top -fill x {*}$opts
+    pack $frm.deleteButton -side top {*}$opts
+    pack $frm.closeButton -side bottom {*}$opts
     grid rowconfigure $form 0 -weight 1
     grid columnconfigure $form 0 -weight 1
 }

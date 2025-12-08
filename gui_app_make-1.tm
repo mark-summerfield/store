@@ -140,9 +140,11 @@ oo::define App method make_tabs {} {
 oo::define App method make_files_tree {} {
     set frm [ttk::frame .panes.tabs.filenameTreeFrame]
     set name filenameTree
-    set FilenameTree [ttk::treeview $frm.$name -show tree \
+    set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
+    set FilenameTree [ttk::treeview $frm.sa.$name -show tree \
         -selectmode browse]
-    ui::scrollize $frm $name vertical
+    $sa setwidget $FilenameTree
+    pack $sa -fill both -expand 1
     gui_misc::set_tree_tags $FilenameTree
     return $frm
 }
@@ -150,9 +152,11 @@ oo::define App method make_files_tree {} {
 oo::define App method make_generations_tree {} {
     set frm [ttk::frame .panes.tabs.generationTreeFrame]
     set name generationTree
-    set GenerationTree [ttk::treeview $frm.$name \
+    set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
+    set GenerationTree [ttk::treeview $frm.sa.$name \
         -columns {Created Message}]
-    ui::scrollize $frm $name both
+    $sa setwidget $GenerationTree
+    pack $sa -fill both -expand 1
     $GenerationTree configure -show tree -selectmode browse
     $GenerationTree column #0 -stretch false
     $GenerationTree column 0 -stretch false

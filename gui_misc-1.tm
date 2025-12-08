@@ -4,6 +4,7 @@ package require autoscroll 1
 package require ctext 3
 package require gui_highlight
 package require ntext 1
+package require scrollutil_tile 2
 package require ui
 
 namespace eval gui_misc {
@@ -11,14 +12,16 @@ namespace eval gui_misc {
 }
 
 proc gui_misc::make_text_frame {} {
-    set frame [ttk::frame .textFrame]
+    set tf [ttk::frame .textFrame]
     set name text
-    set txt [ctext $frame.$name -wrap none -undo true -font Mono \
+    set sa [scrollutil::scrollarea $tf.sa]
+    set txt [ctext $tf.sa.$name -wrap none -undo true -font Mono \
              -linemapbg gray90]
-    ui::scrollize $frame $name both
+    $sa setwidget $txt
+    pack $sa -fill both -expand 1
     bindtags $txt {$txt Ntext . all}
     $txt tag configure sel -selectbackground yellow
-    list $frame $txt
+    list $tf $txt
 }
 
 proc gui_misc::set_tree_tags tree {

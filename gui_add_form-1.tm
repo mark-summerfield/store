@@ -10,6 +10,7 @@ oo::singleton create AddForm {
 
     variable Refresh
     variable StoreFilename
+    variable AddList
 }
 
 oo::define AddForm constructor {} {
@@ -26,17 +27,18 @@ oo::define AddForm method show {store_filename refresh names} {
     set StoreFilename $store_filename
     set Refresh $refresh
     my populate $StoreFilename $names
-    my show_modal .addForm.addListFrame.addList
+    my show_modal $AddList
 }
 
 oo::define AddForm method make_widgets {} {
-    set frame [ttk::frame .addForm.addListFrame]
-    set name addList
-    set addList [ttk::treeview $frame.$name -striped true]
-    ui::scrollize $frame $name vertical
+    set frm [ttk::frame .addForm.addListFrame]
+    set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
+    set AddList [ttk::treeview $frm.sa.addList -striped true]
+    $sa setwidget $AddList
+    pack $sa -fill both -expand 1
     ttk::style configure List.Treeview.Item -indicatorsize 0
-    $addList configure -show tree -style List.Treeview
-    $addList column #0 -anchor w -stretch true
+    $AddList configure -show tree -style List.Treeview
+    $AddList column #0 -anchor w -stretch true
     ttk::frame .addForm.controlsFrame
     set width 9
     set wrap [expr {(3 + $width) * [font measure TkDefaultFont X]}]
@@ -54,12 +56,9 @@ oo::define AddForm method make_widgets {} {
 oo::define AddForm method make_layout {} {
     set opts "-padx $::PAD -pady $::PAD"
     grid .addForm.addListFrame -row 0 -column 0 -sticky news
-    grid .addForm.addListFrame.addList -row 0 -column 0 \
-        -sticky news
-    grid .addForm.addListFrame.scrolly -row 0 -column 1 -sticky ns
+    grid .addForm.addListFrame.sa -row 0 -column 0 -sticky news
     grid columnconfigure .addForm.addListFrame 0 -weight 9
     grid rowconfigure .addForm.addListFrame 0 -weight 1
-    autoscroll::autoscroll .addForm.addListFrame.scrolly
     grid .addForm.controlsFrame -row 0 -column 1 -sticky ns
     pack .addForm.controlsFrame.addButton -side top {*}$opts
     pack .addForm.controlsFrame.addLabel -side top -fill both {*}$opts
@@ -77,8 +76,7 @@ oo::define AddForm method populate {{store_filename ""} {names ""}} {
     if {$store_filename ne ""} {
         set StoreFilename $store_filename
     }
-    set addList .addForm.addListFrame.addList
-    $addList delete [$addList children {}]
+    $AddList delete [$AddList children {}]
     if {![llength $names]} {
         set str [Store new $StoreFilename]
         try {
@@ -88,23 +86,22 @@ oo::define AddForm method populate {{store_filename ""} {names ""}} {
         }
     }
     foreach name $names {
-        set id [$addList insert {} end -text $name]
-        $addList selection add $id
+        set id [$AddList insert {} end -text $name]
+        $AddList selection add $id
     }
 }
 
 oo::define AddForm method on_add {} {
-    set addList .addForm.addListFrame.addList
     set seen [dict create]
     set addable [list]
-    foreach id [$addList selection] {
-        set name [$addList item $id -text]
+    foreach id [$AddList selection] {
+        set name [$AddList item $id -text]
         lappend addable $name
         dict set seen $name ""
     }
     set ignores [list]
-    foreach id [$addList children {}] {
-        set name [$addList item $id -text]
+    foreach id [$AddList children {}] {
+        set name [$AddList item $id -text]
         if {![dict exists $seen $name]} {
             lappend ignores $name
         }

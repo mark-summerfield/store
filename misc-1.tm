@@ -4,9 +4,9 @@ namespace eval misc {}
 
 proc misc::ignore {filename ignores} {
     foreach pattern $ignores {
-        if {[string match $pattern $filename]} { return true }
+        if {[string match $pattern $filename]} { return 1 }
     }
-    return false
+    return 0
 }
 
 proc misc::valid_file name {

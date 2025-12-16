@@ -68,7 +68,7 @@ oo::define App method on_generations_tab {} {
 oo::define App method on_open {} {
     set dirname [tk_chooseDirectory -initialdir . \
                  -title "[tk appname] — Choose Store Folder to Open" \
-                 -mustexist true -parent .]
+                 -mustexist 1 -parent .]
     if {$dirname ne ""} {
         cd $dirname
         set StoreFilename [file normalize .[file tail $dirname].str]
@@ -82,7 +82,7 @@ oo::define App method on_open {} {
 }
 
 oo::define App method on_add_files {} {
-    set filenames [tk_getOpenFile -initialdir . -multiple true \
+    set filenames [tk_getOpenFile -initialdir . -multiple 1 \
                    -title "[tk appname] — Choose a File to Add" -parent .]
     set n [llength $filenames] 
     if {$n} {
@@ -155,7 +155,7 @@ oo::define App method on_copy_to {} {
         if {$gid} {
             set dirname [tk_chooseDirectory -initialdir . \
                          -title "[tk appname] — Choose Folder to Copy To" \
-                         -mustexist false -parent .]
+                         -mustexist 0 -parent .]
             if {$dirname ne ""} {
                 $str copy $gid $dirname
                 my set_status_info "copied @$gid to $dirname" $::SHORT_WAIT
@@ -284,7 +284,7 @@ oo::define App method on_show_all {} {
     if {$ShowState eq "asis"} {
         if {$ShowAll} {
             foreach item [$FilenameTree children {}] {
-                $FilenameTree item $item -hidden false
+                $FilenameTree item $item -hidden 0
             }
         } else {
             foreach item [$FilenameTree children {}] {
@@ -333,7 +333,7 @@ oo::define App method on_find {} {
 }
 
 oo::define App method on_config {} {
-    set ok [Ref new false]
+    set ok [Ref new 0]
     set config [Config new]
     set fontfamily [$config fontfamily]
     set fontsize [$config fontsize]

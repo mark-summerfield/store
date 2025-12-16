@@ -92,7 +92,7 @@ oo::define Store method update {tag} {
 # returns whether the given tag is valid: not an integer & unique
 oo::define Store method validtag {tag} {
     if {[string is integer -strict $tag]} {
-        return false
+        return 0
     }
     expr {![llength [$Db eval {SELECT gid FROM Generations
                                 WHERE tag = :tag LIMIT 1}]]}
@@ -231,7 +231,7 @@ oo::define Store method gids {{filter all}} {
 }
 
 # lists all generations (gid, created) or full (gid, created, tag)
-oo::define Store method generations {{full false}} {
+oo::define Store method generations {{full 0}} {
     if {$full} {
         return [$Db eval {SELECT gid, created, tag, filename
                           FROM HistoryByGeneration}]
@@ -246,7 +246,7 @@ oo::define Store method filenames {{gid 0}} {
               ORDER BY LOWER(filename)}
 }
 
-# returns true if the filename is in the current generation; otherwise false
+# returns 1 if the filename is in the current generation; otherwise 0
 oo::define Store method is_current {filename} {
     set gid [my current_generation]
     $Db eval {SELECT EXISTS(SELECT filename FROM Files WHERE gid = :gid
@@ -403,18 +403,18 @@ oo::define Store method PrepareTarget {action gid filename} {
 
 oo::define Store method is_same_on_disk {filename} {
     if {![file exists $filename]} {
-        return false ;# not on disk
+        return 0 ;# not on disk
     }
     $Db transaction {
         set gid [$Db eval {SELECT gid FROM CurrentGeneration}]
         set dgid [my find_data_gid $gid $filename]
         if {!$dgid} {
-            return false ;# not in store
+            return 0 ;# not in store
         }
         set usize [$Db eval {SELECT usize FROM Files WHERE gid = :dgid
                              AND filename = :filename}]
         if {$usize != [file size $filename]} {
-            return false ;# different sizes
+            return 0 ;# different sizes
         }
         set disk_data [readFile $filename binary]
         lassign [$Db eval {SELECT kind, data FROM Files WHERE gid = :dgid
@@ -444,9 +444,9 @@ oo::define Store method updatable {} {
 
 oo::define Store method have_updates {} {
     foreach filename [my filenames] {
-        if {![my is_same_on_disk $filename]} { return true }
+        if {![my is_same_on_disk $filename]} { return 1 }
     }
-    return false
+    return 0
 }
 
 # we deliberately only go at most one level deep for folders

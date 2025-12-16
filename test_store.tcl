@@ -12,24 +12,24 @@ package require store
 proc test1 {} {
     set procname [lindex [info level 0] 0]
     puts -nonewline "$procname "
-    set ok true
+    set ok 1
     set filename /tmp/${procname}.db
     file delete $filename
     set sqlite_version [db::sqlite_version]
     if {![string match {SQLite 3.*} $sqlite_version]} {
         puts "FAIL: expected SQLite 3.x.y; got $sqlite_version"
-        set ok false
+        set ok 0
     }
     set str [Store new $filename]
     try {
         set gid [$str current_generation]
         if {$gid != 0} {
             puts "FAIL: expected no current generation; got $gid"
-            set ok false
+            set ok 0
         }
         if {[$str filename] ne $filename} {
             puts "FAIL: expected \"$filename\"; got \"[$str filename]\""
-            set ok false
+            set ok 0
         }
     } finally {
         $str destroy 
@@ -40,7 +40,7 @@ proc test1 {} {
 proc test2 {} {
     set procname [lindex [info level 0] 0]
     puts -nonewline "$procname "
-    set ok true
+    set ok 1
     set filename /tmp/${procname}.db
     file delete $filename
     set str [Store new $filename]
@@ -56,7 +56,7 @@ proc test2 {} {
 }
 
 proc test3 {expected reporter} {
-    set ok true
+    set ok 1
     set procname [lindex [info level 0] 0]
     puts -nonewline "$procname "
     set filename /tmp/${procname}.db
@@ -70,7 +70,7 @@ proc test3 {expected reporter} {
         $str update "should change nothing @[$str current_generation]"
         if {![$str is_current README.md]} {
             puts "FAIL: expected README.md to be current"
-            set ok false
+            set ok 0
         }
         # change README.md
         set readme [readFile README.md]
@@ -90,24 +90,24 @@ proc test3 {expected reporter} {
         set n [$str purge cli-1.tm]
         if {$n != 8} {
             puts "FAIL: expected 8 deletions of cli-1.tm; got $n"
-            set ok false
+            set ok 0
         }
         if {[$str is_current cli-1.tm]} {
             puts "FAIL: expected cli-1.tm to not be current"
-            set ok false
+            set ok 0
         }
         $str extract 5 sql/prepare.sql README.md
         set readmex2 [readFile README@5.md]
         if {$readmex2 ne $readmex} {
             puts "FAIL: expected\n$readmex\n--- got ---\n$readmex"
-            set ok false
+            set ok 0
         }
         file delete README@5.md
         set prep1 [readFile sql/prepare.sql]
         set prep2 [readFile sql/prepare@1.sql]
         if {$prep1 ne $prep2} {
             puts "FAIL: expected\n$prep1\n--- got ---\n$prep1"
-            set ok false
+            set ok 0
         }
         file delete sql/prepare@1.sql
         $str copy 4 /tmp/$procname
@@ -115,7 +115,7 @@ proc test3 {expected reporter} {
         set create2 [readFile sql/create.sql]
         if {$create1 ne $create2} {
             puts "FAIL: expected\n$create1\n--- got ---\n$create2"
-            set ok false
+            set ok 0
         }
         file delete -force /tmp/$procname
     } finally {
@@ -124,7 +124,7 @@ proc test3 {expected reporter} {
     set ::messages [string cat {*}$::messages]
     if {$::messages ne $expected} {
         puts "FAIL: expected\n$expected\n--- got ---\n$::messages"
-        set ok false
+        set ok 0
     }
     if {$ok} { puts OK }
 }
@@ -132,7 +132,7 @@ proc test3 {expected reporter} {
 proc test4 {} {
     set procname [lindex [info level 0] 0]
     puts -nonewline "$procname "
-    set ok true
+    set ok 1
     set filename /tmp/${procname}.db
     file delete $filename
     set str [Store new $filename]
@@ -140,18 +140,18 @@ proc test4 {} {
         if {[$str to_string] ne "Store \"/tmp/$procname.db\""} {
             puts "FAIL: expected 'Store \"/tmp/$procname.db\"'; got\
                 \"[$str to_string]\""
-            set ok false
+            set ok 0
         }
         catch { $str update "should cause error" } err_message
         if {$err_message ne "can only update an existing nonempty store"} {
             puts "FAIL: expected nonempty store error; got $err_message"
-            set ok false
+            set ok 0
         }
         $str add README.md
         catch { $str update "should change nothing @1" } err_message
         if {$err_message ne "0" } {
             puts "FAIL: unexpected error; got $err_message"
-            set ok false
+            set ok 0
         }
     } finally {
         $str destroy 
@@ -162,7 +162,7 @@ proc test4 {} {
 proc test5 {} {
     set procname [lindex [info level 0] 0]
     puts -nonewline "$procname "
-    set ok true
+    set ok 1
     set filename /tmp/${procname}.db
     file delete $filename
     set expecteds {{*.a} {*.bak} {*.class} {*.dll} {*.exe} {*.jar} \
@@ -177,7 +177,7 @@ proc test5 {} {
             set expected [lindex $expecteds $i]
             if {$pattern ne $expected} {
                 puts "FAIL: expected \"$expected\"; got \"$pattern\""
-                set ok false
+                set ok 0
             }
             incr i
         }
@@ -188,7 +188,7 @@ proc test5 {} {
             set expected [lindex $expecteds $i]
             if {$pattern ne $expected} {
                 puts "FAIL: expected \"$expected\"; got \"$pattern\""
-                set ok false
+                set ok 0
             }
             incr i
         }
@@ -199,7 +199,7 @@ proc test5 {} {
             set expected [lindex $expecteds $i]
             if {$pattern ne $expected} {
                 puts "FAIL: expected \"$expected\"; got \"$pattern\""
-                set ok false
+                set ok 0
             }
             incr i
         }
@@ -212,7 +212,7 @@ proc test5 {} {
 proc test6 {} {
     set procname [lindex [info level 0] 0]
     puts -nonewline "$procname "
-    set ok true
+    set ok 1
     set filename /tmp/${procname}.db
     file delete $filename
     set str [Store new $filename]
@@ -220,7 +220,7 @@ proc test6 {} {
         if {[$str to_string] ne "Store \"/tmp/$procname.db\""} {
             puts "FAIL: expected 'Store \"/tmp/$procname.db\"'; got\
                 \"[$str to_string]\""
-            set ok false
+            set ok 0
         }
         $str add sql/prepare.sql sql/create.sql cli-1.tm
         $str tag 0 first
@@ -229,32 +229,32 @@ proc test6 {} {
         set tag [$str tag 1]
         if {$tag ne "first"} {
             puts "FAIL: expected tag \"first\"'; got \"$tag\""
-            set ok false
+            set ok 0
         }
         set gid [$str gid_for_tag first]
         if {$gid != 1} {
             puts "FAIL: expected gid 1; got $gid"
-            set ok false
+            set ok 0
         }
         set tag [$str tag 2]
         if {$tag ne "second"} {
             puts "FAIL: expected tag \"second\"'; got \"$tag\""
-            set ok false
+            set ok 0
         }
         set gid [$str gid_for_tag second]
         if {$gid != 2} {
             puts "FAIL: expected gid 2; got $gid"
-            set ok false
+            set ok 0
         }
         set tag [$str tag 3]
         if {$tag ne ""} {
             puts "FAIL: expected tag \"\"'; got \"$tag\""
-            set ok false
+            set ok 0
         }
         set gid [$str gid_for_tag none-such]
         if {$gid != 0} {
             puts "FAIL: expected gid 0; got $gid"
-            set ok false
+            set ok 0
         }
     } finally {
         $str destroy 

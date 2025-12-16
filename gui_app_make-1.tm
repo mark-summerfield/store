@@ -61,7 +61,7 @@ oo::define App method make_controls {} {
         -image [ui::icon about.svg $::ICON_SIZE]
     $frm.moreButton configure -menu $frm.moreButton.menu
     ttk::checkbutton $frm.showOptions -text "Show Options" \
-        -underline 6 -onvalue true -offvalue false \
+        -underline 6 -onvalue 1 -offvalue 0 \
         -variable [my varname ShowOptions] \
         -command [callback on_show_options]
     ttk::frame $frm.showFrame -relief groove 
@@ -69,10 +69,10 @@ oo::define App method make_controls {} {
         -underline 0 -value asis -variable [my varname ShowState] \
         -command [callback on_show_asis]
     ttk::checkbutton $frm.showFrame.withLinos -text "Line Nºs" \
-        -underline 0 -onvalue true -offvalue false \
+        -underline 0 -onvalue 1 -offvalue 0 \
         -variable [my varname WithLinos] -command [callback on_with_linos]
     ttk::checkbutton $frm.showFrame.showAll -text "Show All" \
-        -underline 1 -onvalue true -offvalue false \
+        -underline 1 -onvalue 1 -offvalue 0 \
         -variable [my varname ShowAll] -command [callback on_show_all]
     ttk::radiobutton $frm.showFrame.diffWithDiskRadio \
         -text "Diff with Disk" -underline 0 -value disk \
@@ -82,7 +82,7 @@ oo::define App method make_controls {} {
         -underline 5 -value generation -variable [my varname ShowState] \
         -command [callback on_show_diff_to]
     ttk::checkbutton $frm.showFrame.inContextCheck -text "In Context" \
-        -underline 0 -onvalue true -offvalue false \
+        -underline 0 -onvalue 1 -offvalue 0 \
         -variable [my varname InContext] -command [callback on_in_context]
     ttk::label $frm.showFrame.diffLabel -text @
     ttk::spinbox $frm.showFrame.diffGenSpinbox -format %.0f -from 0 \
@@ -158,9 +158,9 @@ oo::define App method make_generations_tree {} {
     $sa setwidget $GenerationTree
     pack $sa -fill both -expand 1
     $GenerationTree configure -show tree -selectmode browse
-    $GenerationTree column #0 -stretch false
-    $GenerationTree column 0 -stretch false
-    $GenerationTree column 1 -stretch true
+    $GenerationTree column #0 -stretch 0
+    $GenerationTree column 0 -stretch 0
+    $GenerationTree column 1 -stretch 1
     gui_misc::set_tree_tags $GenerationTree
     return $frm
 }
@@ -183,7 +183,7 @@ oo::define App method make_status_bar {} {
     set StatusCleanableLabel [ttk::label $frm.statusCleanableLabel \
                               -relief sunken]
     set StatusSizeLabel [ttk::label $frm.statusSizeLabel -relief sunken]
-    pack $frm.statusInfoLabel -side left -fill x -expand true
+    pack $frm.statusInfoLabel -side left -fill x -expand 1
     pack $frm.statusSizeLabel -side right -fill x
     pack $frm.statusCleanableLabel -side right -fill x
     pack $frm.statusUpdatableLabel -side right -fill x

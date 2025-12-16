@@ -30,11 +30,11 @@ package require gui_app_actions
 package require gui_app_make
 
 oo::define App constructor {} {
-    set ShowOptions true
+    set ShowOptions 1
     set ShowState asis
-    set ShowAll false
-    set WithLinos false
-    set InContext true
+    set ShowAll 0
+    set WithLinos 0
+    set InContext 1
     set StoreFilename [file normalize .[file tail [pwd]].str]
     if {![file exists $StoreFilename]} {
         set StoreFilename ""
@@ -218,7 +218,7 @@ oo::define App method populate_generation_tree {} {
     set str [Store new $StoreFilename [callback set_status_info]]
     try {
         set updatable [$str updatable]
-        foreach {gid created message filename} [$str generations true] {
+        foreach {gid created message filename} [$str generations 1] {
             if {$gid ne $prev_gid} {
                 set prev_gid $gid
                 set parent [$GenerationTree insert {} end -text @$gid \
@@ -260,14 +260,14 @@ oo::define App method show_file {gid filename} {
         $str destroy
     }
     gui_misc::refresh_highlighting $Text [file extension $filename]
-    $Text configure -linemap $WithLinos -highlight true
+    $Text configure -linemap $WithLinos -highlight 1
     $Text delete 1.0 end
     $Text insert end [encoding convertfrom -profile replace utf-8 $data]
     $Text highlight 1.0 end
 }
 
 oo::define App method get_selected {} {
-    set ok false
+    set ok 0
     if {[$Tabs  select] eq ".panes.tabs.filenameTreeFrame"} {
         lassign [my get_selected_from_files] ok gid filename
     } else {
@@ -278,7 +278,7 @@ oo::define App method get_selected {} {
 
 oo::define App method get_selected_from_files {} {
     set item [$FilenameTree selection]
-    if {$item eq ""} { return [list false] }
+    if {$item eq ""} { return [list 0] }
     set txt [$FilenameTree item $item -text]
     if {[string match {@*} $txt]} {
         set gid [string range $txt 1 end]
@@ -287,13 +287,13 @@ oo::define App method get_selected_from_files {} {
         set gid 0
         set filename $txt
     }
-    return [list true $gid $filename]
+    return [list 1 $gid $filename]
 }
 
 oo::define App method get_selected_from_generations {} {
-    set ok false
+    set ok 0
     set item [$GenerationTree selection]
-    if {$item eq ""} { return [list false] }
+    if {$item eq ""} { return [list 0] }
     set txt [$GenerationTree item $item -text]
     if {[string match {@*} $txt]} {
         set gid [string range $txt 1 end]
@@ -302,7 +302,7 @@ oo::define App method get_selected_from_generations {} {
         set gid [$GenerationTree item [$GenerationTree parent $item] -text]
         set gid [string range $gid 1 end]
         set filename $txt
-        set ok true
+        set ok 1
     }
     return [list $ok $gid $filename]
 }
@@ -342,7 +342,7 @@ oo::define App method select_generations_tree_item {gid filename} {
 }
 
 oo::define App method diff {new_gid old_gid filename} {
-    $Text configure -linemap false -highlight false
+    $Text configure -linemap 0 -highlight 0
     gui_actions::diff $StoreFilename $Text $InContext \
         [callback set_status_info] $new_gid $old_gid $filename
 }

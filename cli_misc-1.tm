@@ -18,7 +18,7 @@ proc cli_misc::warn message {
     exit 1
 }
 
-proc cli_misc::info {message {need_action false}} {
+proc cli_misc::info {message {need_action 0}} {
     if {$need_action} {
         puts "${::MAGENTA}$message${::RESET}"
     } else {
@@ -26,7 +26,7 @@ proc cli_misc::info {message {need_action false}} {
     }
 }
 
-proc cli_misc::yes_no {prompt {dangerous false}} {
+proc cli_misc::yes_no {prompt {dangerous 0}} {
     set color [expr {$dangerous ? $::RED : $::MAGENTA}]
     puts -nonewline "${color}$prompt \[yN]?${::RESET} "
     flush stdout

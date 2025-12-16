@@ -26,7 +26,7 @@ oo::define TagsForm constructor {} {
     my make_widgets
     my make_layout
     my make_bindings
-    wm resizable .tagsForm false false
+    wm resizable .tagsForm 0 0
     next .tagsForm [callback on_close]
 }
 
@@ -172,7 +172,7 @@ oo::define TagsForm method on_entry_changed {} {
             $str destroy
         }
     }
-    return true
+    return 1
 }
 
 oo::define TagsForm method on_save {} {

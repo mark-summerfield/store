@@ -17,7 +17,9 @@ proc gui::main {} {
 }
 
 proc gui::make_fonts {family size} {
-    catch { font delete H1 Mono MonoBold MonoItalic MonoBoldItalic }
+    foreach name {H1 Mono MonoBold MonoItalic MonoBoldItalic} {
+        catch { font delete $name }
+    }
     font create H1 -family [font configure TkTextFont -family] \
         -size [expr {3 + [font configure TkTextFont -size]}] -weight bold
     font create Mono -family $family -size $size

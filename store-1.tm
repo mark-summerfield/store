@@ -108,7 +108,8 @@ oo::define Store method tag {{gid 0} {tag ""}} {
     } elseif {$tag ne ""} {
         $Db eval {UPDATE Generations SET tag = :tag WHERE gid = :gid}
     } else {
-        set tag [$Db eval {SELECT tag FROM Generations WHERE gid = :gid}]
+        set tag [$Db onecolumn \
+                {SELECT tag FROM Generations WHERE gid = :gid}]
         return [db::first $tag ""]
     }
 }
@@ -186,7 +187,7 @@ oo::define Store method UpdateOne {gid filename} {
 }
 
 oo::define Store method FindMatch {gid filename data} {
-    set gid [$Db eval {
+    set gid [$Db onecolumn {
         SELECT gid FROM Files
         WHERE filename = :filename AND kind != 'S' AND data = :data
               AND gid != :gid

@@ -107,11 +107,8 @@ oo::define Store method tag {{gid 0} {tag ""}} {
         error "tags may not be integers; got $tag"
     } elseif {$tag ne ""} {
         $Db eval {UPDATE Generations SET tag = :tag WHERE gid = :gid}
-    } else {
-        set tag [$Db onecolumn \
-                {SELECT tag FROM Generations WHERE gid = :gid}]
-        return [db::first $tag ""]
     }
+    $Db onecolumn {SELECT tag FROM Generations WHERE gid = :gid}
 }
 
 # removes a tag for the given or current gid
@@ -193,7 +190,7 @@ oo::define Store method FindMatch {gid filename data} {
               AND gid != :gid
         ORDER BY gid DESC LIMIT 1
     }]
-    db::first $gid 0
+    expr {$gid ne {} ? $gid : 0}
 }
 
 # returns the filenames, dirnames, and globs to ignore

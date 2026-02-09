@@ -17,7 +17,7 @@ oo::class create Store {
 oo::define Store initialize {
     variable VERSION
 
-    const VERSION 1.7.1
+    const VERSION 1.7.2
 }
 
 # creates database if it doesn't exist; sets reporter to ignore messages
@@ -73,11 +73,11 @@ oo::define Store method gid_for_tag tag {
 # Note that ignores should be handled by the application itself.
 oo::define Store method add args {
     const cwd [pwd]
-    set filenames [my filenames]
-    foreach filename [lsort -nocase \
-            [lsort -unique [list {*}[my filenames] {*}$args]]] {
+    set filenames [lsort -dictionary [my filenames]]
+    foreach filename $args {
         set filename [fileutil::relative $cwd [file normalize $filename]]
-        if {[lsearch -exact $filenames $filename] == -1} {
+        if {[lsearch -sorted -dictionary -exact $filenames $filename]
+                == -1} {
             lappend filenames $filename
         }
     }

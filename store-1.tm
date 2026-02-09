@@ -68,12 +68,20 @@ oo::define Store method gid_for_tag tag {
     expr {$gid eq "" ? 0 : $gid}
 }
 
-# creates new generation with 'U' or 'Z' or 'S' for every given file and
-# returns the number of files added.
+# Creates new generation with 'U' or 'Z' or 'S' for every given file and
+# returns the number of files added. Skips already tracked files.
 # Note that ignores should be handled by the application itself.
-oo::define Store method add {args} {
-    set filenames [lsort -nocase \
-        [lsort -unique [list {*}[my filenames] {*}$args]]]
+oo::define Store method add args {
+    const cwd [pwd]
+    set filenames [my filenames]
+    foreach filename [lsort -nocase \
+            [lsort -unique [list {*}[my filenames] {*}$args]]] {
+        set filename [fileutil::relative $cwd [file normalize $filename]]
+        if {[lsearch -exact $filenames $filename] == -1} {
+            lappend filenames $filename
+        }
+    }
+    if {![llength $filenames]} { return 0 }
     {*}$Reporter "adding/updating"
     my Update "" {*}$filenames
 }
@@ -245,7 +253,7 @@ oo::define Store method filenames {{gid 0}} {
 }
 
 # returns 1 if the filename is in the current generation; otherwise 0
-oo::define Store method is_current {filename} {
+oo::define Store method is_current filename {
     set gid [my current_generation]
     $Db eval {SELECT EXISTS(SELECT filename FROM Files WHERE gid = :gid
               AND filename = :filename LIMIT 1)}

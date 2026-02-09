@@ -88,14 +88,15 @@ oo::define App method on_add_files {} {
     if {$n} {
         set str [Store new $StoreFilename [callback set_status_info]]
         try {
-            $str add {*}$filenames
-            if {$n == 1} {
-                my set_status_info "added $filenames" $::SHORT_WAIT
-            } else {
-                my set_status_info "added $n files" $::SHORT_WAIT
+            if {[$str add {*}$filenames]} {
+                if {$n == 1} {
+                    my set_status_info "added $filenames" $::SHORT_WAIT
+                } else {
+                    my set_status_info "added $n files" $::SHORT_WAIT
+                }
+                my report_status
+                my populate
             }
-            my report_status
-            my populate
         } finally {
             $str destroy
         }

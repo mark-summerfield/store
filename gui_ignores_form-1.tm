@@ -48,6 +48,7 @@ oo::define IgnoresForm method make_widgets {} {
     set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
     set IgnoresList [ttk::treeview $frm.sa.$name -striped true -show tree \
         -selectmode browse -style List.Treeview]
+    ui::apply_treeview_bindings $IgnoresList
     $sa setwidget $IgnoresList
     pack $sa -fill both -expand 1
     $IgnoresList column #0 -anchor w -stretch true

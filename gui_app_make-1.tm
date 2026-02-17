@@ -143,6 +143,7 @@ oo::define App method make_files_tree {} {
     set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
     set FilenameTree [ttk::treeview $frm.sa.$name -show tree \
         -selectmode browse]
+    ui::apply_treeview_bindings $FilenameTree
     $sa setwidget $FilenameTree
     pack $sa -fill both -expand 1
     gui_misc::set_tree_tags $FilenameTree
@@ -155,6 +156,7 @@ oo::define App method make_generations_tree {} {
     set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
     set GenerationTree [ttk::treeview $frm.sa.$name \
         -columns {Created Message}]
+    ui::apply_treeview_bindings $GenerationTree
     $sa setwidget $GenerationTree
     pack $sa -fill both -expand 1
     $GenerationTree configure -show tree -selectmode browse

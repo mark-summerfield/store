@@ -34,6 +34,7 @@ oo::define AddForm method make_widgets {} {
     set frm [ttk::frame .addForm.addListFrame]
     set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
     set AddList [ttk::treeview $frm.sa.addList -striped true]
+    ui::apply_treeview_bindings $AddList
     $sa setwidget $AddList
     pack $sa -fill both -expand 1
     ttk::style configure List.Treeview.Item -indicatorsize 0

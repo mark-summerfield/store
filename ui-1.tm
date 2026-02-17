@@ -53,6 +53,30 @@ proc ui::on_ctrl_bs widget {
 
 proc ui::on_ctrl_a widget { $widget selection range 0 end }
 
+# Use for ttk::treeview
+proc ui::apply_treeview_bindings widget {
+    bind $widget <Home> { ui::on_treeview_home %W ; break }
+    bind $widget <End> { ui::on_treeview_end %W ; break }
+}
+
+proc ui::on_treeview_home tree {
+    if {[set children [$tree children {}]] ne {}} {
+        set id [lindex $children 0]
+        $tree selection set $id
+        $tree see $id
+        $tree focus $id
+    }
+}
+
+proc ui::on_treeview_end tree {
+    if {[set children [$tree children {}]] ne {}} {
+        set id [lindex $children end]
+        $tree selection set $id
+        $tree see $id
+        $tree focus $id
+    }
+}
+
 proc ui::popup_menu {menu widget} {
     tk_popup $menu [expr {[winfo rootx $widget]}] \
         [expr {[winfo rooty $widget] + [winfo height $widget]}]

@@ -17,7 +17,7 @@ oo::class create Store {
 oo::define Store initialize {
     variable VERSION
 
-    const VERSION 1.7.2
+    const VERSION 1.8.0
 }
 
 # creates database if it doesn't exist; sets reporter to ignore messages

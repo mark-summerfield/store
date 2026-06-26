@@ -7,25 +7,24 @@ package require util
 
 namespace eval cli_actions {}
 
-proc cli_actions::add {reporter storefile rest} {
-    set str [Store new $storefile $reporter]
+proc cli_actions::add opts {
+    set files [dict get $opts %]
+    set str [GetStore $opts]
     try {
-        if {$rest eq ""} {
+        if {$files eq ""} {
             set names [$str addable]
         } else {
-            set names [$str candidates_from_given $rest]
+            set names [$str candidates_from_given $files]
         }
-        if {[llength $names]} {
-            $str add {*}$names
-        }
+        if {[llength $names]} { $str add {*}$names }
     } finally {
         $str destroy
     }
 }
 
-proc cli_actions::update {reporter storefile rest} {
-    set message [join $rest " "]
-    set str [Store new $storefile $reporter]
+proc cli_actions::update opts {
+    set message [join [dict getdef $opts % " "]]
+    set str [GetStore $opts]
     try {
         if {[$str have_updates]} {
             $str update $message
@@ -43,19 +42,20 @@ proc cli_actions::update {reporter storefile rest} {
     }
 }
 
-proc cli_actions::extract {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+proc cli_actions::extract opts {
+    set str [GetStore $opts]
     try {
+        lassign [GetGidAndRest $str [dict get $opts %]] gid  rest
         $str extract $gid {*}$rest
     } finally {
         $str destroy
     }
 }
 
-proc cli_actions::status {reporter storefile rest} {
+proc cli_actions::status opts {
     set yes_messages [list]
     set no_messages [list]
-    set str [Store new $storefile $reporter]
+    set str [GetStore $opts]
     try {
         set names [$str addable]
         if {[llength $names]} {
@@ -96,9 +96,10 @@ proc cli_actions::status {reporter storefile rest} {
     }
 }
 
-proc cli_actions::copy {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str dirname
+proc cli_actions::copy opts {
+    set str [GetStore $opts]
     try {
+        lassign [GetGidAndRest $str [dict get $opts %]] gid dirname
         $str copy $gid $dirname
     } on error err {
         cli_misc::warn $err
@@ -107,9 +108,10 @@ proc cli_actions::copy {reporter storefile rest} {
     }
 }
 
-proc cli_actions::print {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
+proc cli_actions::print opts {
+    set str [GetStore $opts]
     try {
+        lassign [GetGidAndRest $str [dict get $opts %]] gid filename
         lassign [$str get $gid $filename] gid data
         if {$data ne ""} {
             puts -nonewline [encoding convertfrom -profile replace utf-8 \
@@ -133,10 +135,11 @@ proc cli_actions::print {reporter storefile rest} {
     }
 }
 
-proc cli_actions::diff {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] old_gid str rest
+proc cli_actions::diff opts {
+    set str [GetStore $opts]
     try {
-        lassign [GidAndRest $str $rest] new_gid filename
+        lassign [GetGidAndRest $str [dict get $opts %]] old_gid rest
+        lassign [GetGidAndRest $str $rest] new_gid filename
         if {$old_gid == $new_gid} { ;# compare with file
             if {![file exists $filename]} {
                 cli_misc::warn "can't diff \"$filename\" @$old_gid not \
@@ -196,9 +199,10 @@ proc cli_actions::WarnFileNotFound {str gid filename} {
     }
 }
 
-proc cli_actions::filenames {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+proc cli_actions::filenames opts {
+    set str [GetStore $opts]
     try {
+        lassign [GetGidAndRest $str [dict get $opts %]] gid rest
         foreach filename [$str filenames $gid] {
             set tracked [expr {[$str is_current $filename] \
                     ? "" : " ${::RED}(untracked)${::RESET}"}]
@@ -209,9 +213,10 @@ proc cli_actions::filenames {reporter storefile rest} {
     }
 }
 
-proc cli_actions::generations {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+proc cli_actions::generations opts {
+    set str [GetStore $opts]
     try {
+        lassign [GetGidAndRest $str [dict get $opts %]] gid rest
         if {$rest eq "-f" || $rest eq "--full"} {
             set prev_gid 0
             foreach {gid created message filename} [$str generations true] {
@@ -233,12 +238,12 @@ proc cli_actions::generations {reporter storefile rest} {
     }
 }
 
-proc cli_actions::history {reporter storefile rest} {
-    set str [Store new $storefile $reporter]
+proc cli_actions::history opts {
+    set str [GetStore $opts]
     try {
         set prev_name ""
         set prefix ""
-        foreach {name gid} [$str history $rest] {
+        foreach {name gid} [$str history [dict get $opts %]] {
             if {$prev_name eq $name} {
                 puts -nonewline " @$gid"
             } else {
@@ -256,37 +261,35 @@ proc cli_actions::history {reporter storefile rest} {
     }
 }
 
-proc cli_actions::ignore {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str patterns
+proc cli_actions::ignore opts {
+    set str [GetStore $opts]
     try {
-        $str ignore {*}$patterns
+        $str ignore {*}[dict get $opts %]
     } finally {
         $str destroy
     }
 }
 
-proc cli_actions::ignores {reporter storefile} {
-    lassign [GidStoreAndRest $reporter $storefile {}] gid str rest
+proc cli_actions::ignores opts {
+    set str [GetStore $opts]
     try {
-        foreach pattern [$str ignores] {
-            cli_misc::info $pattern
-        }
+        foreach pattern [$str ignores] { cli_misc::info $pattern }
     } finally {
         $str destroy
     }
 }
 
-proc cli_actions::unignore {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str patterns
+proc cli_actions::unignore opts {
+    set str [GetStore $opts]
     try {
-        $str unignore {*}$patterns
+        $str unignore {*}[dict get $opts %]
     } finally {
         $str destroy
     }
 }
 
-proc cli_actions::clean {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+proc cli_actions::clean opts {
+    set str [GetStore $opts]
     try {
         $str clean
     } finally {
@@ -294,9 +297,10 @@ proc cli_actions::clean {reporter storefile rest} {
     }
 }
 
-proc cli_actions::tag {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+proc cli_actions::tag opts {
+    set str [GetStore $opts]
     try {
+        lassign [GetGidAndRest $str [dict get $opts %]] gid rest
         $str tag $gid $rest
     } on error err {
         cli_misc::warn "failed to add tag '$rest': $err"
@@ -305,9 +309,10 @@ proc cli_actions::tag {reporter storefile rest} {
     }
 }
 
-proc cli_actions::untag {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str rest
+proc cli_actions::untag opts {
+    set str [GetStore $opts]
     try {
+        lassign [GetGidAndRest $str [dict get $opts %]] gid _
         $str untag $gid
     } finally {
         $str destroy
@@ -315,29 +320,28 @@ proc cli_actions::untag {reporter storefile rest} {
 }
 
 
-proc cli_actions::untracked {reporter storefile rest} {
-    set str [Store new $storefile $reporter]
+proc cli_actions::untracked opts {
+    set str [GetStore $opts]
     try {
-        foreach name [$str untracked] {
-            cli_misc::info $name
-        }
+        foreach name [$str untracked] { cli_misc::info $name }
     } finally {
         $str destroy
     }
 }
 
-proc cli_actions::restore {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] _ str rest
+proc cli_actions::restore opts {
+    set str [GetStore $opts]
     try {
-        $str restore {*}$rest
+        $str restore {*}[dict get $opts %]
     } finally {
         $str destroy
     }
 }
 
-proc cli_actions::purge {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] gid str filename
+proc cli_actions::purge opts {
+    set str [GetStore $opts]
     try {
+        set filename [dict get $opts %]
         if {[cli_misc::yes_no "permanently permanently purge \"$filename\"\
                           from the store" true]} {
             set n [$str purge $filename]
@@ -349,23 +353,11 @@ proc cli_actions::purge {reporter storefile rest} {
     }
 }
 
-proc cli_actions::version {reporter storefile rest} {
-    lassign [GidStoreAndRest $reporter $storefile $rest] _ str _
-    try {
-        cli_misc::info "str v [$str version]"
-    } finally {
-        $str destroy
-    }
-    exit 2
+proc cli_actions::GetStore opts {
+    Store new [dict get $opts storefile] [dict get $opts reporter]
 }
 
-proc cli_actions::GidStoreAndRest {reporter storefile rest} {
-    set str [Store new $storefile $reporter]
-    lassign [GidAndRest $str $rest] gid rest
-    list $gid $str $rest
-}
-
-proc cli_actions::GidAndRest {str rest} {
+proc cli_actions::GetGidAndRest {str rest} {
     set gid [$str current_generation]
     set first [lindex $rest 0]
     if {[string match {@[0-9]*} $first]} {

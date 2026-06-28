@@ -241,21 +241,23 @@ proc cli_actions::generations opts {
 proc cli_actions::history opts {
     set str [GetStore $opts]
     try {
-        set prev_name ""
-        set prefix ""
-        foreach {name gid} [$str history [dict get $opts %]] {
-            if {$prev_name eq $name} {
-                puts -nonewline " @$gid"
-            } else {
-                set prev_name $name
-                set tracked [expr {[$str is_current $name] \
-                    ? "" : " ${::RED}(untracked)${::RESET}"}]
-                puts -nonewline "$prefix${::BLUE}$name${::RESET}$tracked\
-                    @$gid"
-                set prefix "\n"
+        foreach filename [dict get $opts %] {
+            set prev_name ""
+            set prefix ""
+            foreach {name gid} [$str history $filename] {
+                if {$prev_name eq $name} {
+                    puts -nonewline " @$gid"
+                } else {
+                    set prev_name $name
+                    set tracked [expr {[$str is_current $name] \
+                        ? "" : " ${::RED}(untracked)${::RESET}"}]
+                    puts -nonewline \
+                        "$prefix${::BLUE}$name${::RESET}$tracked @$gid"
+                    set prefix "\n"
+                }
             }
+            puts ""
         }
-        puts ""
     } finally {
         $str destroy
     }

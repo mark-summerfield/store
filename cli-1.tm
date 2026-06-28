@@ -73,16 +73,15 @@ proc cli::get_opts storefile {
     $parser new_debug
 
     set status_parser [clop::subparser status $parser 0 \
-        "Show the store’s status." \
-        "Status reports any unstored unignored nonempty files and\
+        "Report the store’s status." \
+        "Report any unstored unignored nonempty files and\
         whether updates or cleaning are needed. \[Default action for\
         %B%bstr%! with no arguments.\]"]
     $status_parser new_bool v verbose \
-        "Show the name of every new/changed file \[default %mjust show\
+        "Print the name of every new/changed file \[default %mjust show\
         counts%!\]."
     $status_parser new_help h help "Show status help and quit."
-    $parser new_subcommand s status $status_parser \
-        "Show the store’s status."
+    $parser new_subcommand s status $status_parser
 
     set update_parser [clop::subparser update $parser 0-1 \
         "Create a new generation with an optional tag." \
@@ -164,7 +163,7 @@ proc cli::get_opts storefile {
     $parser new_subcommand d diff $diff_parser
 
     set filenames_parser [clop::subparser filenames $parser 0-1 \
-        "List the tracked files." "" \
+        "Print the list of tracked files." "" \
         "%I%g@GID%! is the generation to list \[default current\]."]
     $filenames_parser set_positional_names @GID
     $filenames_parser new_help h help "Show filenames help and quit."
@@ -181,37 +180,41 @@ proc cli::get_opts storefile {
     $gui_parser new_help h help "Show gui help and quit."
     $parser new_subcommand G gui $gui_parser
 
-    set history_parser [clop::subparser history $parser 1 \
-        "Print the given file’s history." "" \
-        "The file to print the history of."]
+    set history_parser [clop::subparser history $parser 1-255 \
+        "Print the given files’ list of generations." \
+        "Print the given files’ list of generations back to when each was\
+        first added." \
+        "The files to print the history of."]
     $history_parser new_help h help "Show history help and quit."
     $parser new_subcommand H history $history_parser
 
     set ignore_parser [clop::subparser ignore $parser 1-255 \
         "Add the given files/folders/globs to the ignore list." \
-        "Add the given filenames, folders, and globs to the ignore list." \
+        "Add the given filenames, folders, and globs to the list of files\
+        to ignore." \
         "Each %bITEM%! is a file or a folder or a glob pattern."]
     $ignore_parser set_positional_names ITEM ITEM
     $ignore_parser new_help h help "Show ignore help and quit."
     $parser new_subcommand i ignore $ignore_parser
 
     set ignores_parser [clop::subparser ignores $parser 0 \
-        "Print the ignore list."]
+        "Print the list of files to ignore."]
     $ignores_parser new_help h help "Show ignores help and quit."
     $parser new_subcommand I ignores $ignores_parser
 
     set unignore_parser [clop::subparser unignore $parser 1-255 \
         "Remove the given files/folders/globs from the ignore list." \
-        "Remove the given filenames, folders, and globs from the ignore\
-        list." \
+        "Remove the given filenames, folders, and globs from the list of\
+        files to ignore." \
         "Each %bITEM%! is a file or a folder or a glob pattern."]
     $unignore_parser set_positional_names ITEM ITEM
     $unignore_parser new_help h help "Show unignore help and quit."
     $parser new_subcommand U unignore $unignore_parser
 
     set tag_parser [clop::subparser tag $parser 1-2 \
-        "Set the tag for the current or given generation to the given\
-        tag." "" \
+        "Set or replace the tag for the current or given generation." \
+        "Set or replace the tag for the current or given generation to\
+        the given tag %I%moverwritting any existing tag%!." \
         "%I%g@GID%! is the generation to tag \[default current\]. For the\
         %bTAG%! use quotes if multiple words."]
     $tag_parser set_positional_line "%g<@GID>%! %b<TAG>%!"
@@ -219,8 +222,9 @@ proc cli::get_opts storefile {
     $parser new_subcommand t tag $tag_parser
 
     set untag_parser [clop::subparser untag $parser 0-1 \
-        "Untag the current or given generation." "" \
-        "%I%g@GID%! is the generation to untag \[default current\]."]
+        "Untag the current or given generation." \
+        "Untag, i.e., %I%mdelete%!, the current or given generation’s\
+        tag." "%I%g@GID%! is the generation to untag \[default current\]."]
     $untag_parser set_positional_names GID
     $untag_parser new_help h help "Show untag help and quit."
     $parser new_subcommand "" untag $untag_parser
@@ -238,8 +242,8 @@ proc cli::get_opts storefile {
     $parser new_subcommand "" restore $restore_parser
 
     set clean_parser [clop::subparser clean $parser 0 \
-        "Cleans the store by deleting empty generations." \
-        "Cleans the store by deleting empty generations, i.e., those\
+        "Clean the store by deleting empty generations." \
+        "Clean the store by deleting empty generations, i.e., those\
         without any changes."]
     $clean_parser new_help h help "Show clean help and quit."
     $parser new_subcommand C clean $clean_parser

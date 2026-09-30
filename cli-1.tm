@@ -57,7 +57,7 @@ proc cli::get_opts storefile {
             return [list status [dict create % {} verbose 0]]
         }
     }
-    set parser [clop::Parser new str [cli::get_version $storefile] 255 \
+    set parser [clop::Parser new str $::VERSION 255 \
         "Stores generational copies of specified files (excluding those
         explicitly ignored) in %y%I.dirname%!%y.str%!. (For a GUI run
         %B%bstore%!.)" \

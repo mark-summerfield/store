@@ -349,15 +349,6 @@ oo::define App method on_config {} {
 }
 
 oo::define App method on_about {} {
-    set ::VERSION ""
-    if {$StoreFilename ne ""} {
-        set str [Store new $StoreFilename [callback set_status_info]]
-        try {
-            set ::VERSION [$str version]
-        } finally {
-            $str destroy
-        }
-    }
     AboutForm new "An easy-to-use alternative to a version control system" \
         https://github.com/mark-summerfield/store
 }

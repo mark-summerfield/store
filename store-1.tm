@@ -49,11 +49,6 @@ oo::define Store destructor {
 
 oo::define Store method filename {} { return $Filename }
 
-oo::define Store method version {} {
-    classvariable VERSION
-    return "${VERSION}#[$Db eval {PRAGMA USER_VERSION}]"
-}
-
 oo::define Store method current_generation {} {
     $Db eval {SELECT gid FROM CurrentGeneration}
 }

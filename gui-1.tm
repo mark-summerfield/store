@@ -1,6 +1,5 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require config
 package require gui_app
 package require inifile
 package require ui
@@ -9,7 +8,7 @@ namespace eval gui {}
 
 proc gui::main {} {
     ui::wishinit
-    tk appname Store
+    tk appname $::APPNAME
     set config [Config new]
     make_fonts [$config fontfamily] [$config fontsize]
     set app [App new]

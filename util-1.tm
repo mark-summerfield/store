@@ -56,31 +56,27 @@ proc util::islink filename {
     expr {![catch {file link $filename}]}
 }
 
-proc util::uid {} {
-    return #[string range [clock clicks] end-8 end]
-}
-
-proc util::get_ini_filename {} {
-    set name [string totitle [tk appname]].ini
+proc util::get_ini_filename appname {
+    set name $appname.ini
     set home [file home]
     if {[tk windowingsystem] eq "win32"} {
-        set names [list [file join $home $name] \
-            $::APPPATH/$name]
+        set names [list [file join $home $name] $::APPPATH/$name]
         set index 0
     } else {
-        set names [list \
-                [file join $home .config/$name] \
-                [file join $home .$name] $::APPPATH/$name]
-        set index [expr {[file isdirectory \
-                [file join $home .config]] ? 0 : 1}]
+        set names [list [file join $home .config/$name] \
+                        [file join $home .$name] $::APPPATH/$name]
+        set index [expr {[file isdirectory [file join $home .config]] ? 0 \
+                                                                      : 1}]
     }
     foreach name $names {
         set name [file normalize $name]
-        if {[file exists $name]} {
-            return $name
-        }
+        if {[file exists $name]} { return $name }
     }
     lindex $names $index
+}
+
+proc util::uid {} {
+    return #[string range [clock clicks] end-8 end]
 }
 
 proc util::open_url url {

@@ -17,7 +17,7 @@ oo::define Config constructor {} {
     set Blinking true
     set FontFamily [font configure TkFixedFont -family]
     set FontSize [expr {2 + [font configure TkFixedFont -size]}]
-    set Filename [util::get_ini_filename]
+    set Filename [util::get_ini_filename [tk appname]]
     if {[file exists $Filename] && [file size $Filename]} {
         set ini [ini::open $Filename -encoding utf-8 r]
         try {

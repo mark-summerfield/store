@@ -8,10 +8,16 @@ if {![catch {file readlink [info script]} name]} {
 }
 tcl::tm::path add $APPPATH
 
+const VERSION 1.8.1
+
 if {[string match {*str} $::argv0]} {
     package require cli
     cli::main
 } else {
+    const APPNAME Store
+    package require Tk
+    package require config
+    Config new ;# must call tk scaling early
     package require gui
     gui::main
 }

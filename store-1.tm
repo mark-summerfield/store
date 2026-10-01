@@ -81,20 +81,26 @@ oo::define Store method add args {
 # 'U' or 'Z' or 'S' for every file present in the current generation that
 # hasn't been deleted and returns the number updated (which could be 0);
 # must only be used after at least one call to add
-oo::define Store method update {tag} {
+oo::define Store method update tag {
     set gid [my current_generation]
-    if {!$gid} { error "can only update an existing nonempty store" }
-    if {$tag ne ""} { {*}$Reporter "updating with tag \"$tag\"" }
-    my Update $tag {*}[my filenames $gid]
+    if {!$gid} {
+        error "can only update an existing nonempty store"
+    }
+    if {$tag ne "" && [my validtag $tag]} {
+        {*}$Reporter "updating with tag \"$tag\""
+        my Update $tag {*}[my filenames $gid]
+    } else {
+        error "tags may not be empty, integers, or duplicates"
+    }
 }
 
 # returns whether the given tag is valid: not an integer & unique
-oo::define Store method validtag {tag} {
+oo::define Store method validtag tag {
     if {[string is integer -strict $tag]} {
         return 0
     }
-    expr {![llength [$Db eval {SELECT gid FROM Generations
-                                WHERE tag = :tag LIMIT 1}]]}
+    expr {![$Db onecolumn \
+            {SELECT COUNT(*) FROM Generations WHERE tag = :tag}]}
 }
 
 # gets or sets or deletes (if tag is "-") a tag for the given or current gid
@@ -133,6 +139,10 @@ oo::define Store method Update {tag args} {
     }
     if {![llength $filenames]} {
         {*}$Reporter "no files to update"
+        return 0
+    }
+    if {$tag ne "" && ![my validtag $tag]} {
+        {*}$Reporter "tags may not be integers or duplicates"
         return 0
     }
     $Db transaction {

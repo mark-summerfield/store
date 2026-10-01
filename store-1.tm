@@ -87,7 +87,11 @@ oo::define Store method update tag {
         error "can only update an existing nonempty store"
     }
     if {$tag eq "" || [my validtag $tag]} {
-        {*}$Reporter "updating with tag \"$tag\""
+        if {$tag ne ""} {
+            {*}$Reporter "updating with tag \"$tag\""
+        } else {
+            {*}$Reporter updating
+        }
         my Update $tag {*}[my filenames $gid]
     } else {
         error "tags may not be empty, integers, or duplicates"

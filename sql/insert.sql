@@ -1,4 +1,4 @@
--- Copyright © 2025 Mark Summerfield. All Rights Reserved.
+-- Copyright © 2025-26 Mark Summerfield. All Rights Reserved.
 
 -- we don't need '.*' since hidden files are always ignored
 INSERT INTO Ignores (pattern) VALUES ('*.a');

@@ -1,4 +1,4 @@
-# Copyright © 2025 Mark Summerfield. All rights reserved.
+# Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 package require cli_globals
 package require term::receive
@@ -14,7 +14,7 @@ proc cli_misc::warn message {
         const reset ""
         const red ""
     }
-    puts stderr "${red}$message${reset}"
+    puts stderr "${red}warn: $message${reset}"
     exit 1
 }
 

@@ -1,4 +1,4 @@
--- Copyright © 2025 Mark Summerfield. All Rights Reserved.
+-- Copyright © 2025-26 Mark Summerfield. All Rights Reserved.
 
 PRAGMA USER_VERSION = 3;
 

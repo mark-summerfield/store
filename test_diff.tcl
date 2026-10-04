@@ -1,5 +1,5 @@
 #!/usr/bin/env tclsh9
-# Copyright © 2025 Mark Summerfield. All rights reserved.
+# Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 tcl::tm::path add [file normalize [file dirname [info script]]]
 

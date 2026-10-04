@@ -1,4 +1,4 @@
-# Copyright © 2025 Mark Summerfield. All rights reserved.
+# Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 set VERBOSE 1 ;# 0 → quiet; 1 → filtered; 2 → full
 

@@ -12,7 +12,9 @@ oo::singleton create Config {
     variable FontSize
 }
 
-oo::define Config constructor {} {
+oo::define Config constructor {{appname {}}} {
+    set Filename [util::get_ini_filename \
+            [expr {$appname ne "" ? $appname : [tk appname]}]]
     set Geometry "1024x800"
     set Blinking 1
     set FontFamily [font configure TkFixedFont -family]

@@ -1,10 +1,10 @@
-str
-
+str.tcl # VERSION
 cli-1.tm
 cli_actions-1.tm
 cli_misc-1.tm
 cli_globals-1.tm
 
+store.tk # VERSION
 gui-1.tm
 gui_app-1.tm
 gui_app_make-1.tm

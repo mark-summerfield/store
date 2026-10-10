@@ -1,0 +1,19 @@
+#!/usr/bin/env wish9
+# Copyright © 2025-26 Mark Summerfield. All rights reserved.
+
+if {![catch {file readlink [info script]} name]} {
+    const APPPATH [file dirname $name]
+} else {
+    const APPPATH [file normalize [file dirname [info script]]]
+}
+tcl::tm::path add $APPPATH
+
+const APPNAME Store
+const VERSION 1.8.1
+
+package require config
+Config new $::APPNAME ;# must call tk scaling early
+
+package require gui
+
+gui::main

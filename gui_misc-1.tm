@@ -15,7 +15,7 @@ proc gui_misc::make_text_frame {} {
     set tf [ttk::frame .textFrame]
     set name text
     set sa [scrollutil::scrollarea $tf.sa]
-    set txt [ctext $tf.sa.$name -wrap none -undo true -font Mono \
+    set txt [ctext $tf.sa.$name -wrap none -undo 1 -font Mono \
              -linemapbg gray90]
     $sa setwidget $txt
     pack $sa -fill both -expand 1

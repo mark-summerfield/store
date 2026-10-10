@@ -287,19 +287,17 @@ proc cli::unmark s {
 proc cli::say1 {txt {width 0} {indent "     "}} {
     set width [expr {$width ? $width : [cli_misc::width]}]
     puts [unmark [textutil::indent [textutil::adjust $txt \
-            -strictlength true -length $width] $indent 1]]
+            -strictlength 1 -length $width] $indent 1]]
 }
 
 proc cli::say2 {txt {width 0} {indent "  "}} {
     set width [expr {$width ? $width : [cli_misc::width] - 2}]
     puts [unmark [textutil::indent [textutil::adjust $txt \
-            -strictlength true -length $width] $indent]]
+            -strictlength 1 -length $width] $indent]]
 }
 
 proc filtered_reporter message {
-    if {[regexp {^(:?same as|skipped)} $message]} {
-        return
-    }
+    if {[regexp {^(:?same as|skipped)} $message]} return
     cli_misc::info $message
 }
 

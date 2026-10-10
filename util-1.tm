@@ -12,9 +12,7 @@ proc list_to_str lst {
 
 proc commas n {regsub -all {\d(?=(\d{3})+($|\.))} $n {\0,}}
 
-proc lrandom lst {
-    lindex $lst [expr {int(rand() * [llength $lst])}]
-}
+proc lrandom lst { lindex $lst [expr {int(rand() * [llength $lst])}] }
 
 namespace eval util {}
 
@@ -49,7 +47,7 @@ proc util::term_width {{defwidth 72}} {
     if {[dict exists [chan configure stdout] -mode]} { ;# tty
         return [lindex [chan configure stdout -winsize] 0]
     }
-    return $defwidth ;# redirected
+    set defwidth ;# redirected
 }
 
 proc util::islink filename {
@@ -75,9 +73,7 @@ proc util::get_ini_filename appname {
     lindex $names $index
 }
 
-proc util::uid {} {
-    return #[string range [clock clicks] end-8 end]
-}
+proc util::uid {} { return #[string range [clock clicks] end-8 end] }
 
 proc util::open_url url {
     if {[tk windowingsystem] eq "win32"} {

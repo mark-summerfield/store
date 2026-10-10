@@ -14,7 +14,7 @@ oo::singleton create Config {
 
 oo::define Config constructor {} {
     set Geometry "1024x800"
-    set Blinking true
+    set Blinking 1
     set FontFamily [font configure TkFixedFont -family]
     set FontSize [expr {2 + [font configure TkFixedFont -size]}]
     set Filename [util::get_ini_filename [tk appname]]
@@ -52,19 +52,19 @@ oo::define Config method save {} {
     }
 }
 
-oo::define Config method filename {} { return $Filename }
+oo::define Config method filename {} { set Filename }
 oo::define Config method set_filename filename { set Filename $filename }
 
-oo::define Config method blinking {} { return $Blinking }
+oo::define Config method blinking {} { set Blinking }
 oo::define Config method set_blinking blinking { set Blinking $blinking }
 
-oo::define Config method geometry {} { return $Geometry }
+oo::define Config method geometry {} { set Geometry }
 oo::define Config method set_geometry geometry { set Geometry $geometry }
 
-oo::define Config method fontsize {} { return $FontSize }
+oo::define Config method fontsize {} { set FontSize }
 oo::define Config method set_fontsize fontsize { set FontSize $fontsize }
 
-oo::define Config method fontfamily {} { return $FontFamily }
+oo::define Config method fontfamily {} { set FontFamily }
 oo::define Config method set_fontfamily fontfamily {
     set FontFamily $fontfamily
 }

@@ -46,12 +46,12 @@ oo::define IgnoresForm method make_widgets {} {
     set name ignoresList
     ttk::style configure List.Treeview.Item -indicatorsize 0
     set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
-    set IgnoresList [ttk::treeview $frm.sa.$name -striped true -show tree \
+    set IgnoresList [ttk::treeview $frm.sa.$name -striped 1 -show tree \
         -selectmode browse -style List.Treeview]
     ui::apply_treeview_bindings $IgnoresList
     $sa setwidget $IgnoresList
     pack $sa -fill both -expand 1
-    $IgnoresList column #0 -anchor w -stretch true
+    $IgnoresList column #0 -anchor w -stretch 1
     ttk::frame .ignoresForm.controlsFrame
     ttk::button .ignoresForm.controlsFrame.addButton -text Add: \
         -compound left -image [ui::icon list-add.svg $::ICON_SIZE] \

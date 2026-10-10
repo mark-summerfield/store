@@ -87,7 +87,7 @@ proc diff::diff_text {delta txt} {
     $txt delete 1.0 end
     $txt tag configure added -foreground blue
     $txt tag configure del -foreground brown
-    $txt tag configure deleted -foreground brown -overstrike true
+    $txt tag configure deleted -foreground brown -overstrike 1
     $txt tag configure unchanged -foreground gray67
     $txt tag configure ellipsis -foreground teal
     foreach line $delta {

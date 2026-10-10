@@ -34,8 +34,7 @@ proc cli_actions::update opts {
         set names [$str addable]
         if {$::VERBOSE && [llength $names]} {
             lassign [util::n_s [llength $names]] n s
-            cli_misc::info "$n unstored unignored nonempty file$s present" \
-                true
+            cli_misc::info "$n unstored unignored nonempty file$s present" 1
         }
     } finally {
         $str destroy
@@ -86,7 +85,7 @@ proc cli_actions::status opts {
             lappend no_messages "clean"
         }
         if {[llength $yes_messages]} {
-            cli_misc::info [join $yes_messages "\n"] true
+            cli_misc::info [join $yes_messages "\n"] 1
         }
         if {$::VERBOSE && [llength $no_messages]} {
             cli_misc::info [join $no_messages " • "]
@@ -219,7 +218,7 @@ proc cli_actions::generations opts {
         lassign [GetGidAndRest $str [dict get $opts %]] gid rest
         if {$rest eq "-f" || $rest eq "--full"} {
             set prev_gid 0
-            foreach {gid created message filename} [$str generations true] {
+            foreach {gid created message filename} [$str generations 1] {
                 if {$gid != $prev_gid} {
                     cli_misc::info "@$gid $created $message"
                     set prev_gid $gid
@@ -345,7 +344,7 @@ proc cli_actions::purge opts {
     try {
         set filename [dict get $opts %]
         if {[cli_misc::yes_no "permanently permanently purge \"$filename\"\
-                          from the store" true]} {
+                          from the store" 1]} {
             set n [$str purge $filename]
             lassign [util::n_s $n] n s
             cli_misc::info "purged $n version$s"

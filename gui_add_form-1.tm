@@ -33,13 +33,13 @@ oo::define AddForm method show {store_filename refresh names} {
 oo::define AddForm method make_widgets {} {
     set frm [ttk::frame .addForm.addListFrame]
     set sa [scrollutil::scrollarea $frm.sa -xscrollbarmode none]
-    set AddList [ttk::treeview $frm.sa.addList -striped true]
+    set AddList [ttk::treeview $frm.sa.addList -striped 1]
     ui::apply_treeview_bindings $AddList
     $sa setwidget $AddList
     pack $sa -fill both -expand 1
     ttk::style configure List.Treeview.Item -indicatorsize 0
     $AddList configure -show tree -style List.Treeview
-    $AddList column #0 -anchor w -stretch true
+    $AddList column #0 -anchor w -stretch 1
     ttk::frame .addForm.controlsFrame
     set width 9
     set wrap [expr {(3 + $width) * [font measure TkDefaultFont X]}]

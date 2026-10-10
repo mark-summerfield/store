@@ -2,10 +2,10 @@
 
 An easy-to-use and simple alternative to a version control system.
 
-There is a single application, `str` which can be used as a command line
-tool or as a GUI application.
+There is a GUI application, `store.tk`, often soft-linked simply as `store`,
+and a command line tool, `str.tcl`, often soft-linked as `str`.
 
-## GUI — store
+## GUI — store.tk
 
 ![Screenshot](images/screenshot.png)
 
@@ -14,19 +14,17 @@ convenient for viewing and diffing previous generations of files.
 
 Run the GUI using:
 
-    str G
-
-or
-
-    str gui
+    store.tk
 
 or
 
     store
 
-where `store` is a soft link to `str`.
+where `store` is a soft link to `store.tk`.
 
-## Command Line — str
+## Command Line — str.tcl
+
+Here it is assumed that `str` is a soft-link to `str.tcl`.
 
 Add files:
 
@@ -101,7 +99,7 @@ time.
 ## Installation
 
 Unpack anywhere convenient and either put the folder in your `PATH` or add
-soft links to `str` and `store`.
+soft links to `str.tcl` as `str` and to `store.tk` as `store`.
 
 Dependencies: Tcl/Tk >= 9.0.2; Tcllib >= 2.0; Tklib >= 0.9.
 

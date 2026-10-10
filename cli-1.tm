@@ -23,7 +23,6 @@ proc cli::main {} {
         extract { cli_actions::extract $opts }
         filenames { cli_actions::filenames $opts }
         generations { cli_actions::generations $opts }
-        gui { package require gui ; gui::main }
         history { cli_actions::history $opts}
         ignore { cli_actions::ignore $opts }
         ignores { cli_actions::ignores $opts }
@@ -60,7 +59,7 @@ proc cli::get_opts storefile {
     set parser [clop::Parser new str $::VERSION 255 \
         "Stores generational copies of specified files (excluding those
         explicitly ignored) in %y%I.dirname%!%y.str%!. (For a GUI run
-        %B%bstore%!.)" \
+        %B%bstore.tk%!.)" \
         "%I%b@GID%! — @-prefixed generation number or tag name, (e.g.,\
         %y@28%!, %y@alpha1%!); if unspecified, the current generation is\
         assumed. %I%bGLOB%! — when using globs for ignore or unignore\
@@ -175,10 +174,6 @@ proc cli::get_opts storefile {
     $generations_parser new_bool f full "Show filenames."
     $generations_parser new_help h help "Show generations help and quit."
     $parser new_subcommand g generations $generations_parser
-
-    set gui_parser [clop::subparser gui $parser 0 "Start the gui."]
-    $gui_parser new_help h help "Show gui help and quit."
-    $parser new_subcommand G gui $gui_parser
 
     set history_parser [clop::subparser history $parser 1-255 \
         "Print the given files’ list of generations." \

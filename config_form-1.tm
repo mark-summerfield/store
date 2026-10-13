@@ -52,7 +52,8 @@ oo::define ConfigForm method make_widgets {} {
     $tip .configForm.mf.fontButton "The font to use for displaying file\
         contents.\nBest to set the application’s scale (and restart) first."
     ttk::label .configForm.mf.fontLabel -relief sunken \
-        -text "[$config fontfamily] [$config fontsize]"
+            -text "$FontFamily $FontSize" \
+            -font [font create -family $FontFamily]
     ttk::label .configForm.mf.configFileLabel -foreground gray25 \
         -text "Config file"
     ttk::label .configForm.mf.configFilenameLabel -foreground gray25 \
@@ -99,8 +100,9 @@ oo::define ConfigForm method make_bindings {} {
 
 oo::define ConfigForm method on_font {} {
     tk fontchooser configure -parent .configForm \
-        -title "[tk appname] — Choose Font" -font Mono \
-        -command [callback on_font_chosen]
+            -title "[tk appname] — Choose Font" \
+            -font [font create -family $FontFamily] \
+            -command [callback on_font_chosen]
     tk fontchooser show
 }
 
@@ -111,7 +113,8 @@ oo::define ConfigForm method on_font_chosen args {
             set FontFamily [lindex $args 0]
             set FontSize [lindex $args 1]
             .configForm.mf.fontLabel configure \
-                -text "$FontFamily $FontSize"
+                -text "$FontFamily $FontSize" \
+                -font [font create -family $FontFamily]
         }
     }
 }

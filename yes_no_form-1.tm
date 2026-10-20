@@ -52,12 +52,10 @@ oo::define YesNoForm method make_widgets {title body_text} {
 
 oo::define YesNoForm method make_layout {} {
     set opts "-padx 3 -pady 3"
-    grid .yesno_form.frame.label -row 0 -column 0 \
-        -columnspan 2 -sticky news {*}$opts
-    grid .yesno_form.frame.yes_button -row 1 -column 0 \
-        -sticky e {*}$opts
-    grid .yesno_form.frame.no_button -row 1 -column 1 \
-        -sticky w {*}$opts
+    grid .yesno_form.frame.label -row 0 -column 0 -columnspan 2 \
+            -sticky news {*}$opts
+    grid .yesno_form.frame.yes_button -row 1 -column 0 -sticky e {*}$opts
+    grid .yesno_form.frame.no_button -row 1 -column 1 -sticky w {*}$opts
     grid rowconfigure .yesno_form 0 -weight 1
     grid columnconfigure .yesno_form 0 -weight 1
     grid columnconfigure .yesno_form 1 -weight 1

@@ -57,8 +57,7 @@ oo::define AboutForm method make_bindings {} {
 
 oo::define AboutForm method on_click_url index {
     set indexes [.aboutForm.frame.text tag prevrange url $index]
-    set url [string trim [.aboutForm.frame.text \
-            get {*}$indexes]]
+    set url [string trim [.aboutForm.frame.text get {*}$indexes]]
     if {$url ne ""} {
         if {![string match -nocase http*://* $url]} {
             set url [string cat http:// $url]

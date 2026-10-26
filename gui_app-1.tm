@@ -73,9 +73,9 @@ oo::define App method display {} {
     wm deiconify .
     focus $widget
     raise .
-    update
-    after idle {.panes sashpos 0 [winfo width .controlsFrame]}
-    after idle [callback jump_to_first]
+    update idletasks
+    .panes sashpos 0 [winfo width .controlsFrame]
+    my jump_to_first
 }
 
 oo::define App method update_ui {} {

@@ -24,7 +24,7 @@ oo::define Store constructor {filename {reporter ""}} {
                                         : $reporter}]
     set Db [self]#DB
     set exists [file isfile $Filename]
-    sqlite3 $Db $Filename
+    sqlite3 $Db $Filename -nomutex 1
     $Db eval [readFile $::APPPATH/sql/prepare.sql] 
     $Db transaction {
         if {$exists} {
